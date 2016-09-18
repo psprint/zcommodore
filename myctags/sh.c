@@ -26,11 +26,11 @@
 *   DATA DEFINITIONS
 */
 typedef enum {
-	K_FUNCTION
+    K_FUNCTION
 } shKind;
 
 static kindOption ShKinds [] = {
-	{ TRUE, 'f', "function", "functions"}
+    { TRUE, 'f', "function", "functions"}
 };
 
 /*
@@ -43,92 +43,92 @@ static kindOption ShKinds [] = {
  */
 static boolean hackReject (const vString* const tagName)
 {
-	const char *const scriptName = baseFilename (vStringValue (File.name));
-	boolean result = (boolean) (
-			strcmp (scriptName, "configure") == 0  &&
-			strcmp (vStringValue (tagName), "main") == 0);
-	return result;
+    const char *const scriptName = baseFilename (vStringValue (File.name));
+    boolean result = (boolean) (
+            strcmp (scriptName, "configure") == 0  &&
+            strcmp (vStringValue (tagName), "main") == 0);
+    return result;
 }
 
 static void findShTags (void)
 {
-	vString *name = vStringNew ();
-	const unsigned char *line;
+    vString *name = vStringNew ();
+    const unsigned char *line;
 
-	while ((line = fileReadLine ()) != NULL)
-	{
-		const unsigned char* cp = line;
-		boolean functionFound = FALSE;
+    while ((line = fileReadLine ()) != NULL)
+    {
+        const unsigned char* cp = line;
+        boolean functionFound = FALSE;
 
-		if (line [0] == '#')
-			continue;
+        if (line [0] == '#')
+            continue;
 
         // Skip white space
-		while (isspace (*cp))
-			cp++;
+        while (isspace (*cp))
+            cp++;
 
         // String 'function ' in text?
-		if (strncmp ((const char*) cp, "function", (size_t) 8) == 0  &&
-			isspace ((int) cp [8]))
-		{
-			functionFound = TRUE;
-			cp += 8;
+        if (strncmp ((const char*) cp, "function", (size_t) 8) == 0  &&
+            isspace ((int) cp [8]))
+        {
+            functionFound = TRUE;
+            cp += 8;
 
             // Why the additional check?
-			if (! isspace ((int) *cp))
-				continue;
+            if (! isspace ((int) *cp))
+                continue;
 
             // Skip any whitespaces after 'function '
-			while (isspace ((int) *cp))
-				++cp;
-		}
+            while (isspace ((int) *cp))
+                ++cp;
+        }
 
         // After 'function +' if there's no [[:alnum:]_-] then restart
-		if (! (isalnum ((int) *cp) || *cp == '_' || *cp == '-' ))
-			continue;
+        if (! (isalnum ((int) *cp) || *cp == '_' || *cp == '-' ))
+            continue;
 
         // LOAD [[:alnum:]_-]
-		while (isalnum ((int) *cp)  ||  *cp == '_' || *cp == '-' ) {
-			vStringPut (name, (int) *cp);
-			++cp;
-		}
-		vStringTerminate (name);
+        while (isalnum ((int) *cp)  ||  *cp == '_' || *cp == '-' ) {
+            vStringPut (name, (int) *cp);
+            ++cp;
+        }
+        vStringTerminate (name);
 
         // Skip spaces after [[:alnum:]_-]
-		while (isspace ((int) *cp))
-			++cp;
+        while (isspace ((int) *cp))
+            ++cp;
 
         // Detection of function not necessarily beginning with "function"
-		if (*cp++ == '(')
-		{
-			while (isspace ((int) *cp))
-				++cp;
-			if (*cp == ')'  && ! hackReject (name))
-				functionFound = TRUE;
-		}
+        if (*cp++ == '(')
+        {
+            while (isspace ((int) *cp))
+                ++cp;
+            if (*cp == ')'  && ! hackReject (name))
+                functionFound = TRUE;
+        }
 
         // Function found?
-		if (functionFound)
-			makeSimpleTag (name, ShKinds, K_FUNCTION);
+        if (functionFound)
+            makeSimpleTag (name, ShKinds, K_FUNCTION);
 
         // Forget the function
-		vStringClear (name);
+        vStringClear (name);
 
-	}
-	vStringDelete (name);
+    }
+    vStringDelete (name);
 }
 
 extern parserDefinition* ShParser (void)
 {
-	static const char *const extensions [] = {
-		"sh", "SH", "bsh", "bash", "BASH", "ksh", "KSH", "zsh", "Zsh", "ZSH", NULL
-	};
-	parserDefinition* def = parserNew ("Sh");
-	def->kinds      = ShKinds;
-	def->kindCount  = KIND_COUNT (ShKinds);
-	def->extensions = extensions;
-	def->parser     = findShTags;
-	return def;
+    static const char *const extensions [] = {
+        "sh", "SH", "bsh", "bash", "BASH", "ksh", "KSH", "zsh", "Zsh", "ZSH", NULL
+    };
+    parserDefinition* def = parserNew ("Sh");
+    def->kinds      = ShKinds;
+    def->kindCount  = KIND_COUNT (ShKinds);
+    def->extensions = extensions;
+    def->parser     = findShTags;
+    return def;
 }
 
 /* vi:set tabstop=4 shiftwidth=4: */
