@@ -115,7 +115,24 @@ static void findShTags (void) {
         } else if ( strncmp( (const char*) cp, "local", (size_t) 5 ) == 0  && isspace( (int) cp [5] ) ) {
             localVariableFound = TRUE;
             cp += 5;
+        } else if ( strncmp( (const char*) cp, "float", (size_t) 5 ) == 0  && isspace( (int) cp [5] ) ) {
+            localVariableFound = TRUE;
+            cp += 5;
+        } else if ( strncmp( (const char*) cp, "integer", (size_t) 7 ) == 0  && isspace( (int) cp [7] ) ) {
+            localVariableFound = TRUE;
+            cp += 7;
+        } else if ( strncmp( (const char*) cp, "typeset", (size_t) 7 ) == 0  && isspace( (int) cp [7] ) ) {
+            localVariableFound = TRUE;
+            cp += 7;
+        } else if ( strncmp( (const char*) cp, "declare", (size_t) 7 ) == 0  && isspace( (int) cp [7] ) ) {
+            localVariableFound = TRUE;
+            cp += 7;
+        } else if ( strncmp( (const char*) cp, "readonly", (size_t) 8 ) == 0  && isspace( (int) cp [8] ) ) {
+            localVariableFound = TRUE;
+            cp += 8;
+        }
 
+        if ( localVariableFound ) {
             // Skip any whitespaces after 'local '
             while ( isspace( (int) *cp ) )
                 ++ cp;
