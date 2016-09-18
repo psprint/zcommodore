@@ -74,10 +74,6 @@ static void findShTags (void)
             functionFound = TRUE;
             cp += 8;
 
-            // Why the additional check?
-            if ( ! isspace( (int) *cp ) )
-                continue;
-
             // Skip any whitespaces after 'function '
             while ( isspace( (int) *cp ) )
                 ++ cp;
