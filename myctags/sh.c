@@ -63,28 +63,42 @@ static void findShTags (void)
 		if (line [0] == '#')
 			continue;
 
+        // Skip white space
 		while (isspace (*cp))
 			cp++;
+
+        // String 'function ' in text?
 		if (strncmp ((const char*) cp, "function", (size_t) 8) == 0  &&
 			isspace ((int) cp [8]))
 		{
 			functionFound = TRUE;
 			cp += 8;
+
+            // Why the additional check?
 			if (! isspace ((int) *cp))
 				continue;
+
+            // Skip any whitespaces after 'function '
 			while (isspace ((int) *cp))
 				++cp;
 		}
+
+        // After 'function +' if there's no [[:alnum:]_-] then restart
 		if (! (isalnum ((int) *cp) || *cp == '_' || *cp == '-' ))
 			continue;
-		while (isalnum ((int) *cp)  ||  *cp == '_' || *cp == '-' )
-		{
+
+        // LOAD [[:alnum:]_-]
+		while (isalnum ((int) *cp)  ||  *cp == '_' || *cp == '-' ) {
 			vStringPut (name, (int) *cp);
 			++cp;
 		}
 		vStringTerminate (name);
+
+        // Skip spaces after [[:alnum:]_-]
 		while (isspace ((int) *cp))
 			++cp;
+
+        // Detection of function not necessarily beginning with "function"
 		if (*cp++ == '(')
 		{
 			while (isspace ((int) *cp))
@@ -92,9 +106,14 @@ static void findShTags (void)
 			if (*cp == ')'  && ! hackReject (name))
 				functionFound = TRUE;
 		}
+
+        // Function found?
 		if (functionFound)
 			makeSimpleTag (name, ShKinds, K_FUNCTION);
+
+        // Forget the function
 		vStringClear (name);
+
 	}
 	vStringDelete (name);
 }
