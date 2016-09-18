@@ -68,9 +68,7 @@ static void findShTags (void)
             cp++;
 
         // String 'function ' in text?
-        if (strncmp ((const char*) cp, "function", (size_t) 8) == 0  &&
-            isspace ((int) cp [8]))
-        {
+        if ( strncmp ((const char*) cp, "function", (size_t) 8) == 0  && isspace ((int) cp [8]) ) {
             functionFound = TRUE;
             cp += 8;
 
@@ -112,10 +110,10 @@ static void findShTags (void)
             makeSimpleTag (name, ShKinds, K_FUNCTION);
 
         // Forget the function
-        vStringClear (name);
+        vStringClear( name );
 
     }
-    vStringDelete (name);
+    vStringDelete( name );
 }
 
 extern parserDefinition* ShParser (void)
