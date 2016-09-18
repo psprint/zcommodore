@@ -52,15 +52,48 @@ static boolean hackReject (const vString* const tagName)
     return result;
 }
 
-static void findShTags (void)
-{
-    vString *name = vStringNew ();
+#define MAX_NAMES 20
+
+static void clearNames ( vString *names[] ) {
+    int idx = 0;
+    while( names[ idx ] ) {
+        vStringClear( names[ idx ] );
+        ++ idx;
+    }
+}
+
+static void deleteNames ( vString *names[] ) {
+    int idx = 0;
+    while( names[ idx ] ) {
+        vStringDelete( names[ idx ] );
+        names[ idx ] = NULL;
+        ++ idx;
+    }
+}
+
+static int appendNewName( vString *names[], int current_size ) {
+    ++ current_size;
+    if ( current_size > MAX_NAMES ) {
+        return 0;
+    }
+
+    // Don't overwrite existing vString
+    if( NULL == names[ current_size - 1 ] ) {
+        names[ current_size - 1 ] = vStringNew ();
+    }
+    return 1;
+}
+
+static void findShTags (void) {
+    vString * names[ MAX_NAMES + 1 ] = { 0 };
+    int nidx = 0;
     const unsigned char *line;
 
     while ((line = fileReadLine ()) != NULL)
     {
         const unsigned char* cp = line;
         boolean functionFound = FALSE, localVariableFound = FALSE;
+        nidx = 0;
 
         if (line [0] == '#')
             continue;
@@ -116,13 +149,16 @@ static void findShTags (void)
                 }
             }
 
-            // LOAD [[:alnum:]_-]
-            // No '-' at the beginning - above skip-options code handled that
-            while ( isalnum ((int) *cp)  ||  *cp == '_' || *cp == '-' ) {
-                vStringPut( name, (int) *cp );
-                ++ cp;
+            // Append new name if it's not already there
+            if ( appendNewName( names, nidx ) ) {
+                // LOAD [[:alnum:]_-]
+                // No actual '-' at the beginning - above skip-options code handled that
+                while ( isalnum ((int) *cp)  ||  *cp == '_' || *cp == '-' ) {
+                    vStringPut( names[ nidx ], (int) *cp );
+                    ++ cp;
+                }
+                vStringTerminate( names[ nidx ] );
             }
-            vStringTerminate( name );
         }
 
         //
@@ -134,12 +170,15 @@ static void findShTags (void)
             if ( ! ( isalnum ( (int) *cp ) || *cp == '_' || *cp == '-' ) )
                 continue;
 
-            // LOAD [[:alnum:]_-]
-            while ( isalnum ((int) *cp)  ||  *cp == '_' || *cp == '-' ) {
-                vStringPut( name, (int) *cp );
-                ++ cp;
+            // Append new name if it's not already there
+            if ( appendNewName( names, nidx ) ) {
+                // LOAD [[:alnum:]_-]
+                while ( isalnum ((int) *cp)  ||  *cp == '_' || *cp == '-' ) {
+                    vStringPut( names[ nidx ], (int) *cp );
+                    ++ cp;
+                }
+                vStringTerminate( names[ nidx ] );
             }
-            vStringTerminate( name );
 
             // Skip spaces after [[:alnum:]_-]
             while ( isspace( (int) *cp ) )
@@ -150,24 +189,24 @@ static void findShTags (void)
             {
                 while ( isspace( (int) *cp ) )
                     ++ cp;
-                if ( *cp == ')'  && ! hackReject (name) )
+                if ( *cp == ')'  && ! hackReject ( names[ nidx ] ) )
                     functionFound = TRUE;
             }
         }
 
         // Function found?
         if ( functionFound ) {
-            makeSimpleTag( name, ShKinds, K_FUNCTION );
+            makeSimpleTag( names[ nidx ], ShKinds, K_FUNCTION );
         }
         if ( localVariableFound ) {
-            makeSimpleTag( name, ShKinds, K_VARIABLE );
+            makeSimpleTag( names[ nidx ], ShKinds, K_VARIABLE );
         }
 
         // Forget the function
-        vStringClear( name );
+        clearNames( names );
 
     }
-    vStringDelete( name );
+    deleteNames( names );
 }
 
 extern parserDefinition* ShParser (void)
