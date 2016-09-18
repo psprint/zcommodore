@@ -26,11 +26,13 @@
 *   DATA DEFINITIONS
 */
 typedef enum {
-    K_FUNCTION
+    K_FUNCTION,
+    K_VARIABLE
 } shKind;
 
 static kindOption ShKinds [] = {
-    { TRUE, 'f', "function", "functions"}
+    { TRUE, 'f', "function", "functions"},
+    { TRUE, 'v', "variable", "variables"}
 };
 
 /*
@@ -58,56 +60,112 @@ static void findShTags (void)
     while ((line = fileReadLine ()) != NULL)
     {
         const unsigned char* cp = line;
-        boolean functionFound = FALSE;
+        boolean functionFound = FALSE, localVariableFound = FALSE;
 
         if (line [0] == '#')
             continue;
 
         // Skip white space
-        while (isspace (*cp))
+        while ( isspace( *cp ) )
             cp++;
 
         // String 'function ' in text?
-        if ( strncmp ((const char*) cp, "function", (size_t) 8) == 0  && isspace ((int) cp [8]) ) {
+        if ( strncmp( (const char*) cp, "function", (size_t) 8 ) == 0  && isspace( (int) cp [8]) ) {
             functionFound = TRUE;
             cp += 8;
 
             // Why the additional check?
-            if (! isspace ((int) *cp))
+            if ( ! isspace( (int) *cp ) )
                 continue;
 
             // Skip any whitespaces after 'function '
-            while (isspace ((int) *cp))
-                ++cp;
+            while ( isspace( (int) *cp ) )
+                ++ cp;
+
+        // String 'local ' in text?
+        } else if ( strncmp( (const char*) cp, "local", (size_t) 5 ) == 0  && isspace( (int) cp [5] ) ) {
+            localVariableFound = TRUE;
+            cp += 5;
+
+            // Skip any whitespaces after 'local '
+            while ( isspace( (int) *cp ) )
+                ++ cp;
         }
 
-        // After 'function +' if there's no [[:alnum:]_-] then restart
-        if (! (isalnum ((int) *cp) || *cp == '_' || *cp == '-' ))
-            continue;
+        //
+        // LOCAL
+        //
 
-        // LOAD [[:alnum:]_-]
-        while (isalnum ((int) *cp)  ||  *cp == '_' || *cp == '-' ) {
-            vStringPut (name, (int) *cp);
-            ++cp;
+        if ( localVariableFound ) {
+            // After 'local +' if there's no [[:alnum:]_-] then restart
+            if ( ! ( isalnum ( (int) *cp ) || *cp == '_' || *cp == '-' ) )
+                continue;
+
+            // Skip any options
+            while ( *cp == '-' ) {
+                ++ cp;
+
+                // Skip letters of options
+                if ( !isalnum( (int) *cp ) )
+                    continue;
+                while ( isalnum ( (int) *cp ) ) {
+                    ++ cp;
+                    continue;
+                }
+
+                // Skip any whitespace
+                while ( isspace ( (int) *cp ) ) {
+                    ++ cp;
+                    continue;
+                }
+            }
+
+            // LOAD [[:alnum:]_-]
+            // No '-' at the beginning - above skip-options code handled that
+            while ( isalnum ((int) *cp)  ||  *cp == '_' || *cp == '-' ) {
+                vStringPut( name, (int) *cp );
+                ++ cp;
+            }
+            vStringTerminate( name );
         }
-        vStringTerminate (name);
 
-        // Skip spaces after [[:alnum:]_-]
-        while (isspace ((int) *cp))
-            ++cp;
+        //
+        // FUNCTIONS
+        //
 
-        // Detection of function not necessarily beginning with "function"
-        if (*cp++ == '(')
-        {
-            while (isspace ((int) *cp))
-                ++cp;
-            if (*cp == ')'  && ! hackReject (name))
-                functionFound = TRUE;
+        else if ( functionFound || ( !localVariableFound ) ) {
+            // After 'function +' if there's no [[:alnum:]_-] then restart
+            if ( ! ( isalnum ( (int) *cp ) || *cp == '_' || *cp == '-' ) )
+                continue;
+
+            // LOAD [[:alnum:]_-]
+            while ( isalnum ((int) *cp)  ||  *cp == '_' || *cp == '-' ) {
+                vStringPut( name, (int) *cp );
+                ++ cp;
+            }
+            vStringTerminate( name );
+
+            // Skip spaces after [[:alnum:]_-]
+            while ( isspace( (int) *cp ) )
+                ++ cp;
+
+            // Detection of function not necessarily beginning with "function"
+            if (*cp++ == '(')
+            {
+                while ( isspace( (int) *cp ) )
+                    ++ cp;
+                if ( *cp == ')'  && ! hackReject (name) )
+                    functionFound = TRUE;
+            }
         }
 
         // Function found?
-        if (functionFound)
-            makeSimpleTag (name, ShKinds, K_FUNCTION);
+        if ( functionFound ) {
+            makeSimpleTag( name, ShKinds, K_FUNCTION );
+        }
+        if ( localVariableFound ) {
+            makeSimpleTag( name, ShKinds, K_VARIABLE );
+        }
 
         // Forget the function
         vStringClear( name );
