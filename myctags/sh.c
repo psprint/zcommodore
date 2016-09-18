@@ -126,20 +126,42 @@ static void findShTags (void) {
         //
 
         if ( localVariableFound ) {
-            // After 'local +' if there's no [[:alnum:]_-] then restart
+            // After 'local +' if there's no [[:alnum:]_-] then next line
             if ( ! ( isalnum ( (int) *cp ) || *cp == '_' || *cp == '-' ) )
                 continue;
 
-            // Skip any options
-            while ( *cp == '-' ) {
-                ++ cp;
-
-                // Skip letters of options
-                if ( !isalnum( (int) *cp ) )
-                    continue;
-                while ( isalnum ( (int) *cp ) ) {
+            // This is in fact to detect ; or end of line
+            while ( isalnum( (int) *cp ) || *cp == '_' || *cp == '-' ) {
+                // Skip any options
+                while ( *cp == '-' ) {
                     ++ cp;
-                    continue;
+
+                    // Skip letters of options
+                    if ( !isalnum( (int) *cp ) )
+                        continue;
+                    while ( isalnum ( (int) *cp ) ) {
+                        ++ cp;
+                        continue;
+                    }
+
+                    // Skip any whitespace
+                    while ( isspace ( (int) *cp ) ) {
+                        ++ cp;
+                        continue;
+                    }
+                }
+
+                // Append new name if it's not already there
+                if ( appendNewName( names, nidx ) ) {
+                    // LOAD [[:alnum:]_-]
+                    // No actual '-' at the beginning - above skip-options code handled that
+                    while ( isalnum ((int) *cp)  ||  *cp == '_' || *cp == '-' ) {
+                        vStringPut( names[ nidx ], (int) *cp );
+                        ++ cp;
+                    }
+                    vStringTerminate( names[ nidx ] );
+
+                    ++ nidx;
                 }
 
                 // Skip any whitespace
@@ -147,17 +169,6 @@ static void findShTags (void) {
                     ++ cp;
                     continue;
                 }
-            }
-
-            // Append new name if it's not already there
-            if ( appendNewName( names, nidx ) ) {
-                // LOAD [[:alnum:]_-]
-                // No actual '-' at the beginning - above skip-options code handled that
-                while ( isalnum ((int) *cp)  ||  *cp == '_' || *cp == '-' ) {
-                    vStringPut( names[ nidx ], (int) *cp );
-                    ++ cp;
-                }
-                vStringTerminate( names[ nidx ] );
             }
         }
 
@@ -178,6 +189,8 @@ static void findShTags (void) {
                     ++ cp;
                 }
                 vStringTerminate( names[ nidx ] );
+
+                ++ nidx;
             }
 
             // Skip spaces after [[:alnum:]_-]
@@ -196,16 +209,18 @@ static void findShTags (void) {
 
         // Function found?
         if ( functionFound ) {
-            makeSimpleTag( names[ nidx ], ShKinds, K_FUNCTION );
+            for ( int i = 0; i < nidx; ++ i )
+                makeSimpleTag( names[ i ], ShKinds, K_FUNCTION );
         }
         if ( localVariableFound ) {
-            makeSimpleTag( names[ nidx ], ShKinds, K_VARIABLE );
+            for ( int i = 0; i < nidx; ++ i )
+                makeSimpleTag( names[ i ], ShKinds, K_VARIABLE );
         }
 
-        // Forget the function
+        // Forget the gathered data
         clearNames( names );
-
     }
+
     deleteNames( names );
 }
 
