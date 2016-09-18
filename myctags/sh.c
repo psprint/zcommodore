@@ -127,7 +127,7 @@ static void findShTags (void) {
 
         if ( localVariableFound ) {
             // After 'local +' if there's no [[:alnum:]_-] then next line
-            if ( ! ( isalnum ( (int) *cp ) || *cp == '_' || *cp == '-' ) )
+            if ( ! ( isalnum( (int) *cp ) || *cp == '_' || *cp == '-' ) )
                 continue;
 
             // This is in fact to detect ; or end of line
@@ -139,23 +139,19 @@ static void findShTags (void) {
                     // Skip letters of options
                     if ( !isalnum( (int) *cp ) )
                         continue;
-                    while ( isalnum ( (int) *cp ) ) {
+                    while ( isalnum( (int) *cp ) )
                         ++ cp;
-                        continue;
-                    }
 
                     // Skip any whitespace
-                    while ( isspace ( (int) *cp ) ) {
+                    while ( isspace ( (int) *cp ) )
                         ++ cp;
-                        continue;
-                    }
                 }
 
                 // Append new name if it's not already there
                 if ( appendNewName( names, nidx ) ) {
                     // LOAD [[:alnum:]_-]
                     // No actual '-' at the beginning - above skip-options code handled that
-                    while ( isalnum ((int) *cp)  ||  *cp == '_' || *cp == '-' ) {
+                    while ( isalnum( (int) *cp )  ||  *cp == '_' || *cp == '-' ) {
                         vStringPut( names[ nidx ], (int) *cp );
                         ++ cp;
                     }
@@ -164,10 +160,66 @@ static void findShTags (void) {
                     ++ nidx;
                 }
 
-                // Skip any whitespace
-                while ( isspace ( (int) *cp ) ) {
+                if ( *cp != '=' ) {
+                    while ( isspace( (int) *cp ) )
+                        ++ cp;
+                } else {
                     ++ cp;
-                    continue;
+
+                    // Skip whitespace:
+                    // - when " open
+                    // - when ' open
+                    // - when \ preceedes
+                    //
+                    // Don't open/close " and ' when \ preceedes
+                    // or when opposite " or ' already open
+                    //
+                    boolean qm_open = FALSE;
+                    boolean ap_open = FALSE;
+                    boolean bs_precedes = FALSE;
+                    while ( *cp != '\0' ) {
+                        if ( *cp == '"' ) {
+                            if ( !bs_precedes && !ap_open ) {
+                                if ( qm_open )
+                                    qm_open = FALSE;
+                                else
+                                    qm_open = TRUE;
+                            }
+                        }
+
+                        if ( *cp == '\'' ) {
+                            if ( !bs_precedes && !qm_open ) {
+                                if ( ap_open ) {
+                                    ap_open = FALSE;
+                                } else {
+                                    ap_open = TRUE;
+                                }
+                            }
+                        }
+
+                        if ( *cp == '\\' ) {
+                            if ( bs_precedes )
+                                bs_precedes = FALSE;
+                            else
+                                bs_precedes = TRUE;
+                        }
+
+                        if ( isspace( (int) *cp ) ) {
+                            if ( qm_open || ap_open || bs_precedes ) {
+                                bs_precedes = FALSE;
+                                ++ cp;
+                            } else {
+                                // Skip all white spaces and break
+                                while ( isspace( (int) *cp ) )
+                                    ++ cp;
+                                break;
+                            }
+                        } else {
+                            if ( *cp != '\\' )
+                                bs_precedes = FALSE;
+                            ++ cp;
+                        }
+                    }
                 }
             }
         }
@@ -178,13 +230,13 @@ static void findShTags (void) {
 
         else if ( functionFound || ( !localVariableFound ) ) {
             // After 'function +' if there's no [[:alnum:]_-] then restart
-            if ( ! ( isalnum ( (int) *cp ) || *cp == '_' || *cp == '-' ) )
+            if ( ! ( isalnum( (int) *cp ) || *cp == '_' || *cp == '-' ) )
                 continue;
 
             // Append new name if it's not already there
             if ( appendNewName( names, nidx ) ) {
                 // LOAD [[:alnum:]_-]
-                while ( isalnum ((int) *cp)  ||  *cp == '_' || *cp == '-' ) {
+                while ( isalnum( (int) *cp )  ||  *cp == '_' || *cp == '-' ) {
                     vStringPut( names[ nidx ], (int) *cp );
                     ++ cp;
                 }
