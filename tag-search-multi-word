@@ -36,6 +36,7 @@ _tsmw_main() {
             # Read tags file
             if [[ -n "${ZCMDR[current_tag_file]}" ]]; then
                 __tsmw_tag_data=( "${(@f)"$(<${ZCMDR[current_tag_file]})"}" ) 
+                __tsmw_tag_data=( "${__tsmw_tag_data[@]:#(#s)!*}" )
             fi
         fi
 
