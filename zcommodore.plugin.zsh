@@ -18,3 +18,13 @@ ZCMDR_CONFIG_DIR="$HOME/.config/zcommodore"
 if [[ -z "$ZPLG_CUR_PLUGIN" && "${fpath[(r)$ZCMDR_REPO_DIR]}" != $ZCMDR_REPO_DIR ]]; then
     fpath+=( "$ZCMDR_REPO_DIR" )
 fi
+
+#
+# Compile myctags
+#
+
+if [ ! -e "${ZCMDR_REPO_DIR}/myctags/ctags" ]; then
+    echo "\033[1;35m""psprint\033[0m/\033[1;33m""Zcommodore\033[0m is building custom ctags for you..."
+    ( cd "${ZCMDR_REPO_DIR}/myctags"; [ ! -e Makefile ] &&  ./configure )
+    make -C "${ZCMDR_REPO_DIR}/myctags"
+fi
