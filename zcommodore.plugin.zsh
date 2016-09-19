@@ -24,8 +24,8 @@ fi
 #
 
 if [ ! -e "${ZCMDR_REPO_DIR}/myctags/ctags" ]; then
-    echo "\033[1;35m""psprint\033[0m/\033[1;33m""Zcommodore\033[0m is building custom ctags for you..."
-    ( cd "${ZCMDR_REPO_DIR}/myctags"; [ ! -e Makefile ] &&  ./configure )
+    print "${fg_bold[magenta]}psprint${reset_color}/${fg_bold[yellow]}Zcommodore${reset_color} is building custom exuberant ctags for you..."
+    ( cd "${ZCMDR_REPO_DIR}/myctags"; [[ ! -e Makefile ]] &&  ./configure )
     make -C "${ZCMDR_REPO_DIR}/myctags"
 fi
 
