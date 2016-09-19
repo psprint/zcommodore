@@ -99,7 +99,7 @@ static void findShTags (void) {
             continue;
 
         // Skip white space
-        while ( isspace( *cp ) )
+        while ( isspace( (int) *cp ) )
             cp++;
 
         // String 'function ' in text?
