@@ -87,7 +87,7 @@ function zcmdr() {
             print "There are no tags generated (no .zcmdr_tags file and no standard TAGS file)"
             print "Do you want to generate .zcmdr_tags file now? [y/n]"
             local answer
-            read -ys answer
+            read -qs answer
             if [[ "$answer" = "y" ]]; then
                 (
                     "${ZCMDR[ctags_bin]}" -R --langmap=sh:.,sh:+.sh:+.zsh -f ".zcmdr_tags" .
