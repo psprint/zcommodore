@@ -23,6 +23,7 @@ typeset -g __tsmw_hcw_index
 typeset -g __tsmw_hcw_widget_name __tsmw_hcw_restart __tsmw_hcw_call_count
 typeset -g __tsmw_page_size __tsmw_hl_color
 typeset -gaU __tsmw_hcw_found
+typeset -ga __tsmw_tag_data
 
 _tsmw_main() {
     # First call or restart?
@@ -31,6 +32,11 @@ _tsmw_main() {
             # Read configuration data
             zstyle -s ':plugin:zcommodore:tag-search-multi-word' page-size __tsmw_page_size || __tsmw_page_size=$(( LINES / 2 ))
             zstyle -s ':plugin:zcommodore:tag-search-multi-word' highlight-color __tsmw_hl_color || __tsmw_hl_color="fg=magenta,bold"
+
+            # Read tags file
+            if [[ -n "${ZCMDR[current_tag_file]}" ]]; then
+                __tsmw_tag_data=( "${(@f)"$(<${ZCMDR[current_tag_file]})"}" ) 
+            fi
         fi
 
         # '0' will get changed into $to_display limit
@@ -54,7 +60,7 @@ _tsmw_main() {
     if [ "$#__tsmw_hcw_found" -eq "0" ]; then
         # The repeat will make the matching work on a fresh heap arena
         repeat 1; do
-            __tsmw_hcw_found=( "${(@M)history:#(#i)*$~search_pattern*}" )
+            __tsmw_hcw_found=( "${(@M)__tsmw_tag_data:#(#i)*$~search_pattern*}" )
         done
     fi
 
