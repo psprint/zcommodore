@@ -28,3 +28,14 @@ if [ ! -e "${ZCMDR_REPO_DIR}/myctags/ctags" ]; then
     ( cd "${ZCMDR_REPO_DIR}/myctags"; [ ! -e Makefile ] &&  ./configure )
     make -C "${ZCMDR_REPO_DIR}/myctags"
 fi
+
+#
+# Setup
+#
+
+autoload tag-search-multi-word
+zle -N tag-search-multi-word
+zle -N tag-search-multi-word-backwards tag-search-multi-word
+bindkey "^O^K" tag-search-multi-word
+
+[[ -z "${fg_bold[green]}" ]] && builtin autoload -Uz colors && colors

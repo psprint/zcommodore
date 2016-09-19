@@ -1,0 +1,225 @@
+# This is a Zle widget file. In general, it is s used as (without setup
+# provided by the plugin):
+#
+# autoload tag-search-multi-word
+# zle -N tag-search-multi-word
+# zle -N tag-search-multi-word-backwards tag-search-multi-word
+# bindkey "^T" tag-search-multi-word
+#
+# This will bind to Ctrl-T. The plugin binds to Ctrl-O Ctrl-K.
+#
+# Example zstyles:
+# zstyle ":plugin:zcommodore:tag-search-multi-word" page-size "5"
+# zstyle ":plugin:zcommodore:tag-search-multi-word" highlight-color "fg=magenta,bold"
+
+emulate -LR zsh
+setopt typesetsilent extendedglob noshortloops
+
+# When an error, then no cursor keys bindings
+zmodload zsh/terminfo 2>/dev/null
+zmodload zsh/termcap 2>/dev/null
+
+typeset -g __tsmw_hcw_index
+typeset -g __tsmw_hcw_widget_name __tsmw_hcw_restart __tsmw_hcw_call_count
+typeset -g __tsmw_page_size __tsmw_hl_color
+typeset -gaU __tsmw_hcw_found
+
+_tsmw_main() {
+    # First call or restart?
+    if [[ "$__tsmw_hcw_call_count" -le 1 || "$__tsmw_hcw_restart" = "1" ]]; then
+        if [[ "$__tsmw_hcw_call_count" -le 1 ]]; then
+            # Read configuration data
+            zstyle -s ':plugin:zcommodore:tag-search-multi-word' page-size __tsmw_page_size || __tsmw_page_size=$(( LINES / 2 ))
+            zstyle -s ':plugin:zcommodore:tag-search-multi-word' highlight-color __tsmw_hl_color || __tsmw_hl_color="fg=magenta,bold"
+        fi
+
+        # '0' will get changed into $to_display limit
+        [[ "$WIDGET" != *-backwards ]] && __tsmw_hcw_index="1" || __tsmw_hcw_index="0"
+        __tsmw_hcw_widget_name="${WIDGET%-backwards}"
+        __tsmw_hcw_found=( )
+        __tsmw_hcw_finished="0"
+        __tsmw_hcw_restart="0"
+    else
+        # Consecutive call
+        [[ "$WIDGET" != *-backwards ]] && (( __tsmw_hcw_index ++ )) || (( __tsmw_hcw_index -- ))
+    fi
+
+    # Find history entries matching pattern *word1*~^*word2*~^*word3* etc.
+    local search_buffer="${BUFFER%% ##}" search_pattern="" colsearch_pattern=""
+    search_buffer="${search_buffer## ##}"
+    search_buffer="${search_buffer//(#m)[][*?|#~^()><\\]/\\$MATCH}"
+    search_pattern="${search_buffer// ##/*~^*}"
+    colsearch_pattern="${search_buffer// ##/|}"
+
+    if [ "$#__tsmw_hcw_found" -eq "0" ]; then
+        # The repeat will make the matching work on a fresh heap arena
+        repeat 1; do
+            __tsmw_hcw_found=( "${(@M)history:#(#i)*$~search_pattern*}" )
+        done
+    fi
+
+    if [ "$#__tsmw_hcw_found" -le "0" ]; then
+        POSTDISPLAY=$'\n'"No matches found"
+        return 0
+    fi
+
+    #
+    # Pagination, index value guards
+    #
+
+    integer page_size="$__tsmw_page_size"
+    integer max_index="$#__tsmw_hcw_found"
+    [ "$page_size" -gt "$max_index" ] && page_size="$max_index"
+    [ "$__tsmw_hcw_index" -le 0 ] && __tsmw_hcw_index="$max_index"
+    [ "$__tsmw_hcw_index" -gt "$max_index" ] && __tsmw_hcw_index=1
+    integer page_start_idx=$(( ((__tsmw_hcw_index-1)/page_size)*page_size+1 ))
+    integer on_page_idx=$(( (__tsmw_hcw_index-1) % page_size + 1 ))
+
+    #
+    # Prepare display
+    #
+
+    typeset -a disp_list
+    disp_list=( "${(@)__tsmw_hcw_found[page_start_idx,page_start_idx+page_size-1]}" )
+
+    # All entries should have multilines replaced
+    disp_list=( "${(@)disp_list//$'\n'/\\n}" )
+    # ... and truncated to display width, and
+    # also preceeded by two spaces
+    disp_list=( "${(@)disp_list/(#m)*/  ${MATCH[1,COLUMNS-8]}}" )
+
+    local nl=$'\n'
+    local entry="${disp_list[on_page_idx]}"
+    entry[1]='>'
+    disp_list[on_page_idx]="$entry"
+
+    #
+    # Detect where "> .." entry starts
+    #
+
+    local txt_before="${(F)${(@)disp_list[1,on_page_idx-1]}}"
+
+    #
+    # Colorify
+    #
+
+    local preamble=$'\n'"Searching for: $BUFFER"$'\n'"Element #$__tsmw_hcw_index of $max_index"$'\n'
+    local text="${(F)disp_list}"
+    integer offset=${#preamble}+${#BUFFER}
+
+    POSTDISPLAY="$preamble$text"
+
+    region_highlight=( "$(( offset + ${#txt_before} )) $(( offset + ${#txt_before} + ${#entry} + 1 )) underline" )
+    if [ -n "$colsearch_pattern" ]; then
+        # Following line is taken from Zaw (GH zsh-users/zaw) – license is named "Zaw", it is in LICENSE file
+        region_highlight+=( "${(f)${(S)text//*(#bi)(${~colsearch_pattern})/$(( offset + mbegin[1] - 1 )) $(( offset + mend[1] )) ${__tsmw_hl_color}${nl}}%$nl*}" )
+    fi
+}
+
+(( __tsmw_hcw_call_count ++ ))
+_tsmw_main
+
+_tsmw_simulate_widget() {
+    (( __tsmw_hcw_call_count ++ ))
+    _tsmw_main
+}
+
+_tsmw_self_insert() {
+    LBUFFER+="${KEYS[-1]}"
+    __tsmw_hcw_restart="1"
+    _tsmw_main
+}
+
+_tsmw_backward_delete_char() {
+    LBUFFER="${LBUFFER%?}"
+    __tsmw_hcw_restart="1"
+    _tsmw_main
+}
+
+_tsmw_delete_char() {
+    RBUFFER="${RBUFFER#?}"
+    __tsmw_hcw_restart="1"
+    _tsmw_main
+}
+
+if [ "$__tsmw_hcw_call_count" -eq "1" ]; then
+    # Make the tsmw keymap a copy of the current main
+    bindkey -N tsmw emacs
+
+    local down_widget="${WIDGET%-backwards}"
+    local up_widget="${down_widget}-backwards"
+
+    # Manual, termcap, terminfo
+    bindkey -M tsmw '^[OA' "$up_widget"
+    bindkey -M tsmw '^[OB' "$down_widget"
+    bindkey -M tsmw '^[[A' "$up_widget"
+    bindkey -M tsmw '^[[B' "$down_widget"
+    [ -n "$termcap[ku]" ] && bindkey -M tsmw "$termcap[ku]" "$up_widget"
+    [ -n "$termcap[kd]" ] && bindkey -M tsmw "$termcap[kd]" "$down_widget"
+    [ -n "$termcap[kD]" ] && bindkey -M tsmw "$termcap[kD]" delete-char
+    [ -n "$terminfo[kcuu1]" ] && bindkey -M tsmw "$terminfo[kcuu1]" "$up_widget"
+    [ -n "$terminfo[kcud1]" ] && bindkey -M tsmw "$terminfo[kcud1]" "$down_widget"
+    [ -n "$terminfo[kdch1]" ] && bindkey -M tsmw "$terminfo[kdch1]" delete-char
+
+    # More bindkeys, to remove influence of overloading plugins (sy-h, suggestions)
+    # Left/Right cursor keys
+    bindkey -M tsmw '^[[D' .backward-char
+    bindkey -M tsmw '^[[C' .forward-char
+    [ -n "$termcap[kl]" ] && bindkey -M tsmw "$termcap[kl]" .backward-char
+    [ -n "$termcap[kr]" ] && bindkey -M tsmw "$termcap[kr]" .forward-char
+    [ -n "$terminfo[kcub1]" ] && bindkey -M tsmw "$terminfo[kcub1]" .backward-char
+    [ -n "$terminfo[kcuf1]" ] && bindkey -M tsmw "$terminfo[kcuf1]" .forward-char
+    # Now Home/End keys, first few recorded in my .zshrc during the years sequences
+    bindkey -M tsmw "\e[1~" .beginning-of-line
+    bindkey -M tsmw "\e[7~" .beginning-of-line
+    bindkey -M tsmw "\e[H"  .beginning-of-line
+    bindkey -M tsmw "\e[4~" .end-of-line
+    bindkey -M tsmw "\e[F"  .end-of-line
+    bindkey -M tsmw "\e[8~" .end-of-line
+    [ -n "$termcap[kh]" ] && bindkey -M tsmw "$termcap[kh]" .beginning-of-line
+    [ -n "$termcap[@7]" ] && bindkey -M tsmw "$termcap[@7]" .end-of-line
+    [ -n "$terminfo[khome]" ] && bindkey -M tsmw "$terminfo[khome]" .beginning-of-line
+    [ -n "$terminfo[kend]" ] && bindkey -M tsmw "$terminfo[kend]" .end-of-line
+
+    # Needed for Fedora 23, zsh-5.1.1
+    bindkey -M tsmw ' ' self-insert
+
+    # Substitute self-insert, backward-delete-char, delete-char
+    zle -A self-insert saved-self-insert
+    zle -A backward-delete-char saved-backward-delete-char
+    zle -A delete-char saved-delete-char
+    zle -N self-insert _tsmw_self_insert
+    zle -N backward-delete-char _tsmw_backward_delete_char
+    zle -N delete-char _tsmw_delete_char
+
+    # Override ourselves with what we actually are
+    # because zsh-autosuggestions change us
+    zle -A "$down_widget" saved-"$down_widget"
+    zle -A "$up_widget" saved-"$up_widget"
+    zle -N "$down_widget" _tsmw_simulate_widget
+    zle -N "$up_widget" _tsmw_simulate_widget
+
+    if zle .recursive-edit -K tsmw; then
+        BUFFER="${__tsmw_hcw_found[__tsmw_hcw_index]}"
+        CURSOR="${#BUFFER}"
+    else
+        BUFFER=""
+    fi
+    POSTDISPLAY=""
+
+    # Restore self-insert, backward-delete-char, delete-char
+    zle -A saved-self-insert self-insert
+    zle -A saved-backward-delete-char backward-delete-char
+    zle -A saved-delete-char delete-char
+    zle -D saved-self-insert saved-backward-delete-char saved-delete-char
+
+    # Restore ourselves
+    zle -A saved-"$down_widget" "$down_widget"
+    zle -A saved-"$up_widget" "$up_widget"
+    zle -D saved-"$down_widget" saved-"$up_widget"
+
+    # Full reinitialisation at next call
+    __tsmw_hcw_call_count="0"
+fi
+
+# vim:ft=zsh
