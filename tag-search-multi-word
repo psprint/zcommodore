@@ -230,9 +230,24 @@ if [ "$__tsmw_hcw_call_count" -eq "1" ]; then
     zle -N "$pdown_widget" _tsmw_simulate_widget
     zle -N "$pup_widget" _tsmw_simulate_widget
 
+    local selected_editor tagtext taglinebyte tagfile
+    local -a cmd
     if zle .recursive-edit -K tsmw; then
-        BUFFER="${__tsmw_hcw_found[__tsmw_hcw_index]}"
-        CURSOR="${#BUFFER}"
+        zstyle -s ":plugin:zcommodore" editor selected_editor || selected_editor="${EDITOR:-vim}"
+
+        tagtext="${__tsmw_hcw_found[__tsmw_hcw_index]}"
+        if [[ "$tagtext" = (#b)[^$'\177']#$'\177'[^$'\1']#$'\1'([^$'\2']#)$'\2'(*) ]]; then
+            taglinebyte="${match[1]}"
+            tagfile="${match[2]}"
+            case "$selected_editor" in
+                (vim|vi|gvim|mvim)
+                    cmd=( "$selected_editor" "+${taglinebyte%,*}" "${(q)tagfile}" )
+                    ;;
+                (emacs)
+                    cmd=( "$selected_editor" "${(q)tagfile}" )
+                    ;;
+            esac
+        fi
     else
         BUFFER=""
     fi
@@ -251,6 +266,15 @@ if [ "$__tsmw_hcw_call_count" -eq "1" ]; then
 
     # Full reinitialisation at next call
     __tsmw_hcw_call_count="0"
+
+    # Is there a command to run?
+    if [[ "${#cmd}" != "0" ]]; then
+        local auto_accept
+        zstyle -b ":plugin:zcommodore" auto_accept auto_accept || auto_accept="yes"
+        BUFFER="${cmd[*]}"
+        CURSOR="${#BUFFER}"
+        [[ "$auto_accept" = "yes" ]] && zle .accept-line
+    fi
 fi
 
 # vim:ft=zsh
