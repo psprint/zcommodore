@@ -551,7 +551,7 @@ extern void endEtagsFile (const char *const name)
 {
 	const char *line;
 
-	fprintf (TagFile.fp, "\f\n%s,%ld\n", name, (long) TagFile.etags.byteCount);
+	// fprintf (TagFile.fp, "\f\n%s,%ld\n", name, (long) TagFile.etags.byteCount);
 	if (TagFile.etags.fp != NULL)
 	{
 		rewind (TagFile.etags.fp);
@@ -681,8 +681,8 @@ static int writeEtagsEntry (const tagEntryInfo *const tag)
 	int length;
 
 	if (tag->isFileEntry)
-		length = fprintf (TagFile.etags.fp, "\177%s\001%lu,0\n",
-				tag->name, tag->lineNumber);
+		length = fprintf (TagFile.etags.fp, "\177%s\001%lu,0\002%s\n",
+				tag->name, tag->lineNumber, tag->sourceFileName);
 	else
 	{
 		long seekValue;
@@ -694,8 +694,8 @@ static int writeEtagsEntry (const tagEntryInfo *const tag)
 		else
 			line [strlen (line) - 1] = '\0';
 
-		length = fprintf (TagFile.etags.fp, "%s\177%s\001%lu,%ld\n", line,
-				tag->name, tag->lineNumber, seekValue);
+		length = fprintf (TagFile.etags.fp, "%s\177%s\001%lu,%ld\002%s\n", line,
+				tag->name, tag->lineNumber, seekValue, tag->sourceFileName);
 	}
 	TagFile.etags.byteCount += length;
 
