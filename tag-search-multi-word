@@ -244,7 +244,7 @@ if [ "$__tsmw_hcw_call_count" -eq "1" ]; then
                     cmd=( "$selected_editor" "+${taglinebyte%,*}" "${(q)tagfile}" )
                     ;;
                 (emacs)
-                    cmd=( "$selected_editor" "${(q)tagfile}" )
+                    cmd=( "$selected_editor" "+${taglinebyte%,*}" "${(q)tagfile}" )
                     ;;
             esac
         fi
