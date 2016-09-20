@@ -269,11 +269,11 @@ if [ "$__tsmw_hcw_call_count" -eq "1" ]; then
 
     # Is there a command to run?
     if [[ "${#cmd}" != "0" ]]; then
-        local auto_accept
-        zstyle -b ":plugin:zcommodore" auto_accept auto_accept || auto_accept="yes"
+        local auto_run
+        zstyle -b ":plugin:zcommodore" auto_run auto_run || auto_run="yes"
         BUFFER="${cmd[*]}"
         CURSOR="${#BUFFER}"
-        [[ "$auto_accept" = "yes" ]] && zle .accept-line
+        [[ "$auto_run" = "yes" ]] && zle .accept-line
     fi
 fi
 
