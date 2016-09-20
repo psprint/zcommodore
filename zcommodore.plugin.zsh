@@ -36,6 +36,8 @@ fi
 autoload tag-search-multi-word
 zle -N tag-search-multi-word
 zle -N tag-search-multi-word-backwards tag-search-multi-word
+zle -N tag-search-multi-word-pbackwards tag-search-multi-word
+zle -N tag-search-multi-word-pforwards tag-search-multi-word
 bindkey "^O^K" tag-search-multi-word
 
 [[ -z "${fg_bold[green]}" ]] && builtin autoload -Uz colors && colors
