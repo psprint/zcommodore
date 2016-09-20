@@ -240,7 +240,7 @@ if [ "$__tsmw_hcw_call_count" -eq "1" ]; then
             taglinebyte="${match[1]}"
             tagfile="${ZCMDR[current_project]}/${match[2]}"
             case "$selected_editor" in
-                (vim|vi|gvim|mvim)
+                (vim|vi|gvim|mvim|nvim)
                     cmd=( "$selected_editor" "+${taglinebyte%,*}" "${(q)tagfile}" )
                     ;;
                 (emacs)
