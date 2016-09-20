@@ -271,7 +271,7 @@ static void findShTags (void) {
             {
                 while ( isspace( (int) *cp ) )
                     ++ cp;
-                if ( *cp == ')'  && ! hackReject ( names[ nidx ] ) )
+                if ( *cp == ')'  && ! hackReject ( names[ nidx - 1 ] ) )
                     functionFound = TRUE;
             }
         }
