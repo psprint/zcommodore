@@ -140,14 +140,15 @@ static vString* determineInterpreter (const char* const cmd)
 	return interpreter;
 }
 
-static langType getInterpreterLanguage (const char *const fileName)
+static langType getInterpreterModelineLanguage (const char *const fileName)
 {
+    int line_counter = 0, file_size = 0, pos = 0, newline_count = 0, sentinel = 0;
 	langType result = LANG_IGNORE;
 	FILE* const fp = fopen (fileName, "r");
 	if (fp != NULL)
 	{
 		vString* const vLine = vStringNew ();
-		const char* const line = readLine (vLine, fp);
+		const char* line = readLine (vLine, fp);
 		if (line != NULL  &&  line [0] == '#'  &&  line [1] == '!')
 		{
 			const char* const lastSlash = strrchr (line, '/');
@@ -157,7 +158,75 @@ static langType getInterpreterLanguage (const char *const fileName)
 			if (result == LANG_IGNORE)
 				result = getNamedLanguage (vStringValue (interpreter));
 			vStringDelete (interpreter);
-		}
+        } else {
+            while ( line != NULL ) {
+                line_counter += 1;
+                if ( strstr( line, "vim:" ) || strstr( line, "vi:" ) || strstr( line, "ex:" ) ) {
+                    if ( strstr( line, "ft=zsh" ) || strstr( line, "ft=Zsh" ) || strstr( line, "ft=ZSH" ) ||
+                         strstr( line, "filetype=zsh" ) || strstr( line, "filetype=Zsh" ) || strstr( line, "filetype=ZSH" ) )
+                    {
+                        result = SH_LANG_TYPE;
+                    } else if ( strstr( line, "ft=bash" ) || strstr( line, "ft=Bash" ) || strstr( line, "ft=BASH" ) ||
+                            strstr( line, "filetype=bash" ) || strstr( line, "filetype=Bash" ) || strstr( line, "filetype=BASH" ) )
+                    {
+                        result = SH_LANG_TYPE;
+                    } else if ( strstr( line, "ft=sh" ) || strstr( line, "ft=SH" ) ||
+                            strstr( line, "filetype=sh" ) || strstr( line, "filetype=SH" ) )
+                    {
+                        result = SH_LANG_TYPE;
+                    } else if ( strstr( line, "ft=ksh" ) || strstr( line, "ft=KSH" ) ||
+                            strstr( line, "filetype=ksh" ) || strstr( line, "filetype=KSH" ) )
+                    {
+                        result = SH_LANG_TYPE;
+                    }
+                } else if ( strstr( line, "mode:" ) ) {
+                    if ( strstr( line, "mode: zsh" ) || strstr( line, "mode: Zsh" ) || strstr( line, "mode: ZSH" ) ) {
+                        result = SH_LANG_TYPE;
+                    } else if ( strstr( line, "mode: bash" ) || strstr( line, "mode: Bash" ) || strstr( line, "mode: BASH" ) ) {
+                        result = SH_LANG_TYPE;
+                    } else if ( strstr( line, "mode: ksh" ) || strstr( line, "mode: KSH" ) ) {
+                        result = SH_LANG_TYPE;
+                    }
+                }
+
+                if ( result == LANG_IGNORE ) {
+                    if ( line_counter < 4 ) {
+                        // Can do that, lregex.c / processLanguageRegex does that
+                        line = readLine (vLine, fp);
+                    } else if ( line_counter == 4 ) {
+                        // Start from-the-end counting - 100 is 0,
+                        // 104 is last line to be processed
+                        line_counter = 100;
+
+                        fseek( fp, 0L, SEEK_END );
+                        file_size = pos = ftell( fp );
+
+                        // Count how many bytes equals 4 lines
+                        while ( pos ) {
+                            fseek( fp, -- pos, SEEK_SET );
+                            if ( fgetc( fp ) == '\n' ) {
+                                if ( ++ newline_count == 5 - sentinel )
+                                    break;
+                            } else {
+                                if ( file_size - 1 == pos ) {
+                                    // Case when file doesn't end at '\n' byte
+                                    sentinel = 1;
+                                }
+                            }
+                        }
+
+                        line = readLine (vLine, fp);
+                    } else if ( line_counter < 104 ) {
+                        line = readLine (vLine, fp);
+                    } else if ( line_counter >= 104 ) {
+                        // This must match file size, i.e. fp is at EOF here
+                        line = NULL;
+                    }
+                } else {
+                    line = NULL;
+                }
+            }
+        }
 		vStringDelete (vLine);
 		fclose (fp);
 	}
@@ -178,8 +247,10 @@ extern langType getFileLanguage (const char *const fileName)
 		if (language == LANG_IGNORE)
 		{
 			fileStatus *status = eStat (fileName);
-			if (status->isExecutable)
-				language = getInterpreterLanguage (fileName);
+            // Zsh-aimed update: search for modelines in each
+            // unrecognized text file, not only in executables
+			//if (status->isExecutable)
+			language = getInterpreterModelineLanguage (fileName);
 		}
 #endif
 	}

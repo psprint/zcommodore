@@ -14,6 +14,9 @@
 #ifndef _PARSERS_H
 #define _PARSERS_H
 
+/* Sh is at position 31, index 30 */
+#define SH_LANG_TYPE 30
+
 /* Add the name of any new parser definition function here */
 #define PARSER_LIST \
 	AntParser, \
