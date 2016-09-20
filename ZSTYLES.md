@@ -3,6 +3,7 @@
 The values being set are the defaults.
 
 ```zsh
+zstyle ":plugin:zcommodore" cd_at_edit "yes"                    # "cd PROJECT; vim source.cpp" instead of "vim PROJECT/source.cpp"
 zstyle ":plugin:zcommodore" page-size "$(( LINES / 2 ))"        # Value of $LINES / 2 that is evaluated at runtime
 zstyle ":plugin:zcommodore" highlight-color "fg=magenta,bold"   # Zsh style format: color magenta, font style: bold
 zstyle ":plugin:zcommodore" editor "$EDITOR"                    # Value of $EDITOR evaluated at runtime. Supported editors:
