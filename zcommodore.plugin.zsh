@@ -76,7 +76,7 @@ function zcmdr() {
     if [[ "$1" = "-g" ]]; then
         (
             command rm -f ".zcmdr_tags"
-            "${ZCMDR[ctags_bin]}" -R --langmap=sh:.,sh:+.sh:+.zsh -f ".zcmdr_tags" .
+            "${ZCMDR[ctags_bin]}" -e -R --exclude="tags,TAGS" --langmap=sh:.,sh:+.sh,sh:+.zsh -f ".zcmdr_tags" .
         )
         ZCMDR[current_tag_file]="$PWD/.zcmdr_tags"
         print "Done generation of .zcmdr_tags file (-g request)"
@@ -92,7 +92,7 @@ function zcmdr() {
             read -qs answer
             if [[ "$answer" = "y" ]]; then
                 (
-                    "${ZCMDR[ctags_bin]}" -R --langmap=sh:.,sh:+.sh:+.zsh -f ".zcmdr_tags" .
+                    "${ZCMDR[ctags_bin]}" -e -R --exclude="tags,TAGS" --langmap=sh:.,sh:+.sh,sh:+.zsh -f ".zcmdr_tags" .
                 )
                 ZCMDR[current_tag_file]="$PWD/.zcmdr_tags"
                 print "${fg_bold[yellow]}Done.${reset_color}"
