@@ -765,6 +765,7 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 #undef sep
 }
 
+// This function is used for VIM style tags
 static int writePatternEntry (const tagEntryInfo *const tag)
 {
 	char *const line = readSourceLine (TagFile.vLine, tag->filePosition, NULL);
