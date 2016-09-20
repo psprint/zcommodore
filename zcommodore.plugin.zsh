@@ -53,4 +53,25 @@ ZCMDR[ctags_bin]="${ZCMDR_REPO_DIR}/myctags/ctags"
 
 [[ -f "$HOME/.config/zcommodore/current_project" ]] && ZCMDR[current_project]="$(<$HOME/.config/zcommodore/current_project)"
 [[ -f "${ZCMDR[current_project]}/.zcmdr_tags" ]] && ZCMDR[current_tag_file]="${ZCMDR[current_project]}/.zcmdr_tags"
+
+#
+# Functions
+#
+
+#
+# CD to current project's directory
+#
+function zcm-cd() {
+    if [[ -n "${ZCMDR[current_project]}" ]]; then
+        if [[ -d "${ZCMDR[current_project]}" ]]; then
+            builtin cd "${ZCMDR[current_project]}"
+            print "Switched to ${fg_bold[green]}${ZCMDR[current_project]:t}${reset_color}"
+        else
+            print "The project's directory doesn't exist: ${ZCMDR[current_project]}"
+        fi
+    else
+        print "No Current-Project set (it is done with command: zcmdr, from project's directory)"
+    fi
+}
+
 # vim:ft=zsh
