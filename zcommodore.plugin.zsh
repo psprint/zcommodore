@@ -51,4 +51,6 @@ ZCMDR[current_project]=""
 ZCMDR[current_tag_file]=""
 ZCMDR[ctags_bin]="${ZCMDR_REPO_DIR}/myctags/ctags"
 
+[[ -f "$HOME/.config/zcommodore/current_project" ]] && ZCMDR[current_project]="$(<$HOME/.config/zcommodore/current_project)"
+[[ -f "${ZCMDR[current_project]}/.zcmdr_tags" ]] && ZCMDR[current_tag_file]="${ZCMDR[current_project]}/.zcmdr_tags"
 # vim:ft=zsh

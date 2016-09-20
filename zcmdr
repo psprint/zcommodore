@@ -12,6 +12,8 @@ fi
 
 # Always set current project if not $HOME
 ZCMDR[current_project]="$PWD"
+command mkdir -p ~/.config/zcommodore
+echo "$PWD" > ~/.config/zcommodore/current_project
 
 # Next establish the tags file, this can be bumpy
 
