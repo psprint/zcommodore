@@ -260,19 +260,19 @@ static void findShTags (void) {
                 vStringTerminate( names[ nidx ] );
 
                 ++ nidx;
-            }
 
-            // Skip spaces after [[:alnum:]_-]
-            while ( isspace( (int) *cp ) )
-                ++ cp;
-
-            // Detection of function not necessarily beginning with "function"
-            if (*cp++ == '(')
-            {
+                // Skip spaces after [[:alnum:]_-]
                 while ( isspace( (int) *cp ) )
                     ++ cp;
-                if ( *cp == ')'  && ! hackReject ( names[ nidx - 1 ] ) )
-                    functionFound = TRUE;
+
+                // Detection of function not necessarily beginning with "function"
+                if (*cp++ == '(')
+                {
+                    while ( isspace( (int) *cp ) )
+                        ++ cp;
+                    if ( *cp == ')'  && ! hackReject ( names[ nidx - 1 ] ) )
+                        functionFound = TRUE;
+                }
             }
         }
 
