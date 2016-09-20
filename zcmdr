@@ -25,10 +25,8 @@ if [[ "$1" = "-g" ]]; then
 else
     if [[ -e ".zcmdr_tags" ]]; then
         ZCMDR[current_tag_file]="$PWD/.zcmdr_tags"
-    elif [[ -e "TAGS" ]]; then
-        ZCMDR[current_tag_file]="$PWD/TAGS"
     else
-        print "There are no tags generated (no .zcmdr_tags file and no standard TAGS file)"
+        print "There are no tags generated (no .zcmdr_tags file)"
         print "Do you want to generate .zcmdr_tags file now? [y/n]"
         local answer
         read -qs answer
