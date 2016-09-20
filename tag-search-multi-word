@@ -32,8 +32,8 @@ _tsmw_main() {
     if [[ "$__tsmw_hcw_call_count" -le 1 || "$__tsmw_hcw_restart" = "1" ]]; then
         if [[ "$__tsmw_hcw_call_count" -le 1 ]]; then
             # Read configuration data
-            zstyle -s ':plugin:zcommodore:tag-search-multi-word' page-size __tsmw_page_size || __tsmw_page_size=$(( LINES / 2 ))
-            zstyle -s ':plugin:zcommodore:tag-search-multi-word' highlight-color __tsmw_hl_color || __tsmw_hl_color="fg=magenta,bold"
+            zstyle -s ":plugin:zcommodore" page-size __tsmw_page_size || __tsmw_page_size=$(( LINES / 2 ))
+            zstyle -s ":plugin:zcommodore" highlight-color __tsmw_hl_color || __tsmw_hl_color="fg=magenta,bold"
 
             # Read tags file
             if [[ -n "${ZCMDR[current_tag_file]}" ]]; then
