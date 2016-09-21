@@ -19,6 +19,8 @@ if [[ -z "$ZPLG_CUR_PLUGIN" && "${fpath[(r)$ZCMDR_REPO_DIR]}" != $ZCMDR_REPO_DIR
     fpath+=( "$ZCMDR_REPO_DIR" )
 fi
 
+[[ -z "${fg_bold[green]}" ]] && builtin autoload -Uz colors && colors
+
 #
 # Compile myctags
 #
@@ -36,9 +38,11 @@ if [ ! -e "${ZCMDR_REPO_DIR}/myctags/ctags" ]; then
 elif [[ ! -f "${ZCMDR_REPO_DIR}/myctags/COMPILED_AT" || ( "${ZCMDR_REPO_DIR}/myctags/COMPILED_AT" -ot "${ZCMDR_REPO_DIR}/myctags/RECOMPILE_REQUEST" ) ]]; then
     # Final verification via file read
     () {
+        # Don't trust access times and verify hard stored values
         local compiled_at_ts="$(<${ZCMDR_REPO_DIR}/myctags/COMPILED_AT)"
         local recompile_request_ts="$(<${ZCMDR_REPO_DIR}/myctags/RECOMPILE_REQUEST)"
         if [[ "$recompile_request_ts" -gt "${compiled_at_ts:-0}" ]]; then
+            echo "${fg_bold[red]}RECOMPILETION OF CTAGS REQUESTED BY UPDATE${reset_color}"
             ( cd "${ZCMDR_REPO_DIR}/myctags"; ./configure )
             make -C "${ZCMDR_REPO_DIR}/myctags" clean
             make -C "${ZCMDR_REPO_DIR}/myctags"
@@ -60,8 +64,6 @@ zle -N tag-search-multi-word-backwards tag-search-multi-word
 zle -N tag-search-multi-word-pbackwards tag-search-multi-word
 zle -N tag-search-multi-word-pforwards tag-search-multi-word
 bindkey "^O^K" tag-search-multi-word
-
-[[ -z "${fg_bold[green]}" ]] && builtin autoload -Uz colors && colors
 
 #
 # Global parameters
