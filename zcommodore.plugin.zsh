@@ -25,8 +25,29 @@ fi
 
 if [ ! -e "${ZCMDR_REPO_DIR}/myctags/ctags" ]; then
     print "${fg_bold[magenta]}psprint${reset_color}/${fg_bold[yellow]}Zcommodore${reset_color} is building custom exuberant ctags for you..."
-    ( cd "${ZCMDR_REPO_DIR}/myctags"; [[ ! -e Makefile ]] &&  ./configure )
+    ( cd "${ZCMDR_REPO_DIR}/myctags"; [[ ! -e Makefile ]] && ./configure )
     make -C "${ZCMDR_REPO_DIR}/myctags"
+
+    () {
+        local ts="${EPOCHSECONDS}"
+        [[ -z "$ts" ]] && ts="$( date +%s )"
+        echo "$ts" >! "${ZCMDR_REPO_DIR}/myctags/COMPILED_AT"
+    }
+elif [[ ! -f "${ZCMDR_REPO_DIR}/myctags/COMPILED_AT" || ( "${ZCMDR_REPO_DIR}/myctags/COMPILED_AT" -ot "${ZCMDR_REPO_DIR}/myctags/RECOMPILE_REQUEST" ) ]]; then
+    # Final verification via file read
+    () {
+        local compiled_at_ts="$(<${ZCMDR_REPO_DIR}/myctags/COMPILED_AT)"
+        local recompile_request_ts="$(<${ZCMDR_REPO_DIR}/myctags/RECOMPILE_REQUEST)"
+        if [[ "$recompile_request_ts" -gt "${compiled_at_ts:-0}" ]]; then
+            ( cd "${ZCMDR_REPO_DIR}/myctags"; ./configure )
+            make -C "${ZCMDR_REPO_DIR}/myctags" clean
+            make -C "${ZCMDR_REPO_DIR}/myctags"
+
+            local ts="${EPOCHSECONDS}"
+            [[ -z "$ts" ]] && ts="$( date +%s )"
+            echo "$ts" >! "${ZCMDR_REPO_DIR}/myctags/COMPILED_AT"
+        fi
+    }
 fi
 
 #
