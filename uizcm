@@ -65,6 +65,11 @@ __zcmdr_action_backup() {
     __zcmdr_stdlib_to_cmd_line "mkdir -p $dest; cp -vf $dir/$file $dest/${file}_$REPLY"
 }
 
+__zcmdr_action_git_history() {
+    local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5" dest
+    __zcmdr_stdlib_to_cmd_line "git -C $active_path log -p $file"
+}
+
 #
 # Business logic follows
 #
