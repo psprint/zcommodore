@@ -28,8 +28,17 @@ zstyle -s ":plugin:zcommodore" time_limit limit_seconds || limit_seconds="500"
 local curcontext=":zle:$WIDGET"
 local MATCH MBEGIN MEND
 typeset -a OUTPUT
+integer LINE_COUNT
 
 #
+# Establish if the project is Git
+#
+
+local basedir
+integer IS_GIT=0
+basedir="$( git -C "${ZCMDR[current_project]}" rev-parse --show-toplevel 2>/dev/null )/"
+[[ -n "$basedir" ]] && IS_GIT=1
+
 # Last N git commits
 #
 
