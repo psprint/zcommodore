@@ -39,19 +39,48 @@ integer IS_GIT=0
 basedir="$( git -C "${ZCMDR[current_project]}" rev-parse --show-toplevel 2>/dev/null )/"
 [[ -n "$basedir" ]] && IS_GIT=1
 
+#
+# General zstyles
+#
+
+local selected_editor cd_at_edit
+zstyle -s ":plugin:zcommodore" editor selected_editor || selected_editor="${EDITOR:-vim}"
+zstyle -b ":plugin:zcommodore" cd_at_edit cd_at_edit || cd_at_edit="yes"
+
+#
+# Common variables
+#
+
+integer idx         # When iterating arrays
+integer size        # Size of iterated array
+local -a gitcmd     # Git command to be run
+local -a gitout     # Unprocessed git output
+local -a gitout2    # Processed git output
+local entry         # Single entry
+local -a arrentry   # Single entry (e.g. line output from Git) splitted into fields
+
+#
+# Initialization
+#
+
+OUTPUT+=( "" )
+LINE_COUNT+=1
+ZCMDRLIST_NONSELECTABLE_ELEMENTS+=( "$LINE_COUNT" )
+
+#
 # Last N git commits
 #
 
 local git_log_count
-zstyle -s ":plugin:zcommodore" git_log_count || git_log_count="5"
+zstyle -s ":plugin:zcommodore" git_log_count git_log_count || git_log_count="5"
 [[ "$git_log_count" != <-> ]] && git_log_count="5"
 
-local -a gitcmd gitout
 gitcmd=( git -C "${ZCMDR[current_project]}" log --max-count="$git_log_count" --pretty=format:'%h%x01%s%x01%d%x01%cr%x01%an' --abbrev-commit )
 gitout=( "${(@f)"$( "${gitcmd[@]}" )"}" )
 
-local -a gitout2 arrentry
 gitout2=( "${CMDR_RED}'Current HEAD commits of ${CMDR_RED_E}${CMDR_GREEN}${(q)ZCMDR[current_project]:t}${CMDR_GREEN_E}${CMDR_RED}'${CMDR_RED_E}" )
+LINE_COUNT+=1
+ZCMDRLIST_NONSELECTABLE_ELEMENTS+=( "$LINE_COUNT" )
 
 local IFSBKP="$IFS"
 local IFS=$'\1'
@@ -59,8 +88,70 @@ for entry in "${gitout[@]}"; do
     # hash \1 message \1 repo info \1 date \1 author
     arrentry=( ${=entry} )
     gitout2+=( "${CMDR_GREEN}${arrentry[1]}${CMDR_GREEN_E} ${CMDR_CYAN}${(q-)arrentry[2]}${CMDR_CYAN_E} ${CMDR_MAGENTA}((${arrentry[4]}))${CMDR_MAGENTA_E} \`${arrentry[5]}\`" )
+    LINE_COUNT+=1
 done
 IFS="$IFSBKP"
+
+OUTPUT+=( "${gitout2[@]}" )
+
+#
+# List of modified files
+#
+
+OUTPUT+=( "" )
+LINE_COUNT+=1
+ZCMDRLIST_NONSELECTABLE_ELEMENTS+=( "$LINE_COUNT" )
+
+# Read input from GIT
+gitout=( ${(f)"$( git -C "${ZCMDR[current_project]}" diff --name-only 2>/dev/null )"} )
+
+# Start output: nonselectable HEADER
+gitout2=( "${CMDR_RED}'Modified files of ${CMDR_RED_E}${CMDR_GREEN}${(q)ZCMDR[current_project]:t}${CMDR_GREEN_E}${CMDR_RED}'${CMDR_RED_E}" )
+LINE_COUNT+=1
+ZCMDRLIST_NONSELECTABLE_ELEMENTS+=( "$LINE_COUNT" )
+
+# Get zstat's at corresponding array's entries
+local -a stat_result
+local mtime
+if [[ "${ZCMDR[stat_available]}" = "1" ]]; then
+    stat_result=( ${(f)"$( zstat "${basedir}${^gitout[@]}" )"} )
+    stat_result=( "${(M)stat_result[@]:#mtime*}" )
+    stat_result=( "${stat_result[@]/mtime[^0-9]#/}" )
+fi
+
+size=${#gitout[@]}
+for (( idx = 1; idx <= size; idx ++ )); do
+    entry="${gitout[idx]}"
+    mtime="${stat_result[idx]}"
+
+    reply=()
+
+    __zcmdr_stdlib_get_timestamp
+    integer days=$(( (REPLY-mtime)/(24*60*60) ))
+    local day_info
+    (( days > 0 )) && day_info="${days}_day(s)" || day_info="today"
+    day_info="${CMDR_CYAN}${day_info}${CMDR_CYAN_E}"
+    day_info="${(r:10:: :)day_info}"
+
+    # Button function arguments:
+    # $1 - action ID
+    # $2 - data1, e.g. timestamp
+    # $3 - data2, e.g. command
+    # $4 - data3, e.g. active path
+    # $5 - data4, e.g. file path, file name, URL, other data
+    # $6 - text
+    # $7 - handler function name
+    if [ "$cd_at_edit" = "yes" ]; then
+        __zcmdr_stdlib_get_std_button "mod1A" "${mtime}" "${selected_editor}" "${ZCMDR[current_project]}" "$entry" "$day_info" __zcmdr_action_edit_file_cd
+        __zcmdr_stdlib_get_std_button "mod1B" "${mtime}" "${selected_editor}" "${ZCMDR[current_project]}" "$entry" "${entry:t}" __zcmdr_action_edit_file_cd
+    else
+        __zcmdr_stdlib_get_std_button "mod1A" "${mtime}" "${selected_editor}" "${ZCMDR[current_project]}" "$entry" "$day_info" __zcmdr_action_edit_file_abs
+        __zcmdr_stdlib_get_std_button "mod1B" "${mtime}" "${selected_editor}" "${ZCMDR[current_project]}" "$entry" "${entry:t}" __zcmdr_action_edit_file_abs
+    fi
+
+    gitout2+=( "${reply[1]} ${reply[2]}" )
+    LINE_COUNT+=${#reply[@]}
+done
 
 OUTPUT+=( "${gitout2[@]}" )
 
