@@ -43,7 +43,7 @@ local ZCMDRLIST_GENERATION_TIME="$(( SECONDS - start_seconds ))"
 ZCMDRLIST_GENERATION_TIME="${ZCMDRLIST_GENERATION_TIME[1,5]}"
 
 local ZCMDRLIST_WRAPPER_BIT=""
-zaccu-usetty-wrapper zaccu-list-wrapper "${gitout2[@]}" "$ZCMDRLIST_GENERATION_TIME"
+__zcmdr-usetty-wrapper __zcmdr-list-wrapper "${gitout2[@]}" "$ZCMDRLIST_GENERATION_TIME"
 
 zle && zle redisplay
 
