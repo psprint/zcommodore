@@ -44,13 +44,25 @@ __zcmdr_action_git_diff_file_abs() {
 __zcmdr_action_file_cd() {
     local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5"
 
-    # One day __zcmdr_stdlib_resolve_path might access files
-    # on disk (still rather unlikely), so we give it unquoted
-    # paths and quote its output
     __zcmdr_stdlib_resolve_path "${(Q)active_path}" "${(Q)file}"
     local dir="${(q)reply[1]}" file="${(q)reply[2]}"
 
     zaccu_stdlib_to_cmd_line "cd $dir"
+}
+
+__zcmdr_action_backup() {
+    local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5" dest
+
+    zstyle -s ":plugin:zcommodore" backup_dir dest || dest="$HOME/.backup"
+
+    # One day zaccu_stdlib_resolve_path might access files
+    # on disk (still rather unlikely), so we give it unquoted
+    # paths and quote its output
+    zaccu_stdlib_resolve_path "${(Q)active_path}" "${(Q)file}"
+    local dir="${(q)reply[1]}" file="${(q)reply[2]}"
+
+    zaccu_stdlib_get_date_and_time_string
+    zaccu_stdlib_to_cmd_line "mkdir -p $dest; cp -vf $dir/$file $dest/${file}_$REPLY"
 }
 
 #

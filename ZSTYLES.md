@@ -11,4 +11,5 @@ zstyle ":plugin:zcommodore" highlight-color "fg=magenta,bold"   # Zsh style form
                                                                 # vim (gvim, mvim, etc.), emacs
 zstyle ":plugin:zcommodore" auto_run "yes"                      # Automatically run the editor command for selected tag. If "no",
                                                                 # "off", "0" or "false" - only put the command into command line
+zstyle ":plugin:zcommodore" backup_dir "$HOME/.backup"          # Where [Backup] button copies file (time stamp appended to name)
 ```
