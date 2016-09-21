@@ -23,6 +23,20 @@ zstyle -s ":plugin:zcommodore" time_limit limit_seconds || limit_seconds="500"
 [[ "$limit_seconds" != <-> ]] && limit_seconds="500"
 
 #
+# Handler functions
+#
+
+__zcmdr_action_edit_file_cd() {
+    local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5"
+    __zcmdr_stdlib_to_cmd_line "cd ${(q)active_path}; $cmd ${(q)file}"
+}
+
+__zcmdr_action_edit_file_abs() {
+    local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5"
+    __zcmdr_stdlib_to_cmd_line "$cmd ${(q)active_path}/${(q)file}"
+}
+
+#
 # Business logic follows
 #
 
@@ -102,6 +116,15 @@ zle && zle redisplay
 
 if [ -z "$ZCMDRLIST_WRAPPER_BIT" ]; then
     return 1
+fi
+
+# ID, data1, data2, data3, data4
+if __zcmdr_stdlib_decode_hyperlink "$ZCMDRLIST_WRAPPER_BIT"; then
+    local id="${reply[1]}" ts="${reply[2]}" cmd="${reply[3]}" active_path="${reply[4]}" file="${reply[5]}"
+    if [ -n "${ZCMDR_ACTION_IDS_TO_HANDLERS[$id]}" ]; then
+        # Call the handled with all hyper-link data
+        "${ZCMDR_ACTION_IDS_TO_HANDLERS[$id]}" "$id" "$ts" "$cmd" "$active_path" "$file"
+    fi
 fi
 
 return 0
