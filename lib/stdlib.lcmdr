@@ -17,6 +17,36 @@ CMDR_MAGENTA_E=$'\31'
 CMDR_CYAN=$'\6'
 CMDR_CYAN_E=$'\31'
 
+# Appends hyperlink into "reply" output array. It's the
+# standard action button, shown without surrounding
+# "[" and "]".
+#
+# $1 - action ID
+# $2 - data1, e.g. timestamp
+# $3 - data2, e.g. command
+# $4 - data3, e.g. active path
+# $5 - data4, e.g. file path, file name, URL, other data
+# $6 - text
+# $7 - handler function name
+#
+# $reply array is extended by hyperlink's text (one new element)
+#
+function __zcmdr_stdlib_get_std_button() {
+    local id="${(q)1}" data1="${(q)2}" data2="${(q)3}" data3="${(q)4}" data4="${(q)5}" text="$6" handler="$7"
+    reply+=( $'\1'"$id"$'\1'"$data1"$'\1'"$data2"$'\1'"$data3"$'\1'"$data4"$'\2'"${text}" )
+    ZCMDR_ACTION_IDS_TO_HANDLERS[$id]="$handler"
+}
+
+# Appends button hyperlink into "reply" output array
+#
+# Arguments are the same as in zaccu_get_std_button
+#
+function __zcmdr_stdlib_get_button() {
+    local id="${(q)1}" data1="${(q)2}" data2="${(q)3}" data3="${(q)4}" data4="${(q)5}" text="$6" handler="$7"
+    reply+=( $'\1'"$id"$'\1'"$data1"$'\1'"$data2"$'\1'"$data3"$'\1'"$data4"$'\2'"[${text}]" )
+    ZCMDR_ACTION_IDS_TO_HANDLERS[$id]="$handler"
+}
+
 # Resolves absolute path from current working directory and file path
 #
 # $1 - current working directory
