@@ -18,7 +18,7 @@ typeset -F SECONDS=0.0
 local -F start_seconds=$SECONDS
 
 local limit_seconds
-zstyle -s ":accumulator" time_limit limit_seconds || limit_seconds="500"
+zstyle -s ":plugin:zcommodore" time_limit limit_seconds || limit_seconds="500"
 [[ "$limit_seconds" != <-> ]] && limit_seconds="500"
 
 #
@@ -33,8 +33,12 @@ typeset -a OUTPUT
 # Last N git commits
 #
 
+local git_log_count
+zstyle -s ":plugin:zcommodore" git_log_count || git_log_count="5"
+[[ "$git_log_count" != <-> ]] && git_log_count="5"
+
 local -a gitcmd gitout
-gitcmd=( git -C "${ZCMDR[current_project]}" log --max-count=3 --pretty=format:'%h%x01%s%x01%d%x01%cr%x01%an' --abbrev-commit )
+gitcmd=( git -C "${ZCMDR[current_project]}" log --max-count="$git_log_count" --pretty=format:'%h%x01%s%x01%d%x01%cr%x01%an' --abbrev-commit )
 gitout=( "${(@f)"$( "${gitcmd[@]}" )"}" )
 
 local -a gitout2 arrentry
@@ -43,12 +47,11 @@ local IFS=$'\1'
 for entry in "${gitout[@]}"; do
     # hash \1 message \1 repo info \1 date \1 author
     arrentry=( ${=entry} )
-    #gitout2+=( "${CMDR_GREEN}${arrentry[1]}${CMDR_GREEN_E} ${(q-)arrentry[2]} ${CMDR_RED}${(q-)arrentry[3]## }${CMDR_RED_E} ${CMDR_MAGENTA}${(q-)arrentry[4]}${CMDR_MAGENTA_E} ${(q-)arrentry[5]}" )
-    gitout2+=( "${CMDR_GREEN}${arrentry[1]}${CMDR_GREEN_E} ${(q-)arrentry[2]} ${CMDR_MAGENTA}((${arrentry[4]}))${CMDR_MAGENTA_E} \`${arrentry[5]}\`" )
+    gitout2+=( "${CMDR_GREEN}${arrentry[1]}${CMDR_GREEN_E} ${CMDR_CYAN}${(q-)arrentry[2]}${CMDR_CYAN_E} ${CMDR_MAGENTA}((${arrentry[4]}))${CMDR_MAGENTA_E} \`${arrentry[5]}\`" )
 done
 IFS="$IFSBKP"
 
-OUTPUT+=( "${CMDR_RED}'Project's current HEAD commits:'${CMDR_RED_E}" "${gitout2[@]}" )
+OUTPUT+=( "${CMDR_RED}'Current HEAD commits of ${CMDR_RED_E}${CMDR_GREEN}${(q)ZCMDR[current_project]:t}${CMDR_GREEN_E}${CMDR_RED}'${CMDR_RED_E}" "${gitout2[@]}" )
 
 local ZCMDRLIST_GENERATION_TIME="$(( SECONDS - start_seconds ))"
 ZCMDRLIST_GENERATION_TIME="${ZCMDRLIST_GENERATION_TIME[1,5]}"
