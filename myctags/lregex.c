@@ -407,10 +407,9 @@ static void processLanguageRegex (const langType language,
 	{
 		const char* regexfile = parameter + 1;
 		FILE* const fp = fopen (regexfile, "r");
-		if (fp == NULL)
-			error (WARNING | PERROR, regexfile);
-		else
-		{
+		if (fp == NULL) {
+			error (WARNING | PERROR, "%s", regexfile);
+        } else {
 			vString* const regex = vStringNew ();
 			while (readLine (regex, fp))
 				addLanguageRegex (language, vStringValue (regex));
