@@ -21,9 +21,17 @@ local limit_seconds
 zstyle -s ":accumulator" time_limit limit_seconds || limit_seconds="500"
 [[ "$limit_seconds" != <-> ]] && limit_seconds="500"
 
+#
 # Business logic follows
+#
+
 local curcontext=":zle:$WIDGET"
 local MATCH MBEGIN MEND
+typeset -a OUTPUT
+
+#
+# Last N git commits
+#
 
 local -a gitcmd gitout
 gitcmd=( git -C "${ZCMDR[current_project]}" log --max-count=3 --pretty=format:'%h%x01%s%x01%d%x01%cr%x01%an' --abbrev-commit )
@@ -35,15 +43,22 @@ local IFS=$'\1'
 for entry in "${gitout[@]}"; do
     # hash \1 message \1 repo info \1 date \1 author
     arrentry=( ${=entry} )
-    gitout2+=( "${CMDR_GREEN}${arrentry[1]}${CMDR_GREEN_E} ${(q-)arrentry[2]} ${(q-)arrentry[3]## } ${CMDR_MAGENTA}${(q-)arrentry[4]}${CMDR_MAGENTA_E} ${(q-)arrentry[5]}" )
+    #gitout2+=( "${CMDR_GREEN}${arrentry[1]}${CMDR_GREEN_E} ${(q-)arrentry[2]} ${CMDR_RED}${(q-)arrentry[3]## }${CMDR_RED_E} ${CMDR_MAGENTA}${(q-)arrentry[4]}${CMDR_MAGENTA_E} ${(q-)arrentry[5]}" )
+    gitout2+=( "${CMDR_GREEN}${arrentry[1]}${CMDR_GREEN_E} ${(q-)arrentry[2]} ${CMDR_MAGENTA}((${arrentry[4]}))${CMDR_MAGENTA_E} \`${arrentry[5]}\`" )
 done
 IFS="$IFSBKP"
+
+OUTPUT+=( "${CMDR_RED}'Project's current HEAD commits:'${CMDR_RED_E}" "${gitout2[@]}" )
 
 local ZCMDRLIST_GENERATION_TIME="$(( SECONDS - start_seconds ))"
 ZCMDRLIST_GENERATION_TIME="${ZCMDRLIST_GENERATION_TIME[1,5]}"
 
+#
+# Invoke the list, handle outcome
+#
+
 local ZCMDRLIST_WRAPPER_BIT=""
-__zcmdr-usetty-wrapper __zcmdr-list-wrapper "${gitout2[@]}" "$ZCMDRLIST_GENERATION_TIME"
+__zcmdr-usetty-wrapper __zcmdr-list-wrapper "${OUTPUT[@]}" "$ZCMDRLIST_GENERATION_TIME"
 
 zle && zle redisplay
 
