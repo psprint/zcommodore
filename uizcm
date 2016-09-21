@@ -112,7 +112,7 @@ ZCMDRLIST_GENERATION_TIME="${ZCMDRLIST_GENERATION_TIME[1,5]}"
 local ZCMDRLIST_WRAPPER_BIT=""
 __zcmdr-usetty-wrapper __zcmdr-list-wrapper "${OUTPUT[@]}" "$ZCMDRLIST_GENERATION_TIME"
 
-zle && zle redisplay
+zle && zle .redisplay
 
 if [ -z "$ZCMDRLIST_WRAPPER_BIT" ]; then
     return 1
