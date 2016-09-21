@@ -7,6 +7,8 @@ setopt extendedglob typesetsilent
 
 autoload __zcmdr-process-buffer __zcmdr-usetty-wrapper __zcmdr-list __zcmdr-list-input __zcmdr-list-draw
 
+[[ "${ZCMDR[stdlib_sourced]}" != "1" ]] && source "${ZCMDR_REPO_DIR}/lib/stdlib.lcmdr"
+
 ##
 ## Main code
 ##
@@ -23,11 +25,25 @@ zstyle -s ":accumulator" time_limit limit_seconds || limit_seconds="500"
 local curcontext=":zle:$WIDGET"
 local MATCH MBEGIN MEND
 
+local -a gitcmd gitout
+gitcmd=( git -C "${ZCMDR[current_project]}" log --max-count=3 --pretty=format:'%h%x01%s%x01%d%x01%cr%x01%an' --abbrev-commit )
+gitout=( "${(@f)"$( "${gitcmd[@]}" )"}" )
+
+local -a gitout2 arrentry
+local IFSBKP="$IFS"
+local IFS=$'\1'
+for entry in "${gitout[@]}"; do
+    # hash \1 message \1 repo info \1 date \1 author
+    arrentry=( ${=entry} )
+    gitout2+=( "${CMDR_GREEN}${arrentry[1]}${CMDR_GREEN_E} ${(q-)arrentry[2]} ${(q-)arrentry[3]## } ${CMDR_MAGENTA}${(q-)arrentry[4]}${CMDR_MAGENTA_E} ${(q-)arrentry[5]}" )
+done
+IFS="$IFSBKP"
+
 local ZCMDRLIST_GENERATION_TIME="$(( SECONDS - start_seconds ))"
 ZCMDRLIST_GENERATION_TIME="${ZCMDRLIST_GENERATION_TIME[1,5]}"
 
 local ZCMDRLIST_WRAPPER_BIT=""
-zaccu-usetty-wrapper zaccu-list-wrapper "Test entry" "Test entry" "Test entry" "$ZCMDRLIST_GENERATION_TIME"
+zaccu-usetty-wrapper zaccu-list-wrapper "${gitout2[@]}" "$ZCMDRLIST_GENERATION_TIME"
 
 zle && zle redisplay
 
