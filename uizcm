@@ -41,6 +41,18 @@ __zcmdr_action_git_diff_file_abs() {
     __zcmdr_stdlib_to_cmd_line "git -C ${(q)active_path} diff ${(q)file}"
 }
 
+__zcmdr_action_file_cd() {
+    local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5"
+
+    # One day __zcmdr_stdlib_resolve_path might access files
+    # on disk (still rather unlikely), so we give it unquoted
+    # paths and quote its output
+    __zcmdr_stdlib_resolve_path "${(Q)active_path}" "${(Q)file}"
+    local dir="${(q)reply[1]}" file="${(q)reply[2]}"
+
+    zaccu_stdlib_to_cmd_line "cd $dir"
+}
+
 #
 # Business logic follows
 #

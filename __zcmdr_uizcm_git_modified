@@ -54,8 +54,9 @@ for (( idx = 1; idx <= size; idx ++ )); do
     fi
 
     __zcmdr_stdlib_get_button "mod1C" "${mtime}" "" "${ZCMDR[current_project]}" "$entry" "Diff" __zcmdr_action_git_diff_file_abs
+    __zcmdr_stdlib_get_button "mod1D" "${mtime}" "" "${ZCMDR[current_project]}" "$entry" "FileCD" __zcmdr_action_file_cd
 
-    gitout2+=( "${reply[1]} ${reply[2]} ${reply[3]}" )
+    gitout2+=( "${reply[1]} ${reply[2]} ${reply[3]} ${reply[4]}" )
     LINE_COUNT+=${#reply[@]}
 done
 
