@@ -9,7 +9,7 @@ ZCMDRLIST_NONSELECTABLE_ELEMENTS+=( "$LINE_COUNT" )
 # Get zstat's at corresponding array's entries
 local -a stat_result
 local mtime
-if [[ "${ZCMDR[stat_available]}" = "1" ]]; then
+if [[ "${ZCMDR[stat_available]}" = "1" && "${#gitout}" != "0" ]]; then
     stat_result=( ${(f)"$( zstat "${basedir}${^gitout[@]}" )"} )
     stat_result=( "${(M)stat_result[@]:#mtime*}" )
     stat_result=( "${stat_result[@]/mtime[^0-9]#/}" )
