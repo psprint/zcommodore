@@ -47,7 +47,7 @@ __zcmdr_action_file_cd() {
     __zcmdr_stdlib_resolve_path "${(Q)active_path}" "${(Q)file}"
     local dir="${(q)reply[1]}" file="${(q)reply[2]}"
 
-    zaccu_stdlib_to_cmd_line "cd $dir"
+    __zcmdr_stdlib_to_cmd_line "cd $dir"
 }
 
 __zcmdr_action_backup() {
@@ -55,14 +55,14 @@ __zcmdr_action_backup() {
 
     zstyle -s ":plugin:zcommodore" backup_dir dest || dest="$HOME/.backup"
 
-    # One day zaccu_stdlib_resolve_path might access files
+    # One day __zcmdr_stdlib_resolve_path might access files
     # on disk (still rather unlikely), so we give it unquoted
     # paths and quote its output
-    zaccu_stdlib_resolve_path "${(Q)active_path}" "${(Q)file}"
+    __zcmdr_stdlib_resolve_path "${(Q)active_path}" "${(Q)file}"
     local dir="${(q)reply[1]}" file="${(q)reply[2]}"
 
-    zaccu_stdlib_get_date_and_time_string
-    zaccu_stdlib_to_cmd_line "mkdir -p $dest; cp -vf $dir/$file $dest/${file}_$REPLY"
+    __zcmdr_stdlib_get_date_and_time_string
+    __zcmdr_stdlib_to_cmd_line "mkdir -p $dest; cp -vf $dir/$file $dest/${file}_$REPLY"
 }
 
 #
