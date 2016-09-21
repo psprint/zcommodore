@@ -42,6 +42,8 @@ gitcmd=( git -C "${ZCMDR[current_project]}" log --max-count="$git_log_count" --p
 gitout=( "${(@f)"$( "${gitcmd[@]}" )"}" )
 
 local -a gitout2 arrentry
+gitout2=( "${CMDR_RED}'Current HEAD commits of ${CMDR_RED_E}${CMDR_GREEN}${(q)ZCMDR[current_project]:t}${CMDR_GREEN_E}${CMDR_RED}'${CMDR_RED_E}" )
+
 local IFSBKP="$IFS"
 local IFS=$'\1'
 for entry in "${gitout[@]}"; do
@@ -51,7 +53,7 @@ for entry in "${gitout[@]}"; do
 done
 IFS="$IFSBKP"
 
-OUTPUT+=( "${CMDR_RED}'Current HEAD commits of ${CMDR_RED_E}${CMDR_GREEN}${(q)ZCMDR[current_project]:t}${CMDR_GREEN_E}${CMDR_RED}'${CMDR_RED_E}" "${gitout2[@]}" )
+OUTPUT+=( "${gitout2[@]}" )
 
 local ZCMDRLIST_GENERATION_TIME="$(( SECONDS - start_seconds ))"
 ZCMDRLIST_GENERATION_TIME="${ZCMDRLIST_GENERATION_TIME[1,5]}"
