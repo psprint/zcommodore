@@ -6,7 +6,7 @@ emulate -LR zsh
 setopt extendedglob typesetsilent
 
 autoload __zcmdr-process-buffer __zcmdr-usetty-wrapper __zcmdr-list __zcmdr-list-input __zcmdr-list-draw
-autoload __zcmdr_uizcm_last_n_git_log
+autoload __zcmdr_uizcm_last_n_git_log __zcmdr_uizcm_git_modified
 
 [[ "${ZCMDR[stdlib_sourced]}" != "1" ]] && source "${ZCMDR_REPO_DIR}/lib/stdlib.lcmdr"
 
@@ -82,58 +82,11 @@ OUTPUT+=( "" )
 LINE_COUNT+=1
 ZCMDRLIST_NONSELECTABLE_ELEMENTS+=( "$LINE_COUNT" )
 
-# Read input from GIT
-gitout=( ${(f)"$( git -C "${ZCMDR[current_project]}" diff --name-only 2>/dev/null )"} )
+__zcmdr_uizcm_git_modified
 
-# Start output: nonselectable HEADER
-gitout2=( "${CMDR_RED}'Modified files of ${CMDR_RED_E}${CMDR_GREEN}${(q)ZCMDR[current_project]:t}${CMDR_GREEN_E}${CMDR_RED}'${CMDR_RED_E}" )
-LINE_COUNT+=1
-ZCMDRLIST_NONSELECTABLE_ELEMENTS+=( "$LINE_COUNT" )
-
-# Get zstat's at corresponding array's entries
-local -a stat_result
-local mtime
-if [[ "${ZCMDR[stat_available]}" = "1" ]]; then
-    stat_result=( ${(f)"$( zstat "${basedir}${^gitout[@]}" )"} )
-    stat_result=( "${(M)stat_result[@]:#mtime*}" )
-    stat_result=( "${stat_result[@]/mtime[^0-9]#/}" )
-fi
-
-size=${#gitout[@]}
-for (( idx = 1; idx <= size; idx ++ )); do
-    entry="${gitout[idx]}"
-    mtime="${stat_result[idx]}"
-
-    reply=()
-
-    __zcmdr_stdlib_get_timestamp
-    integer days=$(( (REPLY-mtime)/(24*60*60) ))
-    local day_info
-    (( days > 0 )) && day_info="${days}_day(s)" || day_info="today"
-    day_info="${CMDR_CYAN}${day_info}${CMDR_CYAN_E}"
-    day_info="${(r:10:: :)day_info}"
-
-    # Button function arguments:
-    # $1 - action ID
-    # $2 - data1, e.g. timestamp
-    # $3 - data2, e.g. command
-    # $4 - data3, e.g. active path
-    # $5 - data4, e.g. file path, file name, URL, other data
-    # $6 - text
-    # $7 - handler function name
-    if [ "$cd_at_edit" = "yes" ]; then
-        __zcmdr_stdlib_get_std_button "mod1A" "${mtime}" "${selected_editor}" "${ZCMDR[current_project]}" "$entry" "$day_info" __zcmdr_action_edit_file_cd
-        __zcmdr_stdlib_get_std_button "mod1B" "${mtime}" "${selected_editor}" "${ZCMDR[current_project]}" "$entry" "${entry:t}" __zcmdr_action_edit_file_cd
-    else
-        __zcmdr_stdlib_get_std_button "mod1A" "${mtime}" "${selected_editor}" "${ZCMDR[current_project]}" "$entry" "$day_info" __zcmdr_action_edit_file_abs
-        __zcmdr_stdlib_get_std_button "mod1B" "${mtime}" "${selected_editor}" "${ZCMDR[current_project]}" "$entry" "${entry:t}" __zcmdr_action_edit_file_abs
-    fi
-
-    gitout2+=( "${reply[1]} ${reply[2]}" )
-    LINE_COUNT+=${#reply[@]}
-done
-
-OUTPUT+=( "${gitout2[@]}" )
+#
+# Generation time
+#
 
 local ZCMDRLIST_GENERATION_TIME="$(( SECONDS - start_seconds ))"
 ZCMDRLIST_GENERATION_TIME="${ZCMDRLIST_GENERATION_TIME[1,5]}"
