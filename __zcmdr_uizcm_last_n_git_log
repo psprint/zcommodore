@@ -1,0 +1,24 @@
+local git_log_count
+zstyle -s ":plugin:zcommodore" git_log_count git_log_count || git_log_count="5"
+[[ "$git_log_count" != <-> ]] && git_log_count="5"
+
+gitcmd=( git -C "${ZCMDR[current_project]}" log --max-count="$git_log_count" --pretty=format:'%h%x01%s%x01%d%x01%cr%x01%an' --abbrev-commit )
+gitout=( "${(@f)"$( "${gitcmd[@]}" )"}" )
+
+gitout2=( "${CMDR_RED}'Current HEAD commits of ${CMDR_RED_E}${CMDR_GREEN}${(q)ZCMDR[current_project]:t}${CMDR_GREEN_E}${CMDR_RED}'${CMDR_RED_E}" )
+LINE_COUNT+=1
+ZCMDRLIST_NONSELECTABLE_ELEMENTS+=( "$LINE_COUNT" )
+
+local IFSBKP="$IFS"
+local IFS=$'\1'
+for entry in "${gitout[@]}"; do
+    # hash \1 message \1 repo info \1 date \1 author
+    arrentry=( ${=entry} )
+    gitout2+=( "${CMDR_GREEN}${arrentry[1]}${CMDR_GREEN_E} ${CMDR_CYAN}${(q-)arrentry[2]}${CMDR_CYAN_E} ${CMDR_MAGENTA}((${arrentry[4]}))${CMDR_MAGENTA_E} \`${arrentry[5]}\`" )
+    LINE_COUNT+=1
+done
+IFS="$IFSBKP"
+
+OUTPUT+=( "${gitout2[@]}" )
+
+# vim:ft=zsh
