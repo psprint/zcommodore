@@ -76,9 +76,16 @@ typeset -gAH ZCMDR
 ZCMDR[current_project]=""
 ZCMDR[current_tag_file]=""
 ZCMDR[ctags_bin]="${ZCMDR_REPO_DIR}/myctags/ctags"
+typeset -gAH ZCMDR_ACTION_IDS_TO_HANDLERS
 
 [[ -f "$HOME/.config/zcommodore/current_project" ]] && ZCMDR[current_project]="$(<$HOME/.config/zcommodore/current_project)"
 [[ -f "${ZCMDR[current_project]}/.zcmdr_tags" ]] && ZCMDR[current_tag_file]="${ZCMDR[current_project]}/.zcmdr_tags"
+
+#
+# Load modules
+#
+
+zmodload -F zsh/stat b:zstat && ZCMDR[stat_available]="1" || ZCMDR[stat_available]="0"
 
 #
 # Functions
