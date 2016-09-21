@@ -8,6 +8,7 @@ gitout=( "${(@f)"$( "${gitcmd[@]}" )"}" )
 gitout2=( "${CMDR_RED}'Current HEAD commits of ${CMDR_RED_E}${CMDR_GREEN}${(q)ZCMDR[current_project]:t}${CMDR_GREEN_E}${CMDR_RED}'${CMDR_RED_E}" )
 LINE_COUNT+=1
 ZCMDRLIST_NONSELECTABLE_ELEMENTS+=( "$LINE_COUNT" )
+ZCMDRLIST_HOP_INDEXES+=( "$LINE_COUNT" )
 
 local IFSBKP="$IFS"
 local IFS=$'\1'
