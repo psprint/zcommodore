@@ -53,7 +53,9 @@ for (( idx = 1; idx <= size; idx ++ )); do
         __zcmdr_stdlib_get_std_button "mod1B" "${mtime}" "${selected_editor}" "${ZCMDR[current_project]}" "$entry" "${txtentry}" __zcmdr_action_edit_file_abs
     fi
 
-    gitout2+=( "${reply[1]} ${reply[2]}" )
+    __zcmdr_stdlib_get_button "mod1C" "${mtime}" "" "${ZCMDR[current_project]}" "$entry" "Diff" __zcmdr_action_git_diff_file_abs
+
+    gitout2+=( "${reply[1]} ${reply[2]} ${reply[3]}" )
     LINE_COUNT+=${#reply[@]}
 done
 
