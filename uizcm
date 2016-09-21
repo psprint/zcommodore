@@ -1,0 +1,40 @@
+#
+# Started from zle or from command line
+#
+
+emulate -LR zsh
+setopt extendedglob typesetsilent
+
+autoload __zcmdr-process-buffer __zcmdr-usetty-wrapper __zcmdr-list __zcmdr-list-input __zcmdr-list-draw
+
+##
+## Main code
+##
+
+# Measure and limit generation time
+typeset -F SECONDS=0.0
+local -F start_seconds=$SECONDS
+
+local limit_seconds
+zstyle -s ":accumulator" time_limit limit_seconds || limit_seconds="500"
+[[ "$limit_seconds" != <-> ]] && limit_seconds="500"
+
+# Business logic follows
+local curcontext=":zle:$WIDGET"
+local MATCH MBEGIN MEND
+
+local ZCMDRLIST_GENERATION_TIME="$(( SECONDS - start_seconds ))"
+ZCMDRLIST_GENERATION_TIME="${ZCMDRLIST_GENERATION_TIME[1,5]}"
+
+local ZCMDRLIST_WRAPPER_BIT=""
+zaccu-usetty-wrapper zaccu-list-wrapper "Test entry" "Test entry" "Test entry" "$ZCMDRLIST_GENERATION_TIME"
+
+zle && zle redisplay
+
+if [ -z "$ZCMDRLIST_WRAPPER_BIT" ]; then
+    return 1
+fi
+
+return 0
+
+# vim:ft=zsh

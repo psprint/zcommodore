@@ -58,12 +58,15 @@ fi
 # Setup
 #
 
-autoload tag-search-multi-word zcmdr __zcmdr-list __zcmdr-list-draw __zcmdr-list-input __zcmdr-list-wrapper __zcmdr-process-buffer __zcmdr-usetty-wrapper
+autoload tag-search-multi-word zcmdr __zcmdr-list __zcmdr-list-draw __zcmdr-list-input __zcmdr-list-wrapper __zcmdr-process-buffer __zcmdr-usetty-wrapper uizcm
 zle -N tag-search-multi-word
 zle -N tag-search-multi-word-backwards tag-search-multi-word
 zle -N tag-search-multi-word-pbackwards tag-search-multi-word
 zle -N tag-search-multi-word-pforwards tag-search-multi-word
 bindkey "^O^K" tag-search-multi-word
+
+zle -N uizcm
+bindkey "^O^U" uizcm
 
 #
 # Global parameters
