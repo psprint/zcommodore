@@ -29,7 +29,8 @@ for (( idx = 1; idx <= size; idx ++ )); do
     local day_info
     (( days > 0 )) && day_info="${days}_day(s)" || day_info="today"
     day_info="${CMDR_CYAN}${day_info}${CMDR_CYAN_E}"
-    day_info="${(r:10:: :)day_info}"
+    day_info="${(r:12:: :)day_info}"
+    [[ "${day_info/${CMDR_CYAN_E}/}" = "$day_info" ]] && day_info="${day_info}${CMDR_CYAN_E}"
 
     # Main (std) button text
     local txtentry="${entry:t}"
