@@ -70,7 +70,7 @@ __zcmdr_action_git_history() {
 __zcmdr_action_git_ahistory() {
     local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5" dest
 
-    __zcmdr_stdlib_to_cmd_line "cmdr_ahistory ${(q)ZCMDR[current_project]} ${(q)active_path} ${(q)file}"
+    __zcmdr_stdlib_to_cmd_line "cmdr_ahistory ${(q)active_path} . ${(q)file}"
 }
 
 #
