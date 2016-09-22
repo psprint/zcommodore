@@ -86,10 +86,15 @@ integer LINE_COUNT
 # Establish if the project is Git
 #
 
-local basedir
-integer IS_GIT=0
-basedir="$( git -C "${ZCMDR[current_project]}" rev-parse --show-toplevel 2>/dev/null )/"
-[[ -n "$basedir" ]] && IS_GIT=1
+local repo_root_dir
+integer IS_GIT=0 IS_HG=0
+repo_root_dir="$( git -C "${ZCMDR[current_repo]}" rev-parse --show-toplevel 2>/dev/null )"
+if [[ -n "$repo_root_dir" ]]; then
+    IS_GIT=1
+else
+    repo_root_dir="$( hg -R "${ZCMDR[current_repo]}" root 2>/dev/null )"
+    [[ -n "$repo_root_dir" ]] && IS_HG=1
+fi
 
 #
 # General zstyles
