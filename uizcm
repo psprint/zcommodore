@@ -64,7 +64,7 @@ __zcmdr_action_backup() {
 
 __zcmdr_action_git_history() {
     local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5" dest
-    __zcmdr_stdlib_to_cmd_line "git -C ${(q)active_path} log -p ${(q)file}"
+    __zcmdr_stdlib_to_cmd_line "git -C ${(q)active_path} log --follow -p -- ${(q)file}"
 }
 
 #
