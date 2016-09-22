@@ -125,10 +125,12 @@ LINE_COUNT+=1
 ZCMDRLIST_NONSELECTABLE_ELEMENTS+=( "$LINE_COUNT" )
 
 #
-# Last N git commits
+# Last N commits
 #
 
-__zcmdr_uizcm_last_n_git_log
+if (( IS_GIT )); then
+    __zcmdr_uizcm_last_n_git_log
+fi
 
 #
 # List of modified files
@@ -138,7 +140,9 @@ OUTPUT+=( "" )
 LINE_COUNT+=1
 ZCMDRLIST_NONSELECTABLE_ELEMENTS+=( "$LINE_COUNT" )
 
-__zcmdr_uizcm_git_modified
+if (( IS_GIT )); then
+    __zcmdr_uizcm_git_modified
+fi
 
 #
 # Generation time
