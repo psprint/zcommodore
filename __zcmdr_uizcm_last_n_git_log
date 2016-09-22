@@ -12,10 +12,14 @@ ZCMDRLIST_HOP_INDEXES+=( "$LINE_COUNT" )
 
 local IFSBKP="$IFS"
 local IFS=$'\1'
+local entry3
 for entry in "${gitout[@]}"; do
     # hash \1 message \1 repo info \1 date \1 author
     arrentry=( ${=entry} )
-    gitout2+=( "${CMDR_GREEN}${arrentry[1]}${CMDR_GREEN_E} ${CMDR_CYAN}${(q-)arrentry[2]}${CMDR_CYAN_E} ${CMDR_MAGENTA}((${arrentry[4]}))${CMDR_MAGENTA_E} \`${arrentry[5]}\`" )
+    entry3="${arrentry[3]## }"
+    entry3="${(q-)entry3//\([[:space:]]#HEAD[[:space:]]#->[^,]#,[[:space:]]#/(}"
+    [[ -n "$entry3" ]] && entry3=" ${CMDR_YELLOW}$entry3${CMDR_YELLOW_E}"
+    gitout2+=( "${CMDR_GREEN}${arrentry[1]}${CMDR_GREEN_E} ${CMDR_CYAN}${(q-)arrentry[2]}${CMDR_CYAN_E}$entry3 ${CMDR_MAGENTA}((${arrentry[4]}))${CMDR_MAGENTA_E} \`${arrentry[5]}\`" )
     LINE_COUNT+=1
 done
 IFS="$IFSBKP"
