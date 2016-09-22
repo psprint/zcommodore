@@ -59,8 +59,9 @@ for (( idx = 1; idx <= size; idx ++ )); do
     __zcmdr_stdlib_get_button "mod1D" "${mtime}" "/FileCD/" "${ZCMDR[current_project]}" "$entry" "FileCD" __zcmdr_action_file_cd
     __zcmdr_stdlib_get_button "mod1E" "${mtime}" "/Backup/" "${ZCMDR[current_project]}" "$entry" "Backup" __zcmdr_action_backup
     __zcmdr_stdlib_get_button "mod1F" "${mtime}" "/History/" "${ZCMDR[current_project]}" "$entry" "History" __zcmdr_action_git_history
+    __zcmdr_stdlib_get_button "mod1G" "${mtime}" "/Accumulated History/" "${ZCMDR[current_project]}" "$entry" "AHistory" __zcmdr_action_git_ahistory
 
-    gitout2+=( "${reply[1]} ${reply[2]} ${reply[3]} ${reply[4]} ${reply[5]} ${reply[6]}" )
+    gitout2+=( "${reply[1]} ${reply[2]} ${reply[3]} ${reply[4]} ${reply[5]} ${reply[6]} ${reply[7]}" )
     LINE_COUNT+=${#reply[@]}
 done
 

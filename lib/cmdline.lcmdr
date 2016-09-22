@@ -1,0 +1,38 @@
+#
+# $1 - repository path
+# $2 - file path
+# $3 - file name
+#
+cmdr_ahistory() {
+    if [[ "$1" = "-h" ]]; then
+        print "Shows accumulated history for given file"
+        print
+        print "${fg_bold[green]}Usage:${reset_color} cmdr_ahistory <repo path> <file path> <file name>"
+        print
+        print "${fg_bold[green]}Example run:${reset_color}"
+        print "cmdr_ahistory . . myctags/entry.c"
+        print "or:"
+        print "cmdr_ahistory . myctags entry.c"
+        return 0
+    fi
+
+    local repo_path="$1" file_path="$2" file_name="$3"
+    local -a revs
+    revs=( ${(f)"$( git -C "$repo_path" rev-list --all ${(q)file_path}/${(q)file_name} 2>/dev/null )"} )
+
+    local pager_cmd
+    zstyle -s ":plugin:zcommodore" pager_cmd pager_cmd || pager_cmd="less -iR"
+
+    integer idx size="${#revs[@]}"
+    for (( idx = 2; idx <= size; idx ++ )); do
+        print "${fg[yellow]}commit ${revs[1]}${reset_color}"
+        print "${fg[yellow]}commit ${revs[idx]}${reset_color}"
+
+        git -C "$repo_path" diff --color "${revs[idx]}" "${revs[1]}" -- ${(q)file_path}/${(q)file_name}
+        print
+    done | ${=pager_cmd}
+}
+
+ZCMDR[cmdline_sourced]="1"
+
+# vim:ft=zsh

@@ -81,6 +81,8 @@ typeset -gAH ZCMDR_ACTION_IDS_TO_HANDLERS
 [[ -f "$HOME/.config/zcommodore/current_project" ]] && ZCMDR[current_project]="$(<$HOME/.config/zcommodore/current_project)"
 [[ -f "${ZCMDR[current_project]}/.zcmdr_tags" ]] && ZCMDR[current_tag_file]="${ZCMDR[current_project]}/.zcmdr_tags"
 
+[[ "${ZCMDR[cmdline_sourced]}" != "1" ]] && source "${ZCMDR_REPO_DIR}/lib/cmdline.lcmdr"
+
 #
 # Load modules
 #
