@@ -33,6 +33,42 @@ cmdr_ahistory() {
     done | ${=pager_cmd}
 }
 
+#
+# $1 - repository path
+# $2 - file path
+# $3 - file name
+#
+cmdr_store_as_object() {
+    if [[ "$1" = "-h" ]]; then
+        print "Stores given file as BLOB into Git repository. SHA hash"
+        print "is generated so that you can retrieve the file with:"
+        print "    git cat-file -p <SHA>"
+        print "The SHA is appended to stored_objects.lst. The BLOB will"
+        print "be removed by regular Git garbage collecting, as it is"
+        print "unreferenced, after 14 days (default), if git gc will be"
+        print "run."
+        print
+        print "${fg_bold[green]}Usage:${reset_color} cmdr_store_as_object <repo path> <file path> <file name>"
+        print
+        print "${fg_bold[green]}Example run:${reset_color}"
+        print "cmdr_store_as_object . . myctags/entry.c"
+        print "or:"
+        print "cmdr_store_as_object . myctags entry.c"
+        return 0
+    fi
+
+    local repo_path="$1" file_path="$2" file_name="$3"
+
+    local sha=$( git -C "$repo_path" hash-object -w "$file_path/$file_name" )
+
+    __zcmdr_stdlib_get_date_and_time_string
+
+    echo "$sha $REPLY ${(q)file_name}" >>! "$repo_path/stored_objects.lst"
+    echo "Created BLOB for \`$file_name': ${fg_bold[green]}$sha${reset_color}"
+    echo "Saved this SHA into stored_objects.lst"
+    echo "To retrieve the file run: git cat-file -p $sha"
+}
+
 ZCMDR[cmdline_sourced]="1"
 
 # vim:ft=zsh

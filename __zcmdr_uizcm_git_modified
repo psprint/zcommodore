@@ -60,8 +60,9 @@ for (( idx = 1; idx <= size; idx ++ )); do
     __zcmdr_stdlib_get_button "mod1E" "$mtime" "/Backup/" "$repo_root_dir" "$entry" "Backup" __zcmdr_action_backup
     __zcmdr_stdlib_get_button "mod1F" "$mtime" "/History/" "$repo_root_dir" "$entry" "History" __zcmdr_action_git_history
     __zcmdr_stdlib_get_button "mod1G" "$mtime" "/Accumulated History/" "$repo_root_dir" "$entry" "AHistory" __zcmdr_action_git_ahistory
+    __zcmdr_stdlib_get_button "mod1H" "$mtime" "/git hash-object/" "$repo_root_dir" "$entry" "StoreAsObject" __zcmdr_action_git_store_as_object
 
-    gitout2+=( "${reply[1]} ${reply[2]} ${reply[3]} ${reply[4]} ${reply[5]} ${reply[6]} ${reply[7]}" )
+    gitout2+=( "${reply[1]} ${reply[2]} ${reply[3]} ${reply[4]} ${reply[5]} ${reply[6]} ${reply[7]} ${reply[8]}" )
     LINE_COUNT+=${#reply[@]}
 done
 
