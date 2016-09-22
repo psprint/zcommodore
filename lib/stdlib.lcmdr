@@ -206,8 +206,6 @@ function __zcmdr_stdlib_pack_hyperlinks_into_box() {
     #done
 }
 
-ZCMDR[stdlib_sourced]="1"
-
 #
 # Returns timestamp, via datetime or `date` as fallback
 #
@@ -215,5 +213,7 @@ function __zcmdr_stdlib_get_timestamp() {
     REPLY="${EPOCHSECONDS}"
     [[ -z "$REPLY" ]] && REPLY="$(date +%s)"
 }
+
+ZCMDR[stdlib_sourced]="1"
 
 # vim:ft=zsh
