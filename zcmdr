@@ -53,6 +53,8 @@ else
             else
                 print "File .zcmdr_tags wasn't created"
             fi
+        else
+            print "No tags generated (answer was \"no\")"
         fi
     fi
 fi
