@@ -67,7 +67,10 @@ integer term_width="$COLUMNS"
 
 [ "$ZCMDRLIST_REMEMBER_STATE" != 1 ] && ZCMDRLIST_REMEMBER_STATE=2
 
-__zcmdr-list "main" $(( term_height-3 )) $term_width "status" "3" "$term_width" "  Welcome to Zcommodore  " "1" "$@"
+[[ "${ZCMDR[stdlib_sourced]}" != "1" ]] && source "${ZCMDR_REPO_DIR}/lib/stdlib.lcmdr"
+__zcmdr_stdlib_get_time
+
+__zcmdr-list "main" $(( term_height-3 )) $term_width "status" "3" "$term_width" "  Welcome to Zcommodore $REPLY " "1" "$@"
 
 if [[ "$REPLY" != "-1" && "$REPLY" = -(#c0,1)[0-9]## ]]; then
     answer=${reply[REPLY]}
