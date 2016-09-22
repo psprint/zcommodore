@@ -63,12 +63,12 @@ __zcmdr_action_backup() {
 }
 
 __zcmdr_action_git_history() {
-    local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5" dest
+    local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5"
     __zcmdr_stdlib_to_cmd_line "git -C ${(q)active_path} log --follow -p -- ${(q)file}"
 }
 
 __zcmdr_action_git_ahistory() {
-    local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5" dest
+    local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5"
 
     __zcmdr_stdlib_to_cmd_line "cmdr_ahistory ${(q)active_path} . ${(q)file}"
 }
