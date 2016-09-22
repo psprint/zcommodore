@@ -74,12 +74,25 @@ bindkey "^O^U" uizcm
 
 typeset -gAH ZCMDR
 ZCMDR[current_project]=""
+ZCMDR[current_repo]=""
 ZCMDR[current_tag_file]=""
 ZCMDR[ctags_bin]="${ZCMDR_REPO_DIR}/myctags/ctags"
 typeset -gAH ZCMDR_ACTION_IDS_TO_HANDLERS
 
-[[ -f "$HOME/.config/zcommodore/current_project" ]] && ZCMDR[current_project]="$(<$HOME/.config/zcommodore/current_project)"
-[[ -f "${ZCMDR[current_project]}/.zcmdr_tags" ]] && ZCMDR[current_tag_file]="${ZCMDR[current_project]}/.zcmdr_tags"
+if [[ -f "$HOME/.config/zcommodore/current_project" ]]; then
+    local -a input_data
+    input_data=( "${(@f)"$(<$HOME/.config/zcommodore/current_project)"}" )
+
+    ZCMDR[current_project]="${input_data[1]}"
+    ZCMDR[current_repo]="${input_data[2]}"
+    ZCMDR[current_tag_file]="${input_data[3]}"
+
+    # That is not consistent, what is in file that is in
+    # file, but I think that this kind of robustness is fine
+    if [[ -z "${ZCMDR[current_tag_file]}" && -f "${ZCMDR[current_project]}/.zcmdr_tags" ]]; then
+        ZCMDR[current_tag_file]="${ZCMDR[current_project]}/.zcmdr_tags"
+    fi
+fi
 
 [[ "${ZCMDR[cmdline_sourced]}" != "1" ]] && source "${ZCMDR_REPO_DIR}/lib/cmdline.lcmdr"
 
