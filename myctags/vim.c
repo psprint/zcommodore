@@ -362,8 +362,31 @@ static boolean parseCommand (const unsigned char *line)
 		if ((int) *cp == '!')
 			++cp;
 
-		while (*cp && isspace ((int) *cp))
+		boolean spaceAfterCmd = FALSE;
+		while (*cp && isspace ((int) *cp)) {
 			++cp; 
+			spaceAfterCmd = TRUE;
+		}
+
+		/* At this point we are:
+		 * - after "comp", "comc", "com", "comm", "comma", "comman", "command"
+		 * - after following "!"
+		 * - after any following spaces
+		 *
+		 * What I've added is: there must be at least one above space.
+		 * Word "command" that ends e.g. with "." should not be processed
+		 * as command. Also, because of poor state of this file – there is
+		 * no handling of cmdProcessed == FALSE, TRUE is returned, as if the
+		 * command was processed. However, that's not that bad, because vim
+		 * language rather doesn't have multiple declaring things in one line
+		 * (but with |, maybe?). If there is a bad "command<not-space-not-!>",
+		 * then the line can be maybe indeed skipped without loosing correctness.
+		 */
+
+		if ( !spaceAfterCmd ) {
+			cmdProcessed = TRUE;
+			goto cleanUp;
+		}
 	} 
 	else 
 	{
