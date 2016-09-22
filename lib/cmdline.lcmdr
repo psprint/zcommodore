@@ -4,7 +4,7 @@
 # $3 - file name
 #
 cmdr_ahistory() {
-    if [[ "$1" = "-h" ]]; then
+    if [[ "$1" = "-h" || "$#" = "0" ]]; then
         print "Shows accumulated history for given file"
         print
         print "${fg_bold[green]}Usage:${reset_color} cmdr_ahistory <repo path> <file path> <file name>"
@@ -39,7 +39,7 @@ cmdr_ahistory() {
 # $3 - file name
 #
 cmdr_store_as_object() {
-    if [[ "$1" = "-h" ]]; then
+    if [[ "$1" = "-h" || "$#" = "0" ]]; then
         print "Stores given file as BLOB into Git repository. SHA hash"
         print "is generated so that you can retrieve the file with:"
         print "    git cat-file -p <SHA>"
