@@ -13,7 +13,7 @@ fi
 # Always set current project if not $HOME
 ZCMDR[current_project]="$PWD"
 ZCMDR[current_repo]="$( git -C "$PWD" rev-parse --show-toplevel 2>/dev/null )"
-[[ -z "${ZCMDR[current_repo]}" ]] && ZCMDR[current_repo]="$( hg root 2>/dev/null )"
+[[ -z "${ZCMDR[current_repo]}" ]] && ZCMDR[current_repo]="$( hg -R "$PWD" root 2>/dev/null )"
 ZCMDR[current_tag_file]=""
 
 command mkdir -p ~/.config/zcommodore
