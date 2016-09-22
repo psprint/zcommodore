@@ -2,7 +2,7 @@
 gitout=( ${(f)"$( git -C "$repo_root_dir" diff --name-only 2>/dev/null )"} )
 
 # Start output: nonselectable HEADER
-gitout2=( "${CMDR_RED}'Modified files of ${CMDR_RED_E}${CMDR_GREEN}${(q)repo_root_dir:t}${CMDR_GREEN_E}${CMDR_RED}'${CMDR_RED_E}" )
+gitout2=( "${CMDR_RED}'Modified files of ${CMDR_RED_E}${CMDR_YELLOW}${(q)repo_root_dir:t}${CMDR_YELLOW_E}${CMDR_RED}'${CMDR_RED_E}" )
 LINE_COUNT+=1
 ZCMDRLIST_NONSELECTABLE_ELEMENTS+=( "$LINE_COUNT" )
 ZCMDRLIST_HOP_INDEXES+=( "$LINE_COUNT" )
@@ -36,7 +36,7 @@ for (( idx = 1; idx <= size; idx ++ )); do
     local txtentry="${entry:t}"
     txtentry="${txtentry//\%/%%}"
     txtentry='%35<...<'"$txtentry"
-    txtentry="$ACC_YELLOW${(%)txtentry}$ACC_YELLOW_E"
+    txtentry="$ACC_GREEN${(%)txtentry}$ACC_GREEN_E"
     txtentry="${(r:40:: :)txtentry}"
 
     # Button function arguments:
