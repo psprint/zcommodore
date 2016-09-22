@@ -42,7 +42,7 @@ elif [[ ! -f "${ZCMDR_REPO_DIR}/myctags/COMPILED_AT" || ( "${ZCMDR_REPO_DIR}/myc
         local compiled_at_ts="$(<${ZCMDR_REPO_DIR}/myctags/COMPILED_AT)"
         local recompile_request_ts="$(<${ZCMDR_REPO_DIR}/myctags/RECOMPILE_REQUEST)"
         if [[ "$recompile_request_ts" -gt "${compiled_at_ts:-0}" ]]; then
-            echo "${fg_bold[red]}RECOMPILETION OF CTAGS REQUESTED BY UPDATE${reset_color}"
+            echo "${fg_bold[red]}RECOMPILETION OF CTAGS REQUESTED BY PLUGIN'S UPDATE${reset_color}"
             ( cd "${ZCMDR_REPO_DIR}/myctags"; ./configure )
             make -C "${ZCMDR_REPO_DIR}/myctags" clean
             make -C "${ZCMDR_REPO_DIR}/myctags"
