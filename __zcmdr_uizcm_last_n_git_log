@@ -2,10 +2,10 @@ local git_log_count
 zstyle -s ":plugin:zcommodore" git_log_count git_log_count || git_log_count="5"
 [[ "$git_log_count" != <-> ]] && git_log_count="5"
 
-gitcmd=( git -C "${ZCMDR[current_project]}" log --max-count="$git_log_count" --pretty=format:'%h%x01%s%x01%d%x01%cr%x01%an' --abbrev-commit )
+gitcmd=( git -C "$repo_root_dir" log --max-count="$git_log_count" --pretty=format:'%h%x01%s%x01%d%x01%cr%x01%an' --abbrev-commit )
 gitout=( "${(@f)"$( "${gitcmd[@]}" )"}" )
 
-gitout2=( "${CMDR_RED}'Current HEAD commits of ${CMDR_RED_E}${CMDR_GREEN}${(q)ZCMDR[current_project]:t}${CMDR_GREEN_E}${CMDR_RED}'${CMDR_RED_E}" )
+gitout2=( "${CMDR_RED}'Current HEAD Git commits of ${CMDR_RED_E}${CMDR_GREEN}${(q)repo_root_dir:t}${CMDR_GREEN_E}${CMDR_RED}'${CMDR_RED_E}" )
 LINE_COUNT+=1
 ZCMDRLIST_NONSELECTABLE_ELEMENTS+=( "$LINE_COUNT" )
 ZCMDRLIST_HOP_INDEXES+=( "$LINE_COUNT" )
