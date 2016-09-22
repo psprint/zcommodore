@@ -214,6 +214,15 @@ function __zcmdr_stdlib_get_timestamp() {
     [[ -z "$REPLY" ]] && REPLY="$(date +%s)"
 }
 
+#
+# Returns time %H:%M, via datetime or `date` as fallback
+#
+function __zcmdr_stdlib_get_time() {
+    local ts
+    ts="${EPOCHSECONDS}"
+    [[ -z "$ts" ]] && REPLY="$(date '+%H:%M')" || strftime -s REPLY '%H:%M' "$ts"
+}
+
 ZCMDR[stdlib_sourced]="1"
 
 # vim:ft=zsh
