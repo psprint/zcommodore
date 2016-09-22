@@ -11,7 +11,7 @@ ZCMDRLIST_HOP_INDEXES+=( "$LINE_COUNT" )
 local -a stat_result
 local mtime
 if [[ "${ZCMDR[stat_available]}" = "1" && "${#gitout}" != "0" ]]; then
-    stat_result=( ${(f)"$( zstat "${basedir}${^gitout[@]}" )"} )
+    stat_result=( ${(f)"$( zstat "${repo_root_dir}/${^gitout[@]}" )"} )
     stat_result=( "${(M)stat_result[@]:#mtime*}" )
     stat_result=( "${stat_result[@]/mtime[^0-9]#/}" )
 fi
