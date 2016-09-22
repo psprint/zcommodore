@@ -69,6 +69,30 @@ cmdr_store_as_object() {
     echo "To retrieve the file run: git cat-file -p $sha"
 }
 
+#
+# Creates backup directory.
+# Echoes it when no "-s" option
+#
+
+cmdr_bdir() {
+    if [[ "$1" = "-h" ]]; then
+        print "Creates backup directory according to Zstyle setting:"
+        print "zstyle \":plugin:zcommodore\" backup_dir {path}"
+        return 0
+    fi
+
+    zstyle -s ":plugin:zcommodore" backup_dir dest || dest="$HOME/.backup"
+
+    integer existed=0
+    [[ -d "$dest" ]] && existed=1 || mkdir -p "$dest"
+
+    [[ "$1" != "-s" && "$existed" -eq "0" ]] && print "Created backup directory: $dest"
+    [[ "$1" != "-s" && "$existed" -eq "1" ]] && print "Backup directory exists: $dest"
+}
+
+
+
+
 ZCMDR[cmdline_sourced]="1"
 
 # vim:ft=zsh

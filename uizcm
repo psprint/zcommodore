@@ -59,7 +59,7 @@ __zcmdr_action_backup() {
     local dir="${(q)reply[1]}" file="${(q)reply[2]}"
 
     __zcmdr_stdlib_get_date_and_time_string
-    __zcmdr_stdlib_to_cmd_line "mkdir -p ${(q)dest}; cp -vf $dir/$file ${(q)dest}/${file}_$REPLY"
+    __zcmdr_stdlib_to_cmd_line "cmdr_bdir -s; cp -vf $dir/$file ${(q)dest}/${file}_$REPLY"
 }
 
 __zcmdr_action_git_history() {
