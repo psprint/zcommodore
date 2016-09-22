@@ -75,8 +75,13 @@ case "$key" in
         if [[ "$ZCMDRLIST_SEARCH_BUFFER" != "" || "$ZCMDRLIST_IS_UNIQ_MODE" -eq 1 ||
             ${ZCMDRLIST_NONSELECTABLE_ELEMENTS[(r)$current_idx]} != $current_idx ]]
         then
-            # Save current element in the result variable
-            reply=( $current_idx SELECT )
+            # Check if we are at hyperlink. Only then allow selection
+            local -a segs
+            segs=( "${(z@)list[$current_idx]}" )
+            if [[ "${segs[ZCMDRLIST_CURRENT_SEGMENT]//$'\1'/}" != "${segs[ZCMDRLIST_CURRENT_SEGMENT]}" ]]; then
+                # Save current element in the result variable
+                reply=( $current_idx SELECT )
+            fi
         fi
         ;;
     (q|Q)
