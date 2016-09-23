@@ -30,6 +30,8 @@ autoload __zcmdr-list-draw __zcmdr-list-input __zcmdr-process-buffer
 # Outputs a message in the bottom of the screen
 -zcmdrlist_status_msg() {
     # -1 for border, -1 for 0-based indexing
+    zcurses move "$wname_status" 2 0
+    zcurses clear "$wname_status" eol
     zcurses move "$wname_status" 1 2
     zcurses clear "$wname_status" eol
     zcurses string "$wname_status" "$1"
