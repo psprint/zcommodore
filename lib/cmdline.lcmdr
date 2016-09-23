@@ -120,7 +120,7 @@ cmdr_same_files() {
     # Get list of files (3 steps)
     integer nfiles
     local -a files save_files
-    files=( ${(f)"$( git -C "$root_dir" show --name-status "$commit" 2>/dev/null )"} )
+    files=( ${(f)"$( git -C "$root_dir" show --name-status --no-renames "$commit" 2>/dev/null )"} )
     files=( "${(@M)files:#((#s)[ADM][ADM]#[[:space:]]##*|(#s)[ ][ADM][[:space:]]##*)}" )
     files=( "${files[@]/(#b)(#s)[[:alpha:]]##[[:space:]]##(*)(#e)/${match[1]}}" )
     nfiles="${#files}"
