@@ -90,6 +90,74 @@ cmdr_bdir() {
     [[ "$1" != "-s" && "$existed" -eq "1" ]] && print "Backup directory exists: $dest"
 }
 
+cmdr_same_files() {
+    if [[ "$1" = "-h" || "$#" = "0" ]]; then
+        print -- "Searches for commits that alter the same set of files as input commit"
+        print -- "${fg_bold[green]}Usage:${reset_color} cmdr_same_files [-e] <repo path> <commit sha>"
+        print
+        print -- "-e Commits modifying EXACTLY the same files, never more than them"
+        print
+        print -- "${fg_bold[green]}Example run:${reset_color}"
+        print -- "cmdr_same_files -e . f393004"
+        print -- "or"
+        print -- "cmdr_same_files -e ~/github/myproject f393004"
+        return 0
+    fi
+
+    integer exactly=0
+    [[ "$1" = "-e" ]] && exactly=1 && shift
+
+    (( exactly == 1 )) && print "${fg_bold[red]}Searching for commits modifying EXACTLY (-e) the same files${reset_color}"
+    (( exactly == 0 )) && print "${fg_bold[red]}Searching for commits modifying AT LEAST the same files${reset_color}"
+
+    local root_dir="$1"
+    local commit="$2"
+
+    # Get list of files (3 steps)
+    integer nfiles
+    local -a files save_files
+    files=( ${(f)"$( git -C "$root_dir" show --name-status "$commit" 2>/dev/null )"} )
+    files=( "${(@M)files:#((#s)[ADM][ADM]#[[:space:]]##*|(#s)[ ][ADM][[:space:]]##*)}" )
+    files=( "${files[@]/(#b)(#s)[[:alpha:]]##[[:space:]]##(*)(#e)/${match[1]}}" )
+    nfiles="${#files}"
+    save_files=( "${files[@]}" )
+
+    # First revision list
+    local -a revlist
+    revlist=( ${(f)"$( git -C "$root_dir" rev-list HEAD -- ${files[1]} )"} )
+    shift 1 files
+
+    # Following revision lists - do intersections
+    local -a revlist2
+    local f
+    for f in "${files[@]}"; do
+        revlist2=( ${(f)"$( git -C "$root_dir" rev-list HEAD -- $f )"} )
+        revlist=( "${revlist[@]:*revlist2}" )
+    done
+
+    if (( exactly )); then
+        # Now for obtained revision list: count files,
+        # reject revisions that change more files than
+        # the required number
+        local rev
+        revlist2=()
+        for rev in "${revlist[@]}"; do
+            files=( ${(f)"$( git -C "$root_dir" show --name-status "$rev" 2>/dev/null )"} )
+            files=( "${(@M)files:#(#s)[ADM][[:space:]]##*}" )
+            [[ "${#files}" -eq "$nfiles" ]] && revlist2+=( "$rev" )
+        done
+    else
+        revlist2=( "${revlist[@]}" )
+    fi
+
+    if [[ "${#revlist2}" = "0" ]]; then
+        echo "${fg_bold[green]}No commits modifying the same set of files:${reset_color}"
+        print -rl -- "${save_files[@]}"
+    else
+        git -C "$root_dir" show --stat "${revlist2[@]}"
+    fi
+}
+
 
 
 
