@@ -107,11 +107,15 @@ cmdr_same_files() {
     integer exactly=0
     [[ "$1" = "-e" ]] && exactly=1 && shift
 
+    [[ "$#" -lt 2 ]] && { echo "Two parameters required, repo path and commit sha, aborting."; return 1; }
+
     (( exactly == 1 )) && print "${fg_bold[red]}Searching for commits modifying EXACTLY (-e) the same files${reset_color}"
     (( exactly == 0 )) && print "${fg_bold[red]}Searching for commits modifying AT LEAST the same files${reset_color}"
 
     local root_dir="$1"
     local commit="$2"
+
+    [[ ! -d "$root_dir" ]] && { print "Repository dir (first parameter) doesn't exist or isn't directory"; return 1; }
 
     # Get list of files (3 steps)
     integer nfiles
@@ -121,6 +125,8 @@ cmdr_same_files() {
     files=( "${files[@]/(#b)(#s)[[:alpha:]]##[[:space:]]##(*)(#e)/${match[1]}}" )
     nfiles="${#files}"
     save_files=( "${files[@]}" )
+
+    [[ "$nfiles" = "0" ]] && { print "No commits found"; return 1; }
 
     # First revision list
     local -a revlist
