@@ -97,8 +97,6 @@ __zcmdr_action_git_same_files_e() {
 
 local curcontext=":zle:$WIDGET"
 local MATCH MBEGIN MEND
-typeset -a OUTPUT
-integer LINE_COUNT=0
 
 #
 # Establish if the project is Git
@@ -174,10 +172,14 @@ fi
 ZCMDRLIST_NONSELECTABLE_ELEMENTS=()
 ZCMDRLIST_HOP_INDEXES=()
 
-local -a output nonselectables hops
+local -a OUTPUT output nonselectables hops
 local -a prev_nonselectables prev_hops
 local n var_name
-integer size
+integer LINE_COUNT size
+
+OUTPUT=( )
+LINE_COUNT=0
+
 for n in "log" "modified"; do
     # Get output
     var_name="${n}_output"
