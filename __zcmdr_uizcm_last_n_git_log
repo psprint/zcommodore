@@ -4,9 +4,8 @@ local -a nonselectables     # To be appended, upon making indices global, to ZCM
 local -a hop_indices        # To be appended, upon making indices global, to ZCMDRLIST_HOP_INDEXES
 integer own_LINE_COUNT=0    # Local line count
 
-local git_log_count
-zstyle -s ":plugin:zcommodore" git_log_count git_log_count || git_log_count="7"
-[[ "$git_log_count" != <-> ]] && git_log_count="5"
+# Input: number of log entries
+local git_log_count="$1"
 
 gitcmd=( git -C "$repo_root_dir" log --max-count="$git_log_count" --pretty=format:'%H%x01%s%x01%d%x01%cr%x01%an' )
 gitout=( "${(@f)"$( "${gitcmd[@]}" )"}" )

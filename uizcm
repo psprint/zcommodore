@@ -139,6 +139,14 @@ local -a modified_output modified_nonselectables modified_hops
 local -a prev_modified_nonselectables prev_modified_hops
 integer modified_size
 
+#
+# Parameters for modules
+#
+
+local git_log_count
+zstyle -s ":plugin:zcommodore" git_log_count git_log_count || git_log_count="7"
+[[ "$git_log_count" != <-> ]] && git_log_count="7"
+
 ###
 ### REGENERATION REQUEST LOOP ###
 ###
@@ -153,8 +161,10 @@ while (( 1 )); do
 
 if [[ -z "$REGENERATE" || "$REGENERATE" = "log" ]]; then
 
+    [[ "$REGENERATE" = "log" ]] && (( git_log_count+=5 ))
+
     if (( IS_GIT )); then
-        __zcmdr_uizcm_last_n_git_log
+        __zcmdr_uizcm_last_n_git_log "$git_log_count"
 
         log_output=( "${reply[@]}" )
         log_size="$reply2"
