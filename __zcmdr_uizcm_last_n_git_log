@@ -34,8 +34,10 @@ for entry in "${gitout[@]}"; do
     local txt1="${arrentry[1]}"
     txt1="${CMDR_GREEN}${txt1[1,7]}${CMDR_GREEN_E}"
     local txt2="${CMDR_CYAN}${(q-)arrentry[2]}${CMDR_CYAN_E}"
-    __zcmdr_stdlib_get_std_button "glog1A" "0" "/Same-files commits/" "$repo_root_dir" "${arrentry[1]}" "$txt1" __zcmdr_action_git_same_files
+    local txt4="${CMDR_MAGENTA}((${arrentry[4]}))${CMDR_MAGENTA_E}"
+    __zcmdr_stdlib_get_std_button "glog1A" "0" "/Open commit/" "$repo_root_dir" "${arrentry[1]}" "$txt1" __zcmdr_action_git_open_commit
     __zcmdr_stdlib_get_std_button "glog1B" "0" "/Exactly-files commits/" "$repo_root_dir" "${arrentry[1]}" "$txt2" __zcmdr_action_git_same_files_e
+    __zcmdr_stdlib_get_std_button "glog1C" "0" "/Same-files commits/" "$repo_root_dir" "${arrentry[1]}" "$txt4" __zcmdr_action_git_same_files
 
     # Before adding new entry - check if a separator is needed
     if (( ecount > ZCMDR[LOG_SIZE_INITIAL] )); then
@@ -46,7 +48,7 @@ for entry in "${gitout[@]}"; do
         fi
     fi
 
-    gitout2+=( "${reply[1]} ${reply[2]}$entry3 ${CMDR_MAGENTA}((${arrentry[4]}))${CMDR_MAGENTA_E} \`${arrentry[5]}\`" )
+    gitout2+=( "${reply[1]} ${reply[2]}$entry3 ${reply[3]} \`${arrentry[5]}\`" )
     own_LINE_COUNT+=1
 done
 IFS="$IFSBKP"

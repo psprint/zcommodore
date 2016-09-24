@@ -91,6 +91,12 @@ __zcmdr_action_git_same_files_e() {
     __zcmdr_stdlib_to_cmd_line "cmdr_same_files -e ${(q)active_path} $sha"
 }
 
+__zcmdr_action_git_open_commit() {
+    local id="$1" ts="$2" cmd="$3" active_path="$4" sha="$5"
+
+    #__zcmdr_stdlib_to_cmd_line "cmdr_same_files -e ${(q)active_path} $sha"
+}
+
 #
 # Business logic follows
 #
