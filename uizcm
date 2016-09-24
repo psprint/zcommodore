@@ -191,8 +191,6 @@ if [[ -z "$REGENERATE" || "$REGENERATE" = "log" ]]; then
         log_nonselectables=( "${reply3[@]}" )
         log_hops=( "${reply4[@]}" )
     fi
-
-    REGENERATE=""
 fi
 
 #
@@ -209,8 +207,6 @@ if [[ -z "$REGENERATE" || "$REGENERATE" = "modified" ]]; then
         modified_nonselectables=( "${reply3[@]}" )
         modified_hops=( "${reply4[@]}" )
     fi
-
-    REGENERATE=""
 fi
 
 #
@@ -279,6 +275,10 @@ for n in "log" "modified"; do
     OUTPUT+=( "${output[@]}" )
     LINE_COUNT+=size
 done
+
+# Reset regeneration variables
+REGENERATE=""
+REGENERATE_CMD=""
 
 #
 # Generation time
