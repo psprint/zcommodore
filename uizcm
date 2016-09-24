@@ -6,7 +6,7 @@ emulate -LR zsh
 setopt extendedglob typesetsilent
 
 autoload __zcmdr-process-buffer __zcmdr-usetty-wrapper __zcmdr-list __zcmdr-list-input __zcmdr-list-draw
-autoload __zcmdr_uizcm_last_n_git_log __zcmdr_uizcm_git_modified
+autoload __zcmdr_uizcm_last_n_git_log __zcmdr_uizcm_git_modified __zcmdr_action_git_open_commit
 
 [[ "${ZCMDR[stdlib_sourced]}" != "1" ]] && source "${ZCMDR_REPO_DIR}/lib/stdlib.lcmdr"
 
@@ -89,12 +89,6 @@ __zcmdr_action_git_same_files_e() {
     local id="$1" ts="$2" cmd="$3" active_path="$4" sha="$5"
 
     __zcmdr_stdlib_to_cmd_line "cmdr_same_files -e ${(q)active_path} $sha"
-}
-
-__zcmdr_action_git_open_commit() {
-    local id="$1" ts="$2" cmd="$3" active_path="$4" sha="$5"
-
-    #__zcmdr_stdlib_to_cmd_line "cmdr_same_files -e ${(q)active_path} $sha"
 }
 
 #

@@ -1,0 +1,70 @@
+local id="$1" ts="$2" cmd="$3" active_path="$4" sha="$5"
+
+#
+# Handlers
+#
+
+# Own handler for own zcmdr-list - "a" / first action
+__zcmdr_action_git_open_commit_a() {
+    local id="$1" ts="$2" cmd="$3" active_path="$4" sha="$5"
+    __zcmdr_stdlib_to_cmd_line "${selected_editor} =( git -C ${(q)active_path} cat-file blob $sha )"
+}
+
+#
+# Main code
+#
+
+local -a gitcmd             # Git command to run
+local -a gitout             # Unprocessed git output
+local -a gitout2            # Processed git output
+integer own_LINE_COUNT=0    # Local line count
+
+# *-list* state variables, localized so
+# that outer list doesn't get disturbed
+local ZCMDRLIST_FROM_WHAT_IDX_LIST_IS_SHOWN
+local ZCMDRLIST_CURRENT_IDX
+local ZCMDRLIST_IS_SEARCH_MODE
+local ZCMDRLIST_SEARCH_BUFFER
+local ZCMDRLIST_TEXT_OFFSET
+local ZCMDRLIST_IS_UNIQ_MODE
+local ZCMDRLIST_CURRENT_SEGMENT # This variable is responsible for horizontal indexing
+local ZCMDRLIST_ACTIVE_SEGMENTS=()
+local ZCMDRLIST_USER_CURRENT_IDX
+local ZCMDRLIST_USER_LAST_ELEMENT
+local ZCMDRLIST_REMEMBER_STATE=0 # Don't reuse, remember state
+
+# Run git command to list tree of given commit SHA
+gitcmd=( git -C "$active_path" ls-tree -r --full-tree "$sha" )
+gitout=( "${(@f)"$( "${gitcmd[@]}" )"}" )
+
+# Header
+gitout2=( "${CMDR_RED}'Tree ${CMDR_RED_E}${CMDR_YELLOW}${sha[1,7]}${CMDR_YELLOW_E}${CMDR_RED} of ${CMDR_RED_E}${CMDR_YELLOW}${(q)active_path:t}${CMDR_YELLOW_E}${CMDR_RED}'${CMDR_RED_E}" )
+own_LINE_COUNT+=1
+ZCMDRLIST_NONSELECTABLE_ELEMENTS+=( "$own_LINE_COUNT" )
+ZCMDRLIST_HOP_INDEXES+=( "$own_LINE_COUNT" )
+
+#
+# Invoke the list, handle outcome
+#
+
+OUTPUT=( "${gitout2[@]}" "${gitout[@]}" )
+local ZCMDRLIST_WRAPPER_BIT=""
+__zcmdr-usetty-wrapper __zcmdr-list-wrapper "${OUTPUT[@]}"
+
+if [ -z "$ZCMDRLIST_WRAPPER_BIT" ]; then
+    zle && zle .redisplay
+    return 1
+fi
+
+# ID, data1, data2, data3, data4
+if __zcmdr_stdlib_decode_hyperlink "$ZCMDRLIST_WRAPPER_BIT"; then
+    local id="${reply[1]}" ts="${reply[2]}" cmd="${reply[3]}" active_path="${reply[4]}" file="${reply[5]}"
+    if [[ -n "${ZCMDR_ACTION_IDS_TO_HANDLERS[$id]}" ]]; then
+        zle && zle .redisplay
+        # Call the handled with all hyper-link data
+        "${ZCMDR_ACTION_IDS_TO_HANDLERS[$id]}" "$id" "$ts" "$cmd" "$active_path" "$file"
+        break
+    fi
+fi
+
+# vim:ft=zsh
