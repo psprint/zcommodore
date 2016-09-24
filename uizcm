@@ -139,30 +139,48 @@ local -a modified_output modified_nonselectables modified_hops
 local -a prev_modified_nonselectables prev_modified_hops
 integer modified_size
 
+###
+### REGENERATION REQUEST LOOP ###
+###
+
+local REGENERATE=""
+
+while (( 1 )); do
+
 #
 # Last N commits
 #
 
-if (( IS_GIT )); then
-    __zcmdr_uizcm_last_n_git_log
+if [[ -z "$REGENERATE" || "$REGENERATE" = "log" ]]; then
 
-    log_output=( "${reply[@]}" )
-    log_size="$reply2"
-    log_nonselectables=( "${reply3[@]}" )
-    log_hops=( "${reply4[@]}" )
+    if (( IS_GIT )); then
+        __zcmdr_uizcm_last_n_git_log
+
+        log_output=( "${reply[@]}" )
+        log_size="$reply2"
+        log_nonselectables=( "${reply3[@]}" )
+        log_hops=( "${reply4[@]}" )
+    fi
+
+    REGENERATE=""
 fi
 
 #
 # List of modified files
 #
 
-if (( IS_GIT )); then
-    __zcmdr_uizcm_git_modified
+if [[ -z "$REGENERATE" || "$REGENERATE" = "modified" ]]; then
 
-    modified_output=( "${reply[@]}" )
-    modified_size="$reply2"
-    modified_nonselectables=( "${reply3[@]}" )
-    modified_hops=( "${reply4[@]}" )
+    if (( IS_GIT )); then
+        __zcmdr_uizcm_git_modified
+
+        modified_output=( "${reply[@]}" )
+        modified_size="$reply2"
+        modified_nonselectables=( "${reply3[@]}" )
+        modified_hops=( "${reply4[@]}" )
+    fi
+
+    REGENERATE=""
 fi
 
 #
@@ -246,20 +264,26 @@ ZCMDRLIST_GENERATION_TIME="${ZCMDRLIST_GENERATION_TIME[1,5]}"
 local ZCMDRLIST_WRAPPER_BIT=""
 __zcmdr-usetty-wrapper __zcmdr-list-wrapper "${OUTPUT[@]}" "$ZCMDRLIST_GENERATION_TIME"
 
-zle && zle .redisplay
-
 if [ -z "$ZCMDRLIST_WRAPPER_BIT" ]; then
+    zle && zle .redisplay
     return 1
 fi
 
 # ID, data1, data2, data3, data4
 if __zcmdr_stdlib_decode_hyperlink "$ZCMDRLIST_WRAPPER_BIT"; then
     local id="${reply[1]}" ts="${reply[2]}" cmd="${reply[3]}" active_path="${reply[4]}" file="${reply[5]}"
-    if [ -n "${ZCMDR_ACTION_IDS_TO_HANDLERS[$id]}" ]; then
+    if [[ "$id" = "regenerate" ]]; then
+        REGENERATE="$cmd"
+    elif [[ -n "${ZCMDR_ACTION_IDS_TO_HANDLERS[$id]}" ]]; then
+        zle && zle .redisplay
         # Call the handled with all hyper-link data
         "${ZCMDR_ACTION_IDS_TO_HANDLERS[$id]}" "$id" "$ts" "$cmd" "$active_path" "$file"
+        break
     fi
 fi
+
+### REGENERATION REQUEST LOOP ###
+done
 
 return 0
 
