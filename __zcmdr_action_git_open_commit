@@ -6,9 +6,9 @@ local id="$1" ts="$2" cmd="$3" active_path="$4" sha="$5"
 
 # Own handler for own zcmdr-list - "a" / first action
 __zcmdr_action_git_open_commit_a() {
-    local id="$1" path="$2" cmd="$3" active_path="$4" sha="$5"
+    local id="$1" mypath="$2" cmd="$3" active_path="$4" sha="$5"
     if [[ "${ZCMDR[INTERACTIVE_COMMENTS]}" = "1" ]]; then
-        __zcmdr_stdlib_to_cmd_line "${(q)cmd} =( git -C ${(q)active_path} cat-file blob $sha ) # $path"
+        __zcmdr_stdlib_to_cmd_line "${(q)cmd} =( git -C ${(q)active_path} cat-file blob $sha ) # $mypath"
     else
         __zcmdr_stdlib_to_cmd_line "${(q)cmd} =( git -C ${(q)active_path} cat-file blob $sha )"
     fi
