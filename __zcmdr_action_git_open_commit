@@ -39,6 +39,10 @@ local ZCMDRLIST_USER_CURRENT_IDX
 local ZCMDRLIST_USER_LAST_ELEMENT
 local ZCMDRLIST_REMEMBER_STATE=0 # Don't reuse, remember state
 local -A ZCMDRLIST_ACTIVE_SEGMENTS
+local ZCMDRLIST_TRACK_SEGMENTS
+local -a ZCMDRLIST_ENABLED_EVENTS
+local -a ZCMDRLIST_NONSELECTABLE_ELEMENTS
+local -a ZCMDRLIST_HOP_INDEXES
 
 # Run git command to list tree of given commit SHA
 gitcmd=( git -C "$active_path" ls-tree -r --full-tree "$sha" )
