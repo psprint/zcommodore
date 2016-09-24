@@ -2,6 +2,8 @@
 # Started from zle or from command line
 #
 
+[[ -o interactivecomments ]] && ZCMDR[INTERACTIVE_COMMENTS]="1" || ZCMDR[INTERACTIVE_COMMENTS]="0"
+
 emulate -LR zsh
 setopt extendedglob typesetsilent
 

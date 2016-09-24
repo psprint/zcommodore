@@ -6,8 +6,12 @@ local id="$1" ts="$2" cmd="$3" active_path="$4" sha="$5"
 
 # Own handler for own zcmdr-list - "a" / first action
 __zcmdr_action_git_open_commit_a() {
-    local id="$1" ts="$2" cmd="$3" active_path="$4" sha="$5"
-    __zcmdr_stdlib_to_cmd_line "${(q)cmd} =( git -C ${(q)active_path} cat-file blob $sha )"
+    local id="$1" path="$2" cmd="$3" active_path="$4" sha="$5"
+    if [[ "${ZCMDR[INTERACTIVE_COMMENTS]}" = "1" ]]; then
+        __zcmdr_stdlib_to_cmd_line "${(q)cmd} =( git -C ${(q)active_path} cat-file blob $sha ) # $path"
+    else
+        __zcmdr_stdlib_to_cmd_line "${(q)cmd} =( git -C ${(q)active_path} cat-file blob $sha )"
+    fi
 }
 
 #
@@ -61,7 +65,7 @@ gitout3=( "${gitout[@]//(#b)[^ ]# [^ ]# ([^ ]#)$'\t'*/${match[1]}}" )
 
 for (( idx = 1; idx <= size; idx ++ )); do
     reply=( )
-    __zcmdr_stdlib_get_std_button "gopen1A" "0" "$selected_editor" "$active_path" "${gitout3[idx]}" "${gitout2[idx]}" __zcmdr_action_git_open_commit_a
+    __zcmdr_stdlib_get_std_button "gopen1A" "${gitout2[idx]}" "$selected_editor" "$active_path" "${gitout3[idx]}" "${gitout2[idx]}" __zcmdr_action_git_open_commit_a
     output+=( "${reply[1]}" )
 done
 
