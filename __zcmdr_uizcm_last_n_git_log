@@ -57,7 +57,12 @@ IFS="$IFSBKP"
 # Add "More+5" and "Less-5" buttons to fetch more and less log entries
 reply=( )
 
+# More? Has that "ends exactly at git_log_count" small flaw
+if [[ "${#gitout[@]}" -ge "$git_log_count" ]]; then
 __zcmdr_stdlib_get_button "" "regenerate" "log" "plus" "" "More+5" ""
+fi
+
+# Less?
 if [[ "$own_LINE_COUNT" -gt 7 ]]; then
     __zcmdr_stdlib_get_button "" "regenerate" "log" "minus" "" "Less-5" ""
     reply[2]=" ${reply[2]}"
