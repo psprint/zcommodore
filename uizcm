@@ -93,6 +93,11 @@ __zcmdr_action_git_same_files_e() {
     __zcmdr_stdlib_to_cmd_line "cmdr_same_files -e ${(q)active_path} $sha"
 }
 
+__zcmdr_action_git_same_author() {
+    local id="$1" ts="$2" cmd="$3" active_path="$4" author="$5"
+    __zcmdr_stdlib_to_cmd_line "git -C ${(q)active_path} log --author=${(q)author} --date=short --pretty=format:'%Cgreen%cd %h %Creset%s'"
+}
+
 #
 # Business logic follows
 #
