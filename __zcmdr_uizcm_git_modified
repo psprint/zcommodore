@@ -1,3 +1,6 @@
+local -a gitout             # Unprocessed git output
+local -a gitout2            # Processed git output
+
 # Read input from GIT
 gitout=( ${(f)"$( git -C "$repo_root_dir" diff --name-only 2>/dev/null )"} )
 
@@ -16,6 +19,7 @@ if [[ "${ZCMDR[stat_available]}" = "1" && "${#gitout}" != "0" ]]; then
     stat_result=( "${stat_result[@]/mtime[^0-9]#/}" )
 fi
 
+local entry
 size=${#gitout[@]}
 for (( idx = 1; idx <= size; idx ++ )); do
     entry="${gitout[idx]}"
