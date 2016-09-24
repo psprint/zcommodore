@@ -144,8 +144,22 @@ integer modified_size
 #
 
 local git_log_count
-zstyle -s ":plugin:zcommodore" git_log_count git_log_count || git_log_count="7"
-[[ "$git_log_count" != <-> ]] && git_log_count="7"
+
+# Log size already set before? Stick to
+# it and don't read Zstyle only if it's
+# altered, not previous Zstyle value
+#
+# This allows users to change the log size
+# setting without restarting Zsh provided
+# they have log size as it was previously
+# in Zstyle
+if [[ "${+ZCMDR[LOG_SIZE]}" = "1" && "${ZCMDR[LOG_SIZE]}" != "${ZCMDR[LOG_SIZE_INITIAL]}" ]]; then
+    git_log_count="${ZCMDR[LOG_SIZE]}"
+else
+    zstyle -s ":plugin:zcommodore" git_log_count git_log_count || git_log_count="7"
+    [[ "$git_log_count" != <-> ]] && git_log_count="7"
+    ZCMDR[LOG_SIZE_INITIAL]="$git_log_count"
+fi
 
 ###
 ### REGENERATION REQUEST LOOP ###
@@ -162,6 +176,8 @@ while (( 1 )); do
 if [[ -z "$REGENERATE" || "$REGENERATE" = "log" ]]; then
 
     [[ "$REGENERATE" = "log" ]] && (( git_log_count+=5 ))
+
+    ZCMDR[LOG_SIZE]="$git_log_count"
 
     if (( IS_GIT )); then
         __zcmdr_uizcm_last_n_git_log "$git_log_count"
