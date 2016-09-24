@@ -39,6 +39,12 @@ for entry in "${gitout[@]}"; do
 done
 IFS="$IFSBKP"
 
+# Add "More" button to fetch more log entries
+reply=( )
+__zcmdr_stdlib_get_button "" "regenerate" "log" "" "" "More" ""
+gitout2+=( "${reply[1]}" )
+own_LINE_COUNT+=1
+
 reply=( "${gitout2[@]}" )
 reply2="$own_LINE_COUNT"
 reply3=( "${nonselectables[@]}" )
