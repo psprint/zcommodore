@@ -165,7 +165,7 @@ fi
 ### REGENERATION REQUEST LOOP ###
 ###
 
-local REGENERATE=""
+local REGENERATE="" REGENERATE_CMD=""
 
 while (( 1 )); do
 
@@ -175,7 +175,11 @@ while (( 1 )); do
 
 if [[ -z "$REGENERATE" || "$REGENERATE" = "log" ]]; then
 
-    [[ "$REGENERATE" = "log" ]] && (( git_log_count+=5 ))
+    [[ "$REGENERATE" = "log" && "$REGENERATE_CMD" = "plus" ]] && (( git_log_count+=5 ))
+    [[ "$REGENERATE" = "log" && "$REGENERATE_CMD" = "minus" ]] && {
+            (( git_log_count=git_log_count-5 ))
+            (( git_log_count < 1 )) && git_log_count="1"
+    }
 
     ZCMDR[LOG_SIZE]="$git_log_count"
 
@@ -300,6 +304,7 @@ if __zcmdr_stdlib_decode_hyperlink "$ZCMDRLIST_WRAPPER_BIT"; then
     local id="${reply[1]}" ts="${reply[2]}" cmd="${reply[3]}" active_path="${reply[4]}" file="${reply[5]}"
     if [[ -z "$id" && "$ts" = "regenerate" ]]; then
         REGENERATE="$cmd"
+        REGENERATE_CMD="$active_path"
     elif [[ -n "${ZCMDR_ACTION_IDS_TO_HANDLERS[$id]}" ]]; then
         zle && zle .redisplay
         # Call the handled with all hyper-link data
