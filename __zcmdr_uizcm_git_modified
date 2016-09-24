@@ -67,7 +67,7 @@ for (( idx = 1; idx <= size; idx ++ )); do
     __zcmdr_stdlib_get_button "mod1H" "$mtime" "/git hash-object/" "$repo_root_dir" "$entry" "StoreAsObject" __zcmdr_action_git_store_as_object
 
     gitout2+=( "${reply[1]} ${reply[2]} ${reply[3]} ${reply[4]} ${reply[5]} ${reply[6]} ${reply[7]} ${reply[8]}" )
-    LINE_COUNT+=${#reply[@]}
+    own_LINE_COUNT+=1
 done
 
 OUTPUT+=( "${gitout2[@]}" )
