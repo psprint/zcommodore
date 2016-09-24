@@ -132,12 +132,12 @@ local -a reply4     # Module's hops
 # Last N commits
 local -a log_output log_nonselectables log_hops
 local -a prev_log_nonselectables prev_log_hops
-integer log_size
+integer log_size prev_log_size
 
 # Modified files
 local -a modified_output modified_nonselectables modified_hops
 local -a prev_modified_nonselectables prev_modified_hops
-integer modified_size
+integer modified_size prev_modified_size
 
 #
 # Parameters for modules
@@ -266,11 +266,20 @@ for n in "log" "modified"; do
     ZCMDRLIST_NONSELECTABLE_ELEMENTS+=( "${nonselectables[@]}" )
     ZCMDRLIST_HOP_INDEXES+=( "${hops[@]}" )
 
+    # Alter current index if size of section was changed
+    # - using *_size, prev_*_size parameters
+    if [[ "$n" = "log" && "$REGENERATE" = "log" ]]; then
+        integer delta=$(( log_size-prev_log_size ))
+        ZCMDRLIST_CURRENT_IDX=$(( ZCMDRLIST_CURRENT_IDX + delta ))
+    fi
+
     # Also store the indices into prev_* arrays
     var_name="prev_${n}_nonselectables"
     : "${(PA)var_name::=${nonselectables[@]}}";
     var_name="prev_${n}_hops"
     : "${(PA)var_name::=${hops[@]}}";
+    var_name="prev_${n}_size"
+    : "${(P)var_name::=${size}}";
 
     OUTPUT+=( "${output[@]}" )
     LINE_COUNT+=size
