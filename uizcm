@@ -222,9 +222,9 @@ for n in "log" "modified"; do
 
     # Also store the indices into prev_* arrays
     var_name="prev_${n}_nonselectables"
-    : "${(PAs:,:)var_name::=${(j:,:)nonselectables}}";
+    : "${(PA)var_name::=${nonselectables[@]}}";
     var_name="prev_${n}_hops"
-    : "${(PAs:,:)var_name::=${(j:,:)hops}}";
+    : "${(PA)var_name::=${hops[@]}}";
 
     OUTPUT+=( "${output[@]}" )
     LINE_COUNT+=size
