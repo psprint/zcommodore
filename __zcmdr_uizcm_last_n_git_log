@@ -1,5 +1,8 @@
-local -a gitout     # Unprocessed git output
-local -a gitout2    # Processed git output
+local -a gitout             # Unprocessed git output
+local -a gitout2            # Processed git output
+local -a nonselectables     # To be appended, upon making indices global, to ZCMDRLIST_NONSELECTABLE_ELEMENTS
+local -a hop_indices        # To be appended, upon making indices global, to ZCMDRLIST_HOP_INDEXES
+integer own_LINE_COUNT=0    # Local line count
 
 local git_log_count
 zstyle -s ":plugin:zcommodore" git_log_count git_log_count || git_log_count="7"
@@ -9,9 +12,9 @@ gitcmd=( git -C "$repo_root_dir" log --max-count="$git_log_count" --pretty=forma
 gitout=( "${(@f)"$( "${gitcmd[@]}" )"}" )
 
 gitout2=( "${CMDR_RED}'Current HEAD Git commits of ${CMDR_RED_E}${CMDR_YELLOW}${(q)repo_root_dir:t}${CMDR_YELLOW_E}${CMDR_RED}'${CMDR_RED_E}" )
-LINE_COUNT+=1
-ZCMDRLIST_NONSELECTABLE_ELEMENTS+=( "$LINE_COUNT" )
-ZCMDRLIST_HOP_INDEXES+=( "$LINE_COUNT" )
+own_LINE_COUNT+=1
+nonselectables+=( "$own_LINE_COUNT" )
+hop_indices+=( "$own_LINE_COUNT" )
 
 local IFSBKP="$IFS"
 local IFS=$'\1'
@@ -32,10 +35,13 @@ for entry in "${gitout[@]}"; do
     __zcmdr_stdlib_get_std_button "glog1B" "0" "/Exactly-files commits/" "$repo_root_dir" "${arrentry[1]}" "$txt2" __zcmdr_action_git_same_files_e
 
     gitout2+=( "${reply[1]} ${reply[2]}$entry3 ${CMDR_MAGENTA}((${arrentry[4]}))${CMDR_MAGENTA_E} \`${arrentry[5]}\`" )
-    LINE_COUNT+=1
+    own_LINE_COUNT+=1
 done
 IFS="$IFSBKP"
 
-OUTPUT+=( "${gitout2[@]}" )
+reply=( "${gitout2[@]}" )
+reply2="$own_LINE_COUNT"
+reply3=( "${nonselectables[@]}" )
+reply4=( "${hop_indices[@]}" )
 
 # vim:ft=zsh

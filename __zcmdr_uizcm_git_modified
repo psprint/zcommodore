@@ -1,14 +1,17 @@
 local -a gitout             # Unprocessed git output
 local -a gitout2            # Processed git output
+local -a nonselectables     # To be appended, upon making indices global, to ZCMDRLIST_NONSELECTABLE_ELEMENTS
+local -a hop_indices        # To be appended, upon making indices global, to ZCMDRLIST_HOP_INDEXES
+integer own_LINE_COUNT=0    # Local line count
 
 # Read input from GIT
 gitout=( ${(f)"$( git -C "$repo_root_dir" diff --name-only 2>/dev/null )"} )
 
 # Start output: nonselectable HEADER
 gitout2=( "${CMDR_RED}'Modified files of ${CMDR_RED_E}${CMDR_YELLOW}${(q)repo_root_dir:t}${CMDR_YELLOW_E}${CMDR_RED}'${CMDR_RED_E}" )
-LINE_COUNT+=1
-ZCMDRLIST_NONSELECTABLE_ELEMENTS+=( "$LINE_COUNT" )
-ZCMDRLIST_HOP_INDEXES+=( "$LINE_COUNT" )
+own_LINE_COUNT+=1
+nonselectables+=( "$own_LINE_COUNT" )
+hop_indices+=( "$own_LINE_COUNT" )
 
 # Get zstat's at corresponding array's entries
 local -a stat_result
@@ -70,6 +73,9 @@ for (( idx = 1; idx <= size; idx ++ )); do
     own_LINE_COUNT+=1
 done
 
-OUTPUT+=( "${gitout2[@]}" )
+reply=( "${gitout2[@]}" )
+reply2="$own_LINE_COUNT"
+reply3=( "${nonselectables[@]}" )
+reply4=( "${hop_indices[@]}" )
 
 # vim:ft=zsh

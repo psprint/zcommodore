@@ -98,7 +98,7 @@ __zcmdr_action_git_same_files_e() {
 local curcontext=":zle:$WIDGET"
 local MATCH MBEGIN MEND
 typeset -a OUTPUT
-integer LINE_COUNT
+integer LINE_COUNT=0
 
 #
 # Establish if the project is Git
@@ -127,14 +127,9 @@ zstyle -b ":plugin:zcommodore" cd_at_edit cd_at_edit || cd_at_edit="yes"
 #
 
 local -a reply      # Output of module
-
-#
-# Initialization
-#
-
-OUTPUT+=( "" )
-LINE_COUNT+=1
-ZCMDRLIST_NONSELECTABLE_ELEMENTS+=( "$LINE_COUNT" )
+local -a reply2     # Size of the output
+local -a reply3     # Module's non-selectable elements
+local -a reply4     # Module's hop indices
 
 #
 # Last N commits
@@ -142,19 +137,73 @@ ZCMDRLIST_NONSELECTABLE_ELEMENTS+=( "$LINE_COUNT" )
 
 if (( IS_GIT )); then
     __zcmdr_uizcm_last_n_git_log
+
+    local -a log_output log_nonselectables log_hop_indices
+    integer log_size
+
+    log_output=( "${reply[@]}" )
+    log_size="$reply2"
+    log_nonselectables=( "${reply3[@]}" )
+    log_hop_indices=( "${reply4[@]}" )
 fi
 
 #
 # List of modified files
 #
 
-OUTPUT+=( "" )
-LINE_COUNT+=1
-ZCMDRLIST_NONSELECTABLE_ELEMENTS+=( "$LINE_COUNT" )
-
 if (( IS_GIT )); then
     __zcmdr_uizcm_git_modified
+
+    local -a modified_output modified_nonselectables modified_hop_indices
+    integer modified_size
+
+    modified_output=( "${reply[@]}" )
+    modified_size="$reply2"
+    modified_nonselectables=( "${reply3[@]}" )
+    modified_hop_indices=( "${reply4[@]}" )
 fi
+
+#
+# Store all results into OUTPUT, ZCMDRLIST_NONSELECTABLE_ELEMENTS, ZCMDRLIST_HOP_INDEXES
+#
+
+ZCMDRLIST_NONSELECTABLE_ELEMENTS=()
+ZCMDRLIST_HOP_INDEXES=()
+
+local -a output nonselectables hop_indices
+local n var_name
+integer size
+for n in "log" "modified"; do
+    # Get output
+    var_name="${n}_output"
+    output=( "${(PA@)var_name}" )
+
+    # Get output size
+    var_name="${n}_size"
+    size="${(P)var_name}"
+
+    # Get nonselectables
+    var_name="${n}_nonselectables"
+    nonselectables=( "${(PA@)var_name}" )
+
+    # Get hop indices
+    var_name="${n}_hop_indices"
+    hop_indices=( "${(PA@)var_name}" )
+
+    OUTPUT+=( "" )
+    LINE_COUNT+=1
+    ZCMDRLIST_NONSELECTABLE_ELEMENTS+=( "$LINE_COUNT" )
+
+    # Translate returned indices to global ones
+    nonselectables=( "${nonselectables[@]//(#b)([[:digit:]]##)/$(( ${match[1]} + LINE_COUNT ))}" )
+    hop_indices=( "${hop_indices[@]//(#b)([[:digit:]]##)/$(( ${match[1]} + LINE_COUNT ))}" )
+
+    ZCMDRLIST_NONSELECTABLE_ELEMENTS+=( "${nonselectables[@]}" )
+    ZCMDRLIST_HOP_INDEXES+=( "${hop_indices[@]}" )
+
+    OUTPUT+=( "${output[@]}" )
+    LINE_COUNT+=size
+done
 
 #
 # Generation time
