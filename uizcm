@@ -123,16 +123,10 @@ zstyle -s ":plugin:zcommodore" editor selected_editor || selected_editor="${EDIT
 zstyle -b ":plugin:zcommodore" cd_at_edit cd_at_edit || cd_at_edit="yes"
 
 #
-# Common variables
+# Variables
 #
 
-integer idx         # When iterating arrays
-integer size        # Size of iterated array
-local -a gitcmd     # Git command to be run
-local -a gitout     # Unprocessed git output
-local -a gitout2    # Processed git output
-local entry         # Single entry
-local -a arrentry   # Single entry (e.g. line output from Git) splitted into fields
+local -a reply      # Output of module
 
 #
 # Initialization

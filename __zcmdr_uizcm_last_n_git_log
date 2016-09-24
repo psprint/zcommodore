@@ -1,3 +1,6 @@
+local -a gitout     # Unprocessed git output
+local -a gitout2    # Processed git output
+
 local git_log_count
 zstyle -s ":plugin:zcommodore" git_log_count git_log_count || git_log_count="7"
 [[ "$git_log_count" != <-> ]] && git_log_count="5"
@@ -12,7 +15,8 @@ ZCMDRLIST_HOP_INDEXES+=( "$LINE_COUNT" )
 
 local IFSBKP="$IFS"
 local IFS=$'\1'
-local entry3
+local entry entry3
+local -a arrentry
 for entry in "${gitout[@]}"; do
     # hash \1 message \1 repo info \1 date \1 author
     arrentry=( ${=entry} )
