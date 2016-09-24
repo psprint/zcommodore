@@ -128,17 +128,17 @@ zstyle -b ":plugin:zcommodore" cd_at_edit cd_at_edit || cd_at_edit="yes"
 
 local -a reply      # Output of module
 local -a reply2     # Size of the output
-local -a reply3     # Module's non-selectable elements
-local -a reply4     # Module's hop indices
+local -a reply3     # Module's nonselectables
+local -a reply4     # Module's hops
 
 # Last N commits
-local -a log_output log_nonselectables log_hop_indices
-local -a prev_log_nonselectables prev_log_hop_indices
+local -a log_output log_nonselectables log_hops
+local -a prev_log_nonselectables prev_log_hops
 integer log_size
 
 # Modified files
-local -a modified_output modified_nonselectables modified_hop_indices
-local -a prev_modified_nonselectables prev_modified_hop_indices
+local -a modified_output modified_nonselectables modified_hops
+local -a prev_modified_nonselectables prev_modified_hops
 integer modified_size
 
 #
@@ -151,7 +151,7 @@ if (( IS_GIT )); then
     log_output=( "${reply[@]}" )
     log_size="$reply2"
     log_nonselectables=( "${reply3[@]}" )
-    log_hop_indices=( "${reply4[@]}" )
+    log_hops=( "${reply4[@]}" )
 fi
 
 #
@@ -164,7 +164,7 @@ if (( IS_GIT )); then
     modified_output=( "${reply[@]}" )
     modified_size="$reply2"
     modified_nonselectables=( "${reply3[@]}" )
-    modified_hop_indices=( "${reply4[@]}" )
+    modified_hops=( "${reply4[@]}" )
 fi
 
 #
@@ -174,8 +174,8 @@ fi
 ZCMDRLIST_NONSELECTABLE_ELEMENTS=()
 ZCMDRLIST_HOP_INDEXES=()
 
-local -a output nonselectables hop_indices
-local -a prev_nonselectables prev_hop_indices
+local -a output nonselectables hops
+local -a prev_nonselectables prev_hops
 local n var_name
 integer size
 for n in "log" "modified"; do
@@ -191,17 +191,17 @@ for n in "log" "modified"; do
     var_name="${n}_nonselectables"
     nonselectables=( "${(PA@)var_name}" )
 
-    # Get hop indices
-    var_name="${n}_hop_indices"
-    hop_indices=( "${(PA@)var_name}" )
+    # Get hops
+    var_name="${n}_hops"
+    hops=( "${(PA@)var_name}" )
 
     # Get previous nonselectables
     var_name="prev_${n}_nonselectables"
     prev_nonselectables=( "${(PA@)var_name}" )
 
-    # Get previous hop indices
-    var_name="prev_${n}_hop_indices"
-    prev_hop_indices=( "${(PA@)var_name}" )
+    # Get previous hops
+    var_name="prev_${n}_hops"
+    prev_hops=( "${(PA@)var_name}" )
 
     OUTPUT+=( "" )
     LINE_COUNT+=1
@@ -210,21 +210,21 @@ for n in "log" "modified"; do
     # Remove previous non-selectables and hops,
     # added on previous creation of this section
     ZCMDRLIST_NONSELECTABLE_ELEMENTS=( "${ZCMDRLIST_NONSELECTABLE_ELEMENTS[@]:|prev_nonselectables}" )
-    ZCMDRLIST_HOP_INDEXES=( "${ZCMDRLIST_HOP_INDEXES[@]:|prev_hop_indices}" )
+    ZCMDRLIST_HOP_INDEXES=( "${ZCMDRLIST_HOP_INDEXES[@]:|prev_hops}" )
 
     # Translate returned indices to global ones
     nonselectables=( "${nonselectables[@]//(#b)([[:digit:]]##)/$(( ${match[1]} + LINE_COUNT ))}" )
-    hop_indices=( "${hop_indices[@]//(#b)([[:digit:]]##)/$(( ${match[1]} + LINE_COUNT ))}" )
+    hops=( "${hops[@]//(#b)([[:digit:]]##)/$(( ${match[1]} + LINE_COUNT ))}" )
 
-    # Add current hop indices
+    # Add current hops
     ZCMDRLIST_NONSELECTABLE_ELEMENTS+=( "${nonselectables[@]}" )
-    ZCMDRLIST_HOP_INDEXES+=( "${hop_indices[@]}" )
+    ZCMDRLIST_HOP_INDEXES+=( "${hops[@]}" )
 
     # Also store the indices into prev_* arrays
     var_name="prev_${n}_nonselectables"
     : "${(PAs:,:)var_name::=${(j:,:)nonselectables}}";
-    var_name="prev_${n}_hop_indices"
-    : "${(PAs:,:)var_name::=${(j:,:)hop_indices}}";
+    var_name="prev_${n}_hops"
+    : "${(PAs:,:)var_name::=${(j:,:)hops}}";
 
     OUTPUT+=( "${output[@]}" )
     LINE_COUNT+=size
