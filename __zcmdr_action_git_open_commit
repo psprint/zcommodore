@@ -7,17 +7,20 @@ local id="$1" ts="$2" cmd="$3" active_path="$4" sha="$5"
 # Own handler for own zcmdr-list - "a" / first action
 __zcmdr_action_git_open_commit_a() {
     local id="$1" ts="$2" cmd="$3" active_path="$4" sha="$5"
-    __zcmdr_stdlib_to_cmd_line "${selected_editor} =( git -C ${(q)active_path} cat-file blob $sha )"
+    __zcmdr_stdlib_to_cmd_line "${(q)cmd} =( git -C ${(q)active_path} cat-file blob $sha )"
 }
 
 #
 # Main code
 #
 
+local -a output             # Parameter with textual output
 local -a gitcmd             # Git command to run
 local -a gitout             # Unprocessed git output
-local -a gitout2            # Processed git output
+local -a gitout2            # Just file paths
+local -a gitout3            # Just SHAs
 integer own_LINE_COUNT=0    # Local line count
+integer size idx            # Size of listed tree, iterating index
 
 # *-list* state variables, localized so
 # that outer list doesn't get disturbed
@@ -36,20 +39,38 @@ local ZCMDRLIST_REMEMBER_STATE=0 # Don't reuse, remember state
 # Run git command to list tree of given commit SHA
 gitcmd=( git -C "$active_path" ls-tree -r --full-tree "$sha" )
 gitout=( "${(@f)"$( "${gitcmd[@]}" )"}" )
+size="${#gitout[@]}"
 
 # Header
-gitout2=( "${CMDR_RED}'Tree ${CMDR_RED_E}${CMDR_YELLOW}${sha[1,7]}${CMDR_YELLOW_E}${CMDR_RED} of ${CMDR_RED_E}${CMDR_YELLOW}${(q)active_path:t}${CMDR_YELLOW_E}${CMDR_RED}'${CMDR_RED_E}" )
+output=( "${CMDR_RED}'Tree ${CMDR_RED_E}${CMDR_YELLOW}${sha[1,7]}${CMDR_YELLOW_E}${CMDR_RED} of ${CMDR_RED_E}${CMDR_YELLOW}${(q)active_path:t}${CMDR_YELLOW_E}${CMDR_RED}'${CMDR_RED_E}" )
 own_LINE_COUNT+=1
 ZCMDRLIST_NONSELECTABLE_ELEMENTS+=( "$own_LINE_COUNT" )
 ZCMDRLIST_HOP_INDEXES+=( "$own_LINE_COUNT" )
+
+# Get second list without SHAs and modes, for display
+local -a gitout2
+gitout2=( "${gitout[@]//(#b)*$'\t'(*)/${match[1]}}" )
+
+# Get third list with only SHAs
+local -a gitout3
+gitout3=( "${gitout[@]//(#b)[^ ]# [^ ]# ([^ ]#)$'\t'*/${match[1]}}" )
+
+#
+# Create output
+#
+
+for (( idx = 1; idx <= size; idx ++ )); do
+    reply=( )
+    __zcmdr_stdlib_get_std_button "gopen1A" "0" "$selected_editor" "$active_path" "${gitout3[idx]}" "${gitout2[idx]}" __zcmdr_action_git_open_commit_a
+    output+=( "${reply[1]}" )
+done
 
 #
 # Invoke the list, handle outcome
 #
 
-OUTPUT=( "${gitout2[@]}" "${gitout[@]}" )
 local ZCMDRLIST_WRAPPER_BIT=""
-__zcmdr-usetty-wrapper __zcmdr-list-wrapper "${OUTPUT[@]}"
+__zcmdr-usetty-wrapper __zcmdr-list-wrapper "${output[@]}"
 
 if [ -z "$ZCMDRLIST_WRAPPER_BIT" ]; then
     zle && zle .redisplay
