@@ -1,3 +1,4 @@
+local -a gitcmd             # Git command to run
 local -a gitout             # Unprocessed git output
 local -a gitout2            # Processed git output
 local -a nonselectables     # To be appended, upon making indices global, to ZCMDRLIST_NONSELECTABLE_ELEMENTS
