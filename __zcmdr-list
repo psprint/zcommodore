@@ -280,7 +280,6 @@ if [[ -z "$ZCMDRLIST_REMEMBER_STATE" || "$ZCMDRLIST_REMEMBER_STATE" -eq 0 || "$Z
     ZCMDRLIST_TEXT_OFFSET=0
     ZCMDRLIST_IS_UNIQ_MODE=0
     ZCMDRLIST_CURRENT_SEGMENT=1 # This variable is responsible for horizontal indexing
-    typeset -gA ZCMDRLIST_ACTIVE_SEGMENTS
     ZCMDRLIST_ACTIVE_SEGMENTS=()
 
     # Zero - because it isn't known, unless we
