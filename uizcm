@@ -195,12 +195,8 @@ start_seconds=$SECONDS
 # Establish if the project is Git
 #
 
-if [[
-        -z "$REGENERATE" ||
-        "$REGENERATE" = *,switch_project,* ||
-        "$REGENERATE" = *,switch_project_g,* ||
-        "$REGENERATE" = *,all,*
-   ]]
+if [[ -z "$REGENERATE" || "$REGENERATE" = *,switch_project,* ||
+        "$REGENERATE" = *,switch_project_g,* || "$REGENERATE" = *,all,* ]]
 then
 
     local -a input_data
