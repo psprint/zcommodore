@@ -223,6 +223,38 @@ function __zcmdr_stdlib_get_time() {
     [[ -z "$ts" || "$ts" = "0" ]] && REPLY="$(date '+%H:%M')" || strftime -s REPLY '%H:%M' "$ts"
 }
 
+#
+# Returns next file to write to in circular buffer set
+# of file names <base>.1 <base>.2 ... <base>.<size>
+#
+# The buffer is ordered according to modification time.
+#
+# $1 - base of file names in circular buffer
+# $2 - maximum number of files in circular buffer
+#
+function __zcmdr_stdlib_circular_next() {
+    setopt localoptions extendedglob
+
+    # Input data
+    local base="$1" count="$2"
+
+    # Circular buffers' directory
+    local circpath="$HOME/.config/zcommodore/var/circular_buffers"
+    command mkdir -p "$circpath"
+
+    local -a circular_buffer
+    circular_buffer=( "$circpath"/"$base".[[:digit:]]##(OmN) );
+
+    if [[ "$count" -gt "${#circular_buffer}" ]]; then
+        integer next_index=$(( ${#circular_buffer} + 1 ))
+        REPLY="$circpath/${base}.${next_index}"
+    else
+        REPLY="${circular_buffer[1]}"
+    fi
+
+    return 0
+}
+
 ZCMDR[stdlib_sourced]="1"
 
 # vim:ft=zsh
