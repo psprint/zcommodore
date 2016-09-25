@@ -213,6 +213,9 @@ if [ "$__tsmw_hcw_call_count" -eq "1" ]; then
     # Needed for Fedora 23, zsh-5.1.1
     bindkey -M tsmw ' ' self-insert
 
+    # Removal of default Ctrl-R binding
+    bindkey -M tsmw '^R' "$down_widget"
+
     # Substitute self-insert, backward-delete-char, delete-char
     zle -A self-insert saved-self-insert
     zle -A backward-delete-char saved-backward-delete-char
