@@ -44,10 +44,12 @@ autoload __zcmdr-list-draw __zcmdr-list-input __zcmdr-process-buffer
         zcurses attr "$wname_status" "red/$background"
         zcurses string "$wname_status" "$2"
         zcurses attr "$wname_status" "$colorpair"
-        zcurses string "$wname_status" "$wd"
-        zcurses attr "$wname_status" "green/$background"
-        zcurses string "$wname_status" "$3"
-        zcurses attr "$wname_status" "$colorpair"
+        if [[ -n "$3" ]]; then
+            zcurses string "$wname_status" "$wd"
+            zcurses attr "$wname_status" "green/$background"
+            zcurses string "$wname_status" "$3"
+            zcurses attr "$wname_status" "$colorpair"
+        fi
         (( status_msg_strlen += ${#cmd} + ${#2} + ${#wd} + ${#3} ))
     fi
 }
@@ -512,7 +514,7 @@ while (( 1 )); do
         local st_path="" st_cmd=""
         if __zcmdr_stdlib_decode_hyperlink "${tmp[$ZCMDRLIST_CURRENT_SEGMENT]}"; then
             st_cmd="${(Q)reply[3]}"
-            st_path="${(Q)reply[4]}"
+            [[ -n "${(Q)reply[1]}" ]] && st_path="${(Q)reply[4]}"
 
             if [ "${reply[2]}" != "${reply[2]/-1/}" ]; then
                 local -a st_qopts_qpaths
