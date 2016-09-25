@@ -38,6 +38,8 @@ for proj in "${reply[@]}"; do
 
     output+=( "${reply[1]} ${reply[2]}" )
     own_LINE_COUNT+=1
+
+    [[ "$pcount" -ge "$nprojects" ]] && break
 done
 IFS="$IFSBKP"
 
