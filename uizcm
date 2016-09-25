@@ -382,8 +382,8 @@ fi
 # ID, data1, data2, data3, data4
 if __zcmdr_stdlib_decode_hyperlink "$ZCMDRLIST_WRAPPER_BIT"; then
     local id="${reply[1]}" ts="${reply[2]}" cmd="${reply[3]}" active_path="${reply[4]}" file="${reply[5]}"
-    if [[ -z "$id" && "$ts" = "regenerate" ]]; then
-        REGENERATE="$cmd"
+    if [[ -z "$id" ]]; then
+        REGENERATE="$ts"
         REGENERATE_ARG="$active_path"
     elif [[ -n "${ZCMDR_ACTION_IDS_TO_HANDLERS[$id]}" ]]; then
         zle && zle .redisplay
