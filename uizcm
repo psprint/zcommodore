@@ -195,7 +195,7 @@ fi
 # Last N projects
 #
 
-if [[ -z "$REGENERATE" || "$REGENERATE" = "projects" ]]; then
+if [[ -z "$REGENERATE" || "$REGENERATE" = *,projects,* || "$REGENERATE" = *,all,* ]]; then
     __zcmdr_uizcm_last_n_projects "$nprojects"
 
     proj_output=( "${reply[@]}" )
@@ -208,10 +208,10 @@ fi
 # Last N commits
 #
 
-if [[ -z "$REGENERATE" || "$REGENERATE" = "log" ]]; then
+if [[ -z "$REGENERATE" || "$REGENERATE" = *,log,* || "$REGENERATE" = *,all,* ]]; then
 
-    [[ "$REGENERATE" = "log" && "$REGENERATE_CMD" = "plus" ]] && (( log_count+=5 ))
-    [[ "$REGENERATE" = "log" && "$REGENERATE_CMD" = "minus" ]] && {
+    [[ "$REGENERATE" = *,log,* && "$REGENERATE_CMD" = "plus" ]] && (( log_count+=5 ))
+    [[ "$REGENERATE" = *,log,* && "$REGENERATE_CMD" = "minus" ]] && {
             (( log_count=log_count-5 ))
             (( log_count < 1 )) && log_count="1"
     }
@@ -232,7 +232,7 @@ fi
 # List of modified files
 #
 
-if [[ -z "$REGENERATE" || "$REGENERATE" = "modified" ]]; then
+if [[ -z "$REGENERATE" || "$REGENERATE" = *,modified,* || "$REGENERATE" = *,all,* ]]; then
 
     if (( IS_GIT )); then
         __zcmdr_uizcm_git_modified
