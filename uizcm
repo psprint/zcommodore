@@ -169,7 +169,7 @@ zstyle -s ":plugin:zcommodore" nprojects nprojects || nprojects="5"
 ### REGENERATION REQUEST LOOP ###
 ###
 
-local REGENERATE="" REGENERATE_CMD=""
+local REGENERATE="" REGENERATE_ARG=""
 
 while (( 1 )); do
 
@@ -210,8 +210,8 @@ fi
 
 if [[ -z "$REGENERATE" || "$REGENERATE" = *,log,* || "$REGENERATE" = *,all,* ]]; then
 
-    [[ "$REGENERATE" = *,log,* && "$REGENERATE_CMD" = "plus" ]] && (( log_count+=5 ))
-    [[ "$REGENERATE" = *,log,* && "$REGENERATE_CMD" = "minus" ]] && {
+    [[ "$REGENERATE" = *,log,* && "$REGENERATE_ARG" = "plus" ]] && (( log_count+=5 ))
+    [[ "$REGENERATE" = *,log,* && "$REGENERATE_ARG" = "minus" ]] && {
             (( log_count=log_count-5 ))
             (( log_count < 1 )) && log_count="1"
     }
@@ -322,7 +322,7 @@ done
 
 # Reset regeneration variables
 REGENERATE=""
-REGENERATE_CMD=""
+REGENERATE_ARG=""
 
 #
 # Generation time
@@ -348,7 +348,7 @@ if __zcmdr_stdlib_decode_hyperlink "$ZCMDRLIST_WRAPPER_BIT"; then
     local id="${reply[1]}" ts="${reply[2]}" cmd="${reply[3]}" active_path="${reply[4]}" file="${reply[5]}"
     if [[ -z "$id" && "$ts" = "regenerate" ]]; then
         REGENERATE="$cmd"
-        REGENERATE_CMD="$active_path"
+        REGENERATE_ARG="$active_path"
     elif [[ -n "${ZCMDR_ACTION_IDS_TO_HANDLERS[$id]}" ]]; then
         zle && zle .redisplay
         # Call the handled with all hyper-link data
