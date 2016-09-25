@@ -220,7 +220,7 @@ function __zcmdr_stdlib_get_timestamp() {
 function __zcmdr_stdlib_get_time() {
     local ts
     ts="${EPOCHSECONDS}"
-    [[ -z "$ts" ]] && REPLY="$(date '+%H:%M')" || strftime -s REPLY '%H:%M' "$ts"
+    [[ -z "$ts" || "$ts" = "0" ]] && REPLY="$(date '+%H:%M')" || strftime -s REPLY '%H:%M' "$ts"
 }
 
 ZCMDR[stdlib_sourced]="1"
