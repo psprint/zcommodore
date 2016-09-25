@@ -165,6 +165,15 @@ zstyle -s ":plugin:zcommodore" nprojects nprojects || nprojects="5"
 [[ "$nprojects" != <-> ]] && nprojects="5"
 [[ "$nprojects" = "0" ]] && nprojects="1"
 
+#
+# Own copy of current_* ZCMDR fields, to be able
+# to switch without switching session's state
+#
+
+local current_project="${ZCMDR[current_project]}"
+local current_repo="${ZCMDR[current_repo]}"
+local current_tag_file="${ZCMD[current_tag_file]}"
+
 ###
 ### REGENERATION REQUEST LOOP ###
 ###
@@ -177,18 +186,42 @@ while (( 1 )); do
 # Establish if the project is Git
 #
 
-if [[ -z "$REGENERATE" || "$REGENERATE" = "switch_project" ]]; then
+if [[
+        -z "$REGENERATE" ||
+        "$REGENERATE" = *,switch_project,* ||
+        "$REGENERATE" = *,switch_project_g,* ||
+        "$REGENERATE" = *,all,*
+   ]]
+then
+
+    local -a input_data
+    if [[ "$REGENERATE" = *,switch_project,* || "$REGENERATE" = *,switch_project_g,* ]]; then
+        input_data=( "${(@f)"$(<$REGENERATE_ARG)"}" )
+    elif [[ -n "$REGENERATE" ]]; then
+        input_data=( "${(@f)"$(<$HOME/.config/zcommodore/current_project)"}" )
+    fi
+
+    if [[ -n "$REGENERATE" ]]; then
+        current_project="${input_data[1]}"
+        current_repo="${input_data[2]}"
+        current_tag_file="${input_data[3]}"
+
+        if [[ "$REGENERATE" = *,switch_project_g,* ]]; then
+            ZCMDR[current_project]="$current_project"
+            ZCMDR[current_repo]="$current_repo"
+            ZCMDR[current_tag_file]="$current_tag_file"
+        fi
+    fi
 
     local repo_root_dir
     integer IS_GIT=0 IS_HG=0
-    repo_root_dir="$( git -C "${ZCMDR[current_repo]}" rev-parse --show-toplevel 2>/dev/null )"
+    repo_root_dir="$( git -C "$current_repo" rev-parse --show-toplevel 2>/dev/null )"
     if [[ -n "$repo_root_dir" ]]; then
         IS_GIT=1
     else
-        repo_root_dir="$( hg -R "${ZCMDR[current_repo]}" root 2>/dev/null )"
+        repo_root_dir="$( hg -R "$current_repo" root 2>/dev/null )"
         [[ -n "$repo_root_dir" ]] && IS_HG=1
     fi
-
 fi
 
 #
