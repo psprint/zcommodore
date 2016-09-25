@@ -243,7 +243,7 @@ function __zcmdr_stdlib_circular_next() {
     command mkdir -p "$circpath"
 
     local -a circular_buffer
-    circular_buffer=( "$circpath"/"$base".[[:digit:]]##(OmN) );
+    circular_buffer=( "$circpath"/"$base".[[:digit:]]##(OmN) )
 
     if [[ "$count" -gt "${#circular_buffer}" ]]; then
         integer next_index=$(( ${#circular_buffer} + 1 ))
