@@ -339,7 +339,7 @@ for n in "proj" "log" "modified"; do
 
     # Alter current index if size of section was changed
     # - using *_size, prev_*_size parameters
-    if [[ "$n" = "log" && "$REGENERATE" = "log" ]]; then
+    if [[ "$n" = "log" && "$REGENERATE" = *,log,* ]]; then
         integer delta=$(( log_size-prev_log_size ))
         ZCMDRLIST_CURRENT_IDX=$(( ZCMDRLIST_CURRENT_IDX + delta ))
     fi
