@@ -9,6 +9,7 @@ setopt extendedglob typesetsilent
 
 autoload __zcmdr-process-buffer __zcmdr-usetty-wrapper __zcmdr-list __zcmdr-list-input __zcmdr-list-draw
 autoload __zcmdr_uizcm_last_n_git_log __zcmdr_uizcm_git_modified __zcmdr_action_git_open_commit
+autoload __zcmdr_uizcm_last_n_projects
 
 [[ "${ZCMDR[stdlib_sourced]}" != "1" ]] && source "${ZCMDR_REPO_DIR}/lib/stdlib.lcmdr"
 
@@ -136,6 +137,11 @@ local -a reply2     # Size of the output
 local -a reply3     # Module's nonselectables
 local -a reply4     # Module's hops
 
+# Last N projects
+local -a proj_output proj_nonselectables proj_hops
+local -a prev_proj_nonselectables prev_proj_hops
+integer proj_size prev_proj_size
+
 # Last N commits
 local -a log_output log_nonselectables log_hops
 local -a prev_log_nonselectables prev_log_hops
@@ -168,6 +174,11 @@ else
     ZCMDR[LOG_SIZE_INITIAL]="$log_count"
 fi
 
+local nprojects
+zstyle -s ":plugin:zcommodore" nprojects nprojects || nprojects="5"
+[[ "$nprojects" != <-> ]] && nprojects="5"
+[[ "$nprojects" = "0" ]] && nprojects="1"
+
 ###
 ### REGENERATION REQUEST LOOP ###
 ###
@@ -175,6 +186,19 @@ fi
 local REGENERATE="" REGENERATE_CMD=""
 
 while (( 1 )); do
+
+#
+# Last N projects
+#
+
+if [[ -z "$REGENERATE" || "$REGENERATE" = "projects" ]]; then
+    __zcmdr_uizcm_last_n_projects "$log_count"
+
+    proj_output=( "${reply[@]}" )
+    proj_size="$reply2"
+    proj_nonselectables=( "${reply3[@]}" )
+    proj_hops=( "${reply4[@]}" )
+fi
 
 #
 # Last N commits
@@ -231,7 +255,7 @@ integer LINE_COUNT size
 OUTPUT=( )
 LINE_COUNT=0
 
-for n in "log" "modified"; do
+for n in "proj" "log" "modified"; do
     # Get output
     var_name="${n}_output"
     output=( "${(PA@)var_name}" )

@@ -1,0 +1,49 @@
+local -a output             # Output array
+integer own_LINE_COUNT=0    # Local line count
+local -a nonselectables     # To be appended, upon making indices global, to ZCMDRLIST_NONSELECTABLE_ELEMENTS
+local -a hop_indices        # To be appended, upon making indices global, to ZCMDRLIST_HOP_INDEXES
+
+# Input: number of project entries
+local nprojects="$1"
+
+output=( "${CMDR_RED}'Last ${CMDR_RED_E}${CMDR_YELLOW}<< ${nprojects} >>${CMDR_YELLOW_E}${CMDR_RED} projects'${CMDR_RED_E}" )
+own_LINE_COUNT+=1
+nonselectables+=( "$own_LINE_COUNT" )
+hop_indices+=( "$own_LINE_COUNT" )
+
+# Fetch paths to files with data on last $nprojects projects
+__zcmdr_stdlib_circular_paths "last_project"
+
+local -a entries
+integer pcount=0
+local proj
+for proj in "${reply[@]}"; do
+    # Count projects
+    pcount+=1
+
+    entries=( "${(@f)"$(<$proj)"}" )
+    local txtname="${entries[2]:t}"
+    txtname="${txtname//\%/%%}"
+    txtname='%65<...<'"$txtname"
+    txtname="$ACC_GREEN${(%)txtname}$ACC_GREEN_E"
+    txtname="${(r:40:: :)txtname}"
+
+    local txtproject="${entries[1]}"
+    txtproject="${txtproject/$HOME/~}"
+    txtproject="$ACC_YELLOW${txtproject}$ACC_YELLOW_E"
+
+    reply=( )
+    __zcmdr_stdlib_get_std_button "projA" "0" "/Switch project/" "" "" "$txtname" __zcmdr_action_switch_project
+    __zcmdr_stdlib_get_std_button "projB" "0" "/Global switch project/" "" "" "$txtproject" __zcmdr_action_switch_project_g
+
+    output+=( "${reply[1]} ${reply[2]}" )
+    own_LINE_COUNT+=1
+done
+IFS="$IFSBKP"
+
+reply=( "${output[@]}" )
+reply2="$own_LINE_COUNT"
+reply3=( "${nonselectables[@]}" )
+reply4=( "${hop_indices[@]}" )
+
+# vim:ft=zsh
