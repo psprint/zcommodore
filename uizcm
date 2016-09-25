@@ -19,7 +19,7 @@ autoload __zcmdr_uizcm_last_n_projects
 
 # Measure and limit generation time
 typeset -F SECONDS=0.0
-local -F start_seconds=$SECONDS
+local -F start_seconds
 
 local limit_seconds
 zstyle -s ":plugin:zcommodore" time_limit limit_seconds || limit_seconds="500"
@@ -181,6 +181,9 @@ local current_tag_file="${ZCMD[current_tag_file]}"
 local REGENERATE="" REGENERATE_ARG=""
 
 while (( 1 )); do
+
+# Measure generation time
+start_seconds=$SECONDS
 
 #
 # Establish if the project is Git
