@@ -255,6 +255,32 @@ function __zcmdr_stdlib_circular_next() {
     return 0
 }
 
+#
+# Returns absolute file paths of given circular buffer.
+# They are ordered from most recent to least recent.
+#
+# No count is obtained, so all files are returned, even
+# actually disabled by nprojects Zstyle. Thus, a house
+# keeping has to be done somewhere.
+#
+# $1 - name of the circular buffer
+#
+function __zcmdr_stdlib_circular_paths() {
+    setopt localoptions extendedglob
+
+    # Input data
+    local base="$1"
+
+    # Output array
+    reply=( )
+
+    # Circular buffers' directory
+    local circpath="$HOME/.config/zcommodore/var/circular_buffers"
+    [[ ! -d "$circpath" ]] && return 1
+
+    reply=( "$circpath"/"$base".[[:digit:]]##(omN) )
+}
+
 ZCMDR[stdlib_sourced]="1"
 
 # vim:ft=zsh
