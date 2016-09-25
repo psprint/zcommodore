@@ -39,8 +39,8 @@ for entry in "${gitout[@]}"; do
     local txt5="\`${arrentry[5]}\`"
 
     __zcmdr_stdlib_get_std_button "glog1A" "0" "/Open commit/" "$repo_root_dir" "${arrentry[1]}" "$txt1" __zcmdr_action_git_open_commit
-    __zcmdr_stdlib_get_std_button "glog1B" "0" "/Exactly-files commits/" "$repo_root_dir" "${arrentry[1]}" "$txt2" __zcmdr_action_git_same_files_e
-    __zcmdr_stdlib_get_std_button "glog1C" "0" "/Same-files commits/" "$repo_root_dir" "${arrentry[1]}" "$txt4" __zcmdr_action_git_same_files
+    __zcmdr_stdlib_get_std_button "glog1B" "0" "/Diff/" "$repo_root_dir" "${arrentry[1]}" "$txt2" __zcmdr_action_git_diff
+    __zcmdr_stdlib_get_std_button "glog1C" "0" "/Same-files commits/" "$repo_root_dir" "${arrentry[1]}" "$txt4" __zcmdr_action_git_same_files_e
     __zcmdr_stdlib_get_std_button "glog1D" "0" "/Same-author commits/" "$repo_root_dir" "${arrentry[5]}" "$txt5" __zcmdr_action_git_same_author
 
     # Before adding new entry - check if a separator is needed
