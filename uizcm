@@ -9,7 +9,7 @@ setopt extendedglob typesetsilent
 
 autoload __zcmdr-process-buffer __zcmdr-usetty-wrapper __zcmdr-list __zcmdr-list-input __zcmdr-list-draw
 autoload __zcmdr_uizcm_last_n_git_log __zcmdr_uizcm_git_modified __zcmdr_action_git_open_commit
-autoload __zcmdr_uizcm_last_nprojects
+autoload __zcmdr_uizcm_last_nprojects __zcmdr_uizcm_git_header
 
 [[ "${ZCMDR[stdlib_sourced]}" != "1" ]] && source "${ZCMDR_REPO_DIR}/lib/stdlib.lcmdr"
 
@@ -230,6 +230,19 @@ then
 fi
 
 #
+# Header
+#
+
+if [[ -z "$REGENERATE" || "$REGENERATE" = *,header,* || "$REGENERATE" = *,all,* ]]; then
+    __zcmdr_uizcm_git_header
+
+    header_output=( "${reply[@]}" )
+    header_size="$reply2"
+    header_nonselectables=( "${reply3[@]}" )
+    header_hops=( "${reply4[@]}" )
+fi
+
+#
 # Last N projects
 #
 
@@ -297,7 +310,7 @@ integer LINE_COUNT size
 OUTPUT=( )
 LINE_COUNT=0
 
-for n in "proj" "log" "modified"; do
+for n in "header" "proj" "log" "modified"; do
     # Get output
     var_name="${n}_output"
     output=( "${(PA@)var_name}" )

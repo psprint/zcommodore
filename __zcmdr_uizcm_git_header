@@ -1,0 +1,23 @@
+local -a output             # Output array
+integer own_LINE_COUNT=0    # Local line count
+local -a nonselectables     # To be appended, upon making indices global, to ZCMDRLIST_NONSELECTABLE_ELEMENTS
+local -a hop_indices        # To be appended, upon making indices global, to ZCMDRLIST_HOP_INDEXES
+
+output=( "${CMDR_GREEN}'<<${CMDR_GREEN_E} ${CMDR_RED}${repo_root_dir:t:r:u}${CMDR_RED_E} ${CMDR_GREEN}>>'${CMDR_GREEN_E}" )
+own_LINE_COUNT+=1
+nonselectables+=( "$own_LINE_COUNT" )
+hop_indices+=( "$own_LINE_COUNT" )
+
+integer merging=0
+[[ -e "$repo_root_dir"/.git/MERGE_HEAD ]] && merging=1
+integer cpicking=0
+[[ -e "$repo_root_dir"/.git/CHERRY_PICK_HEAD ]] && cpicking=1
+integer bisecting=0
+[[ -e "$repo_root_dir"/.git/BISECT_NAMES ]] && cpicking=1
+
+reply=( "${output[@]}" )
+reply2="$own_LINE_COUNT"
+reply3=( "${nonselectables[@]}" )
+reply4=( "${hop_indices[@]}" )
+
+# vim:ft=zsh

@@ -33,8 +33,8 @@ for proj in "${reply[@]}"; do
     txtproject="$ACC_YELLOW${txtproject}$ACC_YELLOW_E"
 
     reply=( )
-    __zcmdr_stdlib_get_std_button "" ",switch_project,log,modified," "/Load project/" "$proj" "" "$txtname" ""
-    __zcmdr_stdlib_get_std_button "" ",switch_project_g,log,modified," "/Switch project/" "$proj" "" "$txtproject" ""
+    __zcmdr_stdlib_get_std_button "" ",switch_project,header,log,modified," "/Load project/" "$proj" "" "$txtname" ""
+    __zcmdr_stdlib_get_std_button "" ",switch_project_g,header,log,modified," "/Switch project/" "$proj" "" "$txtproject" ""
 
     output+=( "${reply[1]} ${reply[2]}" )
     own_LINE_COUNT+=1
