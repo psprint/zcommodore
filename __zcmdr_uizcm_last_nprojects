@@ -41,7 +41,6 @@ for proj in "${reply[@]}"; do
 
     [[ "$pcount" -ge "$nprojects" ]] && break
 done
-IFS="$IFSBKP"
 
 reply=( "${output[@]}" )
 reply2="$own_LINE_COUNT"
