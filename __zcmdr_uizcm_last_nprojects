@@ -31,9 +31,11 @@ for proj in "${reply[@]}"; do
     txtname="$ACC_GREEN${txtname}$ACC_GREEN_E"
     txtname="${(r:35:: :)txtname}"
 
+    local home2="${HOME// /--SPACE--}"
     local txtproject="${entries[1]}"
-    txtproject="${txtproject/$HOME/~}"
+    txtproject="${txtproject/(#s)$HOME/$home2}"
     txtproject="${(q-)txtproject}"
+    txtproject="${txtproject/(#b)(#s)([\']#)$home2/${match[1]}~}"
     txtproject="$ACC_YELLOW${txtproject}$ACC_YELLOW_E"
 
     reply=( )
