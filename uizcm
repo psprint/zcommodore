@@ -102,7 +102,7 @@ __zcmdr_action_git_same_author() {
 __zcmdr_action_git_diff() {
     local id="$1" ts="$2" cmd="$3" active_path="$4" sha="$5"
 
-    __zcmdr_stdlib_to_cmd_line "git -C ${(q)active_path} log -p -1 --word-diff $sha"
+    __zcmdr_stdlib_to_cmd_line "git -C ${(q)active_path} log -p -1 --word-diff=color $sha"
 }
 
 #
