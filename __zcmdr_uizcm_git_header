@@ -3,7 +3,15 @@ integer own_LINE_COUNT=0    # Local line count
 local -a nonselectables     # To be appended, upon making indices global, to ZCMDRLIST_NONSELECTABLE_ELEMENTS
 local -a hop_indices        # To be appended, upon making indices global, to ZCMDRLIST_HOP_INDEXES
 
-output=( "${CMDR_GREEN}'<<${CMDR_GREEN_E} ${CMDR_RED}${repo_root_dir:t:r:u}${CMDR_RED_E} ${CMDR_GREEN}>>'${CMDR_GREEN_E}" )
+local header_text="${CMDR_YELLOW_E}${CMDR_GREEN}'<< ${CMDR_GREEN_E}${CMDR_RED}${repo_root_dir:t:r:u} ${CMDR_RED_E}${CMDR_GREEN}>>'${CMDR_GREEN_E}"
+integer hlen=$(( ${#header_text} - 7 ))
+integer pad_size=$(( (COLUMNS - hlen) / 2 ))
+header_text="${CMDR_YELLOW}${(l:pad_size-1+hlen+6:: :)header_text}"
+local rightpad=""
+rightpad="${(l:pad_size-1:: :)rightpad}"
+header_text+="${CMDR_YELLOW}$rightpad${CMDR_YELLOW_E}"
+
+output=( "$header_text" )
 own_LINE_COUNT+=1
 nonselectables+=( "$own_LINE_COUNT" )
 hop_indices+=( "$own_LINE_COUNT" )
