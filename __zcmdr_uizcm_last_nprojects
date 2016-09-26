@@ -24,9 +24,9 @@ for proj in "${reply[@]}"; do
     entries=( "${(@f)"$(<$proj)"}" )
     local txtname="${entries[2]:t}"
     txtname="${txtname//\%/%%}"
-    txtname='%65<...<'"$txtname"
+    txtname='%30<...<'"$txtname"
     txtname="$ACC_GREEN${(%)txtname}$ACC_GREEN_E"
-    txtname="${(r:40:: :)txtname}"
+    txtname="${(r:35:: :)txtname}"
 
     local txtproject="${entries[1]}"
     txtproject="${txtproject/$HOME/~}"
