@@ -112,7 +112,7 @@ __zcmdr_action_zconvey_zcmdr_g() {
         if ! type zc 2>/dev/null 1>&2; then
             __zcmdr_stdlib_to_cmd_line "cd ${(q)active_path}; zcmdr -g; echo \"\\nZconvey is not installed: http://github.com/psprint/zconvey\""
         else
-            __zcmdr_stdlib_to_cmd_line "cd ${(q)active_path}; zcmdr -g; zc -a cd ${(q)active_path}\; zcmdr"
+            __zcmdr_stdlib_to_cmd_line "cd ${(q)active_path}; zcmdr -g; zc-all cd ${(q)active_path}\; zcmdr"
         fi
     else
         __zcmdr_stdlib_to_cmd_line "cd ${(q)active_path}; zcmdr -g"
