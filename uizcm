@@ -105,6 +105,20 @@ __zcmdr_action_git_diff() {
     __zcmdr_stdlib_to_cmd_line "git -C ${(q)active_path} log -p -1 --word-diff=color $sha"
 }
 
+__zcmdr_action_zconvey_zcmdr_g() {
+    local id="$1" ts="$2" cmd="$3" active_path="$4" zconvey="$5"
+
+    if [[ "$zconvey" = "yes" ]]; then
+        if ! type zc 2>/dev/null 1>&2; then
+            __zcmdr_stdlib_to_cmd_line "cd ${(q)active_path}; zcmdr -g; echo \"\\nZconvey is not installed: http://github.com/psprint/zconvey\""
+        else
+            __zcmdr_stdlib_to_cmd_line "cd ${(q)active_path}; zcmdr -g; zc -a cd ${(q)active_path}\; zcmdr"
+        fi
+    else
+        __zcmdr_stdlib_to_cmd_line "cd ${(q)active_path}; zcmdr -g"
+    fi
+}
+
 #
 # Business logic follows
 #
