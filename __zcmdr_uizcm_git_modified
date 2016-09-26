@@ -55,19 +55,19 @@ for (( idx = 1; idx <= size; idx ++ )); do
     # $6 - text
     # $7 - handler function name
     if [ "$cd_at_edit" = "yes" ]; then
-        __zcmdr_stdlib_get_std_button "mod1A" "$mtime" "$selected_editor" "$repo_root_dir" "$entry" "$day_info" __zcmdr_action_edit_file_cd
-        __zcmdr_stdlib_get_std_button "mod1B" "$mtime" "$selected_editor" "$repo_root_dir" "$entry" "$txtentry" __zcmdr_action_edit_file_cd
+        __zcmdr_stdlib_get_std_button "gmodA" "$mtime" "$selected_editor" "$repo_root_dir" "$entry" "$day_info" __zcmdr_action_edit_file_cd
+        __zcmdr_stdlib_get_std_button "gmodB" "$mtime" "$selected_editor" "$repo_root_dir" "$entry" "$txtentry" __zcmdr_action_edit_file_cd
     else
-        __zcmdr_stdlib_get_std_button "mod1A" "$mtime" "$selected_editor" "$repo_root_dir" "$entry" "$day_info" __zcmdr_action_edit_file_abs
-        __zcmdr_stdlib_get_std_button "mod1B" "$mtime" "$selected_editor" "$repo_root_dir" "$entry" "$txtentry" __zcmdr_action_edit_file_abs
+        __zcmdr_stdlib_get_std_button "gmodA" "$mtime" "$selected_editor" "$repo_root_dir" "$entry" "$day_info" __zcmdr_action_edit_file_abs
+        __zcmdr_stdlib_get_std_button "gmodB" "$mtime" "$selected_editor" "$repo_root_dir" "$entry" "$txtentry" __zcmdr_action_edit_file_abs
     fi
 
-    __zcmdr_stdlib_get_button "mod1C" "$mtime" "/Diff/" "$repo_root_dir" "$entry" "Diff" __zcmdr_action_git_diff_file_abs
-    __zcmdr_stdlib_get_button "mod1D" "$mtime" "/FileCD/" "$repo_root_dir" "$entry" "FileCD" __zcmdr_action_file_cd
-    __zcmdr_stdlib_get_button "mod1E" "$mtime" "/Backup/" "$repo_root_dir" "$entry" "Backup" __zcmdr_action_backup
-    __zcmdr_stdlib_get_button "mod1F" "$mtime" "/History/" "$repo_root_dir" "$entry" "History" __zcmdr_action_git_history
-    __zcmdr_stdlib_get_button "mod1G" "$mtime" "/Accumulated History/" "$repo_root_dir" "$entry" "AHistory" __zcmdr_action_git_ahistory
-    __zcmdr_stdlib_get_button "mod1H" "$mtime" "/git hash-object/" "$repo_root_dir" "$entry" "StoreAsObject" __zcmdr_action_git_store_as_object
+    __zcmdr_stdlib_get_button "gmodC" "$mtime" "/Diff/" "$repo_root_dir" "$entry" "Diff" __zcmdr_action_git_diff_file_abs
+    __zcmdr_stdlib_get_button "gmodD" "$mtime" "/FileCD/" "$repo_root_dir" "$entry" "FileCD" __zcmdr_action_file_cd
+    __zcmdr_stdlib_get_button "gmodE" "$mtime" "/Backup/" "$repo_root_dir" "$entry" "Backup" __zcmdr_action_backup
+    __zcmdr_stdlib_get_button "gmodF" "$mtime" "/History/" "$repo_root_dir" "$entry" "History" __zcmdr_action_git_history
+    __zcmdr_stdlib_get_button "gmodG" "$mtime" "/Accumulated History/" "$repo_root_dir" "$entry" "AHistory" __zcmdr_action_git_ahistory
+    __zcmdr_stdlib_get_button "gmodH" "$mtime" "/git hash-object/" "$repo_root_dir" "$entry" "StoreAsObject" __zcmdr_action_git_store_as_object
 
     gitout2+=( "${reply[1]} ${reply[2]} ${reply[3]} ${reply[4]} ${reply[5]} ${reply[6]} ${reply[7]} ${reply[8]}" )
     own_LINE_COUNT+=1
