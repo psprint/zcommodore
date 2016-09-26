@@ -21,7 +21,7 @@ integer merging=0
 integer cpicking=0
 [[ -e "$repo_root_dir"/.git/CHERRY_PICK_HEAD ]] && cpicking=1
 integer bisecting=0
-[[ -e "$repo_root_dir"/.git/BISECT_NAMES ]] && cpicking=1
+[[ -e "$repo_root_dir"/.git/BISECT_NAMES ]] && bisecting=1
 
 reply=( "${output[@]}" )
 reply2="$own_LINE_COUNT"
