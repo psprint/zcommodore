@@ -26,11 +26,14 @@ for proj in "${reply[@]}"; do
     [[ -z "$txtname" ]] && txtname="${entries[1]:t}"
     txtname="${txtname//\%/%%}"
     txtname='%30<...<'"$txtname"
-    txtname="$ACC_GREEN${(%)txtname}$ACC_GREEN_E"
+    txtname="${(%)txtname}"
+    txtname="${(q-)txtname}"
+    txtname="$ACC_GREEN${txtname}$ACC_GREEN_E"
     txtname="${(r:35:: :)txtname}"
 
     local txtproject="${entries[1]}"
     txtproject="${txtproject/$HOME/~}"
+    txtproject="${(q-)txtproject}"
     txtproject="$ACC_YELLOW${txtproject}$ACC_YELLOW_E"
 
     reply=( )
