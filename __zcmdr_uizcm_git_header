@@ -6,9 +6,9 @@ local -a hop_indices        # To be appended, upon making indices global, to ZCM
 local header_text="${CMDR_YELLOW_E}${CMDR_GREEN}'<< ${CMDR_GREEN_E}${CMDR_RED}${repo_root_dir:t:r:u} ${CMDR_RED_E}${CMDR_GREEN}>>'${CMDR_GREEN_E}"
 integer hlen=$(( ${#header_text} - 7 ))
 integer pad_size=$(( (COLUMNS - hlen) / 2 ))
-header_text="${CMDR_YELLOW}${(l:pad_size-1+hlen+6:: :)header_text}"
+header_text="${CMDR_YELLOW}${(l:pad_size-2+hlen+7:: :)header_text}"
 local rightpad=""
-rightpad="${(l:pad_size-1:: :)rightpad}"
+rightpad="${(l:pad_size:: :)rightpad}"
 header_text+="${CMDR_YELLOW}$rightpad${CMDR_YELLOW_E}"
 
 output=( "$header_text" )
