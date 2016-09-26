@@ -23,6 +23,28 @@ integer cpicking=0
 integer bisecting=0
 [[ -e "$repo_root_dir"/.git/BISECT_NAMES ]] && bisecting=1
 
+local line=""
+integer codes_len=0;
+(( merging )) && { line="${CMDR_YELLOW}((Merging))${CMDR_YELLOW_E} "; codes_len+=2; }
+(( cpicking )) && { line+="${CMDR_YELLOW}((Cherry-Picking))${CMDR_YELLOW_E} "; codes_len+=2; }
+(( bisecting )) && { line+="${CMDR_YELLOW}((Bisecting))${CMDR_YELLOW_E} "; codes_len+=2; }
+line="${line%% }"
+
+if [[ -n "$line" ]]; then
+    line="${CMDR_YELLOW_E}$line"
+    codes_len+=1;
+    integer llen=$(( ${#line} - codes_len ))
+    pad_size=$(( (COLUMNS - llen) / 2 ))
+    line="${CMDR_YELLOW}${(l:pad_size+llen+codes_len-2:: :)line}"
+    rightpad=""
+    rightpad="${(l:pad_size:: :)rightpad}"
+    line+="${CMDR_YELLOW}$rightpad${CMDR_YELLOW_E}"
+
+    output+=( "$line" )
+    own_LINE_COUNT+=1
+    nonselectables+=( "$own_LINE_COUNT" )
+fi
+
 reply=( "${output[@]}" )
 reply2="$own_LINE_COUNT"
 reply3=( "${nonselectables[@]}" )
