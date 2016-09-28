@@ -3,9 +3,12 @@
 #
 
 [[ -o interactivecomments ]] && ZCMDR[INTERACTIVE_COMMENTS]="1" || ZCMDR[INTERACTIVE_COMMENTS]="0"
+[[ -o promptsubst ]] && ZCMDR[PROMPT_SUBST]="1" || ZCMDR[PROMPT_SUBST]="0"
 
 emulate -LR zsh
 setopt extendedglob typesetsilent
+
+[[ "${ZCMDR[PROMPT_SUBST]}" = "1" ]] && setopt promptsubst
 
 echo "FPATH: $FPATH" >> /tmp/reply-fp
 
@@ -413,7 +416,7 @@ local ZCMDRLIST_WRAPPER_BIT=""
 __zcmdr-usetty-wrapper __zcmdr-list-wrapper "${OUTPUT[@]}" "$ZCMDRLIST_GENERATION_TIME"
 
 if [ -z "$ZCMDRLIST_WRAPPER_BIT" ]; then
-    zle && zle .redisplay
+    zle && { zle .redisplay; zle .reset-prompt; }
     return 1
 fi
 
@@ -424,7 +427,7 @@ if __zcmdr_stdlib_decode_hyperlink "$ZCMDRLIST_WRAPPER_BIT"; then
         REGENERATE="$ts"
         REGENERATE_ARG="$active_path"
     elif [[ -n "${ZCMDR_ACTION_IDS_TO_HANDLERS[$id]}" ]]; then
-        [[ "$id" != "glog1A" ]] && zle && zle .redisplay
+        [[ "$id" != "glog1A" ]] && zle && { zle .redisplay; zle .reset-prompt; }
         # Call the handled with all hyper-link data
         "${ZCMDR_ACTION_IDS_TO_HANDLERS[$id]}" "$id" "$ts" "$cmd" "$active_path" "$file"
         break
