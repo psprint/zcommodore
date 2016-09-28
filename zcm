@@ -19,7 +19,7 @@ ZCMDR[current_repo]="$( git -C "$PWD" rev-parse --show-toplevel 2>/dev/null )"
 ZCMDR[current_tag_file]=""
 
 command mkdir -p ~/.config/zcommodore
-echo "$PWD" >! ~/.config/zcommodore/current_project
+echo "${ZCMDR[current_project]}" >! ~/.config/zcommodore/current_project
 echo "${ZCMDR[current_repo]}" >>! ~/.config/zcommodore/current_project
 
 #
