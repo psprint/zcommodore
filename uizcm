@@ -236,6 +236,8 @@ then
             ZCMDR[current_project]="$current_project"
             ZCMDR[current_repo]="$current_repo"
             ZCMDR[current_tag_file]="$current_tag_file"
+
+            builtin cd "$current_project"
         fi
     fi
 
