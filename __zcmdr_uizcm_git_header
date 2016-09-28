@@ -59,8 +59,8 @@ fi
 # Project-switching additional actions
 #
 
-if [[ "$REGENERATE" = *,switch_project,* || "$REGENERATE" = *,switch_project_g,* ]]; then
-    if [[ "$REGENERATE" = *,switch_project,* ]]; then
+if [[ "$REGENERATE" = *,load_project,* || "$REGENERATE" = *,switch_project,* ]]; then
+    if [[ "$REGENERATE" = *,load_project,* ]]; then
         line="${CMDR_CYAN}\`Loaded new project. Do you want to:\`${CMDR_CYAN_E}"
     else
         line="${CMDR_CYAN}\`Switched Zsh to new project. Do you want to:\`${CMDR_CYAN_E}"

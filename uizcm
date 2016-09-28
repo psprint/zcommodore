@@ -216,12 +216,12 @@ start_seconds=$SECONDS
 # Establish if the project is Git
 #
 
-if [[ -z "$REGENERATE" || "$REGENERATE" = *,switch_project,* ||
-        "$REGENERATE" = *,switch_project_g,* || "$REGENERATE" = *,all,* ]]
+if [[ -z "$REGENERATE" || "$REGENERATE" = *,load_project,* ||
+        "$REGENERATE" = *,switch_project,* || "$REGENERATE" = *,all,* ]]
 then
 
     local -a input_data
-    if [[ "$REGENERATE" = *,switch_project,* || "$REGENERATE" = *,switch_project_g,* ]]; then
+    if [[ "$REGENERATE" = *,load_project,* || "$REGENERATE" = *,switch_project,* ]]; then
         input_data=( "${(@f)"$(<$REGENERATE_ARG)"}" )
     elif [[ -n "$REGENERATE" ]]; then
         input_data=( "${(@f)"$(<$HOME/.config/zcommodore/current_project)"}" )
@@ -232,7 +232,7 @@ then
         current_repo="${input_data[2]}"
         current_tag_file="${input_data[3]}"
 
-        if [[ "$REGENERATE" = *,switch_project_g,* ]]; then
+        if [[ "$REGENERATE" = *,switch_project,* ]]; then
             ZCMDR[current_project]="$current_project"
             ZCMDR[current_repo]="$current_repo"
             ZCMDR[current_tag_file]="$current_tag_file"
