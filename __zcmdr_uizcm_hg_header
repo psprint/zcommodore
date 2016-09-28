@@ -1,0 +1,81 @@
+local -a output             # Output array
+integer own_LINE_COUNT=0    # Local line count
+local -a nonselectables     # To be appended, upon making indices global, to ZCMDRLIST_NONSELECTABLE_ELEMENTS
+local -a hop_indices        # To be appended, upon making indices global, to ZCMDRLIST_HOP_INDEXES
+
+#
+# Main header
+#
+
+local project_name="${repo_root_dir:t:r:u}"
+[[ -z "$project_name" ]] && project_name="$current_project:t:u"
+local header_text="${CMDR_YELLOW_E}${CMDR_RED}<< ${CMDR_RED_E}${CMDR_GREEN}${project_name}${CMDR_GREEN_E}${CMDR_RED} >>${CMDR_RED_E}"
+integer hlen=$(( ${#header_text} - 7 ))
+integer pad_size=$(( (COLUMNS - hlen) / 2 ))
+header_text="${CMDR_YELLOW}${(l:pad_size-2+hlen+7:: :)header_text}"
+local rightpad=""
+rightpad="${(l:pad_size:: :)rightpad}"
+header_text+="${CMDR_YELLOW}$rightpad${CMDR_YELLOW_E}"
+
+output=( "$header_text" )
+own_LINE_COUNT+=1
+nonselectables+=( "$own_LINE_COUNT" )
+hop_indices+=( "$own_LINE_COUNT" )
+
+#
+# Merging, cherry-picking, bisecting status
+#
+
+integer merging=0
+[[ -e "$repo_root_dir"/.hg/merge/state ]] && merging=1
+integer grafting=0
+[[ -e "$repo_root_dir"/.hg/graftstate ]] && grafting=1
+integer bisecting=0
+[[ -e "$repo_root_dir"/.hg/bisect.state ]] && bisecting=1
+
+local line=""
+integer codes_len=0;
+(( merging )) && { line="${CMDR_YELLOW}((Merging))${CMDR_YELLOW_E} "; codes_len+=2; }
+(( grafting )) && { line+="${CMDR_YELLOW}((Grafting))${CMDR_YELLOW_E} "; codes_len+=2; }
+(( bisecting )) && { line+="${CMDR_YELLOW}((Bisecting))${CMDR_YELLOW_E} "; codes_len+=2; }
+line="${line%% }"
+
+if [[ -n "$line" ]]; then
+    line="${CMDR_YELLOW_E}$line"
+    codes_len+=1;
+    integer llen=$(( ${#line} - codes_len ))
+    pad_size=$(( (COLUMNS - llen) / 2 ))
+    line="${CMDR_YELLOW}${(l:pad_size+llen+codes_len-2:: :)line}"
+    rightpad=""
+    rightpad="${(l:pad_size:: :)rightpad}"
+    line+="${CMDR_YELLOW}$rightpad${CMDR_YELLOW_E}"
+
+    output+=( "$line" )
+    own_LINE_COUNT+=1
+    nonselectables+=( "$own_LINE_COUNT" )
+fi
+
+#
+# Project-switching additional actions
+#
+
+if [[ "$REGENERATE" = *,load_project,* || "$REGENERATE" = *,switch_project,* ]]; then
+    if [[ "$REGENERATE" = *,load_project,* ]]; then
+        line="${CMDR_CYAN}\`Loaded new project. Do you want to:\`${CMDR_CYAN_E}"
+    else
+        line="${CMDR_CYAN}\`Switched Zsh to new project. Do you want to:\`${CMDR_CYAN_E}"
+    fi
+
+    reply=()
+    __zcmdr_stdlib_get_std_button "gheadA" "$mtime" "/Save/" "$current_project" "" "${CMDR_GREEN}((Switch permanenty))${CMDR_GREEN_E}" __zcmdr_action_zconvey_zcmdr_g
+    __zcmdr_stdlib_get_std_button "gheadB" "$mtime" "/Save,Zconvey/" "$current_project" "yes" "${CMDR_MAGENTA}((Also Zconvey the switch to other Zsh))${CMDR_MAGENTA_E}" __zcmdr_action_zconvey_zcmdr_g
+    output+=( "$line ${reply[1]} ${reply[2]}" )
+    own_LINE_COUNT+=1
+fi
+
+reply=( "${output[@]}" )
+reply2="$own_LINE_COUNT"
+reply3=( "${nonselectables[@]}" )
+reply4=( "${hop_indices[@]}" )
+
+# vim:ft=zsh
