@@ -31,13 +31,6 @@ zstyle -s ":plugin:zcommodore" nprojects nprojects || nprojects="5"
 [[ "$nprojects" != <-> ]] && nprojects="5"
 [[ "$nprojects" = "0" ]] && nprojects="1"
 
-local circular_file_path
-__zcmdr_stdlib_circular_next "last_project" "$nprojects"
-circular_file_path="$REPLY"
-
-echo "$PWD" >! "$circular_file_path"
-echo "${ZCMDR[current_repo]}" >>! "$circular_file_path"
-
 #
 # Next establish the tags file
 #
@@ -80,6 +73,14 @@ else
 fi
 
 echo "${ZCMDR[current_tag_file]}" >>! ~/.config/zcommodore/current_project
+
+# Repeat the 3 outputs for circular buffer
+local circular_file_path
+__zcmdr_stdlib_circular_next "last_project" "$nprojects"
+circular_file_path="$REPLY"
+
+echo "$PWD" >! "$circular_file_path"
+echo "${ZCMDR[current_repo]}" >>! "$circular_file_path"
 echo "${ZCMDR[current_tag_file]}" >>! "$circular_file_path"
 
 print "Zcommodore Current-Project is now: ${PWD:h}/${fg_bold[green]}${PWD:t}${reset_color}"
