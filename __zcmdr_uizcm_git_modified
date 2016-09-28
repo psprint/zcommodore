@@ -23,7 +23,8 @@ if [[ "${ZCMDR[stat_available]}" = "1" && "${#gitout}" != "0" ]]; then
 fi
 
 local entry
-size=${#gitout[@]}
+integer size=${#gitout[@]}
+integer idx
 for (( idx = 1; idx <= size; idx ++ )); do
     entry="${gitout[idx]}"
     mtime="${stat_result[idx]}"
