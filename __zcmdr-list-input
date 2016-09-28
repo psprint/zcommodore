@@ -34,11 +34,13 @@ case "$key" in
     (UP|k|$'\C-P')
         # Are there any elements before the current one?
         [ "$current_idx" -gt 1 ] && current_idx=current_idx-1;
+        [[ -z "${list[$current_idx]}" && "$current_idx" -gt 1 ]] && current_idx=current_idx-1
         -zcmdrlist_compute_first_to_show_idx
         ;;
     (DOWN|j|$'\C-N')
         # Are there any elements after the current one?
         [ "$current_idx" -lt "$last_element" ] && current_idx=current_idx+1;
+        [[ -z "${list[$current_idx]}" && "$current_idx" -lt "$last_element" ]] && current_idx=current_idx+1
         -zcmdrlist_compute_first_to_show_idx
         ;;
     (PPAGE|$'\b'|$'\C-?'|BACKSPACE)
@@ -140,6 +142,7 @@ case "$key" in
     (LEFT|'h'|BTAB)
         if [[ "$key" = "BTAB" && ${ZCMDRLIST_NONSELECTABLE_ELEMENTS[(r)$current_idx]} = $current_idx ]]; then
             [[ "$current_idx" -gt "1" ]] && current_idx=current_idx-1 && ZCMDRLIST_CURRENT_SEGMENT="100"
+            [[ -z "${list[$current_idx]}" && "$current_idx" -gt 1 ]] && current_idx=current_idx-1
         else
             if [ "$ZCMDRLIST_CURRENT_SEGMENT" -gt "$nseg" ]; then
                 (( ZCMDRLIST_CURRENT_SEGMENT = nseg - 1 ))
@@ -147,6 +150,7 @@ case "$key" in
             else
                 if [[ "$key" = "BTAB" && "$ZCMDRLIST_CURRENT_SEGMENT" -eq "1" ]]; then
                     [ "$current_idx" -gt "1" ] && current_idx=current_idx-1 && ZCMDRLIST_CURRENT_SEGMENT="100"
+                    [[ -z "${list[$current_idx]}" && "$current_idx" -gt 1 ]] && current_idx=current_idx-1
                 else
                     (( ZCMDRLIST_CURRENT_SEGMENT = ZCMDRLIST_CURRENT_SEGMENT - 1 ))
                 fi
@@ -156,10 +160,14 @@ case "$key" in
     (RIGHT|'l'|$'\t')
         if [[ "$key" = $'\t' && ${ZCMDRLIST_NONSELECTABLE_ELEMENTS[(r)$current_idx]} = $current_idx ]]; then
             [ "$current_idx" -lt "$last_element" ] && current_idx=current_idx+1 && ZCMDRLIST_CURRENT_SEGMENT=1
+            [[ -z "${list[$current_idx]}" && "$current_idx" -lt "$last_element" ]] && current_idx=current_idx+1
         else
             (( ZCMDRLIST_CURRENT_SEGMENT = ZCMDRLIST_CURRENT_SEGMENT + 1 ))
             if [ "$key" = $'\t' ]; then
-                [ "$ZCMDRLIST_CURRENT_SEGMENT" -gt "$nseg" ] && [ "$current_idx" -lt "$last_element" ] && current_idx=current_idx+1 && ZCMDRLIST_CURRENT_SEGMENT="1"
+                if [[ "$ZCMDRLIST_CURRENT_SEGMENT" -gt "$nseg" ]]; then
+                    [ "$current_idx" -lt "$last_element" ] && current_idx=current_idx+1 && ZCMDRLIST_CURRENT_SEGMENT="1"
+                    [[ -z "${list[$current_idx]}" && "$current_idx" -lt "$last_element" ]] && current_idx=current_idx+1
+                fi
             fi
             [ "$ZCMDRLIST_CURRENT_SEGMENT" -gt "$nseg" ] && ZCMDRLIST_CURRENT_SEGMENT="$nseg"
         fi
@@ -193,11 +201,13 @@ case "$key" in
     #
 
     (UP|$'\C-P')
-        [ "$current_idx" -gt 1 ] && current_idx=current_idx-1;
+        [ "$current_idx" -gt 1 ] && current_idx=current_idx-1
+        [[ -z "${list[$current_idx]}" && "$current_idx" -gt 1 ]] && current_idx=current_idx-1
         -zcmdrlist_compute_first_to_show_idx
         ;;
     (DOWN|$'\C-N')
         [ "$current_idx" -lt "$last_element" ] && current_idx=current_idx+1;
+        [[ -z "${list[$current_idx]}" && "$current_idx" -lt "$last_element" ]] && current_idx=current_idx+1
         -zcmdrlist_compute_first_to_show_idx
         ;;
     (PPAGE)
@@ -231,6 +241,7 @@ case "$key" in
     (LEFT|BTAB)
         if [[ "$key" = "BTAB" && ${ZCMDRLIST_NONSELECTABLE_ELEMENTS[(r)$current_idx]} = $current_idx ]]; then
             [[ "$current_idx" -gt "1" ]] && current_idx=current_idx-1 && ZCMDRLIST_CURRENT_SEGMENT="100"
+            [[ -z "${list[$current_idx]}" && "$current_idx" -gt 1 ]] && current_idx=current_idx-1
         else
             if [ "$ZCMDRLIST_CURRENT_SEGMENT" -gt "$nseg" ]; then
                 (( ZCMDRLIST_CURRENT_SEGMENT = nseg - 1 ))
@@ -238,6 +249,7 @@ case "$key" in
             else
                 if [[ "$key" = BTAB && "$ZCMDRLIST_CURRENT_SEGMENT" -eq "1" ]]; then
                     [ "$current_idx" -gt "1" ] && current_idx=current_idx-1 && ZCMDRLIST_CURRENT_SEGMENT="100"
+                    [[ -z "${list[$current_idx]}" && "$current_idx" -gt 1 ]] && current_idx=current_idx-1
                 else
                     (( ZCMDRLIST_CURRENT_SEGMENT = ZCMDRLIST_CURRENT_SEGMENT - 1 ))
                 fi
@@ -247,10 +259,14 @@ case "$key" in
     (RIGHT|$'\t')
         if [[ "$key" = $'\t' && ${ZCMDRLIST_NONSELECTABLE_ELEMENTS[(r)$current_idx]} = $current_idx ]]; then
             [ "$current_idx" -lt "$last_element" ] && current_idx=current_idx+1 && ZCMDRLIST_CURRENT_SEGMENT=1
+            [[ -z "${list[$current_idx]}" && "$current_idx" -lt "$last_element" ]] && current_idx=current_idx+1
         else
             (( ZCMDRLIST_CURRENT_SEGMENT = ZCMDRLIST_CURRENT_SEGMENT + 1 ))
             if [ "$key" = $'\t' ]; then
-                [ "$ZCMDRLIST_CURRENT_SEGMENT" -gt "$nseg" ] && [ "$current_idx" -lt "$last_element" ] && current_idx=current_idx+1 && ZCMDRLIST_CURRENT_SEGMENT="1"
+                if [[ "$ZCMDRLIST_CURRENT_SEGMENT" -gt "$nseg" ]]; then
+                    [ "$current_idx" -lt "$last_element" ] && current_idx=current_idx+1 && ZCMDRLIST_CURRENT_SEGMENT="1"
+                    [[ -z "${list[$current_idx]}" && "$current_idx" -lt "$last_element" ]] && current_idx=current_idx+1
+                fi
             fi
             [ "$ZCMDRLIST_CURRENT_SEGMENT" -gt "$nseg" ] && ZCMDRLIST_CURRENT_SEGMENT="$nseg"
         fi
