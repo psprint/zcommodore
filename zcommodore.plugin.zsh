@@ -122,4 +122,23 @@ function zcm-cd() {
     fi
 }
 
+#
+# Switch session to current project
+#
+function zcm-refresh() {
+    local -a input_data
+    input_data=( "${(@f)"$(<$HOME/.config/zcommodore/current_project)"}" )
+    ZCMDR[current_project]="${input_data[1]}"
+    ZCMDR[current_repo]="${input_data[2]}"
+    ZCMDR[current_tag_file]="${input_data[3]}"
+
+    print "Obtained data from ~/.config/zcommodore/current_project"
+
+    local p="${ZCMDR[current_repo]:t}"
+    [[ -z "$p" ]] && p="${ZCMDR[current_project]:t}"
+    print "Switched to ${fg_bold[green]}$p${reset_color}"
+
+    cd "${ZCMDR[current_project]}"
+}
+
 # vim:ft=zsh
