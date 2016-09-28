@@ -145,6 +145,11 @@ local -a reply2     # Size of the output
 local -a reply3     # Module's nonselectables
 local -a reply4     # Module's hops
 
+# Header
+local -a header_output header_nonselectables header_hops
+local -a prev_header_nonselectables prev_header_hops
+integer header_size prev_header_size
+
 # Last N projects
 local -a proj_output proj_nonselectables proj_hops
 local -a prev_proj_nonselectables prev_proj_hops
