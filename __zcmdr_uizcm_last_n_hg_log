@@ -8,7 +8,7 @@ integer own_LINE_COUNT=0   # Local line count
 # Input: number of log entries
 local hg_log_count="$1"
 
-hgcmd=( hg -R "$repo_root_dir" log -l "$hg_log_count" -T'{node}\1{desc|firstline}\1{date|age}\1{author|emailuser}\n' )
+hgcmd=( hg --cwd "$repo_root_dir" log -l "$hg_log_count" -T'{node}\1{desc|firstline}\1{date|age}\1{author|emailuser}\n' )
 hgout=( "${(@f)"$( "${hgcmd[@]}" )"}" )
 
 hgout2=( "${CMDR_RED}'Current Hg commits of ${CMDR_RED_E}${CMDR_YELLOW}${(q)repo_root_dir:t}${CMDR_YELLOW_E}${CMDR_RED}'${CMDR_RED_E}" )

@@ -5,7 +5,7 @@ local -a hop_indices        # To be appended, upon making indices global, to ZCM
 integer own_LINE_COUNT=0    # Local line count
 
 # Read input from GIT
-hgout=( ${(f)"$( hg -R "$repo_root_dir" status -m --no-status 2>/dev/null )"} )
+hgout=( ${(f)"$( hg --cwd "$repo_root_dir" status -m --no-status 2>/dev/null )"} )
 
 echo "Hgout: ${hgout[@]}" >> /tmp/reply
 

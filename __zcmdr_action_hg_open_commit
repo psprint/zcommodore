@@ -45,7 +45,7 @@ local -a ZCMDRLIST_NONSELECTABLE_ELEMENTS
 local -a ZCMDRLIST_HOP_INDEXES
 
 # Run git command to list tree of given commit SHA
-hgcmd=( hg -R "$active_path" manifest -r "$sha" )
+hgcmd=( hg --cwd "$active_path" manifest -r "$sha" )
 hgout=( "${(@f)"$( "${hgcmd[@]}" )"}" )
 size="${#hgout[@]}"
 
