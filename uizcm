@@ -148,6 +148,13 @@ __zcmdr_action_hg_history() {
     __zcmdr_stdlib_to_cmd_line "hg --cwd ${(q)active_path} log -p -- ${(q)file} | ${PAGER:-less}"
 }
 
+__zcmdr_action_tree_open() {
+    local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5"
+    file="${(q)file}"
+    file="${file/(#s)\\~/~}"
+    __zcmdr_stdlib_to_cmd_line "${(q)cmd} $file"
+}
+
 #
 # Business logic follows
 #
@@ -355,6 +362,19 @@ if [[ -z "$REGENERATE" || "$REGENERATE" = *,modified,* || "$REGENERATE" = *,all,
 fi
 
 #
+# Tree of project
+#
+
+if [[ -z "$REGENERATE" || "$REGENERATE" = *,tree,* || "$REGENERATE" = *,all,* ]]; then
+    __zcmdr_uizcm_tree
+
+    tree_output=( "${reply[@]}" )
+    tree_size="$reply2"
+    tree_nonselectables=( "${reply3[@]}" )
+    tree_hops=( "${reply4[@]}" )
+fi
+
+#
 # Store all results into OUTPUT, ZCMDRLIST_NONSELECTABLE_ELEMENTS, ZCMDRLIST_HOP_INDEXES
 #
 
@@ -369,7 +389,7 @@ integer LINE_COUNT size
 OUTPUT=( )
 LINE_COUNT=0
 
-for n in "header" "proj" "log" "modified"; do
+for n in "header" "proj" "log" "modified" "tree"; do
     # Get output
     var_name="${n}_output"
     output=( "${(PA@)var_name}" )
