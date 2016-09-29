@@ -143,6 +143,11 @@ __zcmdr_action_hg_diff_file_abs() {
     __zcmdr_stdlib_to_cmd_line "hg --cwd ${(q)active_path} diff ${(q)file}"
 }
 
+__zcmdr_action_hg_history() {
+    local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5"
+    __zcmdr_stdlib_to_cmd_line "hg --cwd ${(q)active_path} log -p -- ${(q)file} | ${PAGER:-less}"
+}
+
 #
 # Business logic follows
 #
