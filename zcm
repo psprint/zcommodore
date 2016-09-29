@@ -2,7 +2,9 @@ __zcmdr_usage_zcm() {
     print -- "Project switching tool. With no arguments will switch to current directory."
     print -- "With -g will also generate tags. With -l will list last N projects. With"
     print -- "-z will Zconvey the project change to all sessions (-f: also to busy ones;"
-    print -- "the command can time-out, by default after 22 seconds)."
+    print -- "the command can time-out, by default after 22 seconds). Passing -z twice,"
+    print -- "e.g. as -zz, will result in ONLY Zconveying currently set project - options"
+    print -- "-l and -g are ignored, and project is not set to current directory."
     print
     print -- "${fg_bold[green]}Usage: zcmdr [-g] [-l] [-z] [-f] [-q] [-v] [-h|--help]${reset_color}"
     print -- "-h|--help       This message"
@@ -16,7 +18,8 @@ __zcmdr_usage_zcm() {
 }
 
 local -A opthash
-zparseopts -D -A opthash g -gen l -list z -zconvey f -force q -quiet v -verbose h -help || { __zcmdr_usage_zcm; return 1; }
+local -a optarr
+zparseopts -D -A opthash g -gen l -list z+=optarr -zconvey f -force q -quiet v -verbose h -help || { __zcmdr_usage_zcm; return 1; }
 
 integer gen=0 list=0 zconvey=0 force=0 quiet=0 verbose=0
 
@@ -31,7 +34,22 @@ integer gen=0 list=0 zconvey=0 force=0 quiet=0 verbose=0
 (( quiet = ${+opthash[-q]} + ${+opthash[--quiet]} ))
 (( verbose = ${+opthash[-v]} + ${+opthash[--verbose]} ))
 
-if [[ ( "$list" = "0" ) && ( "$PWD" = "$HOME" ) ]]; then
+# Multiple Z option
+if [[ "${optarr[(I)-z]}" != "0" && "${optarr[(I)-z]}" != "${optarr[(i)-z]}" ]]; then
+    (( zconvey ++ ))
+
+    # Not nice excluding of whole operation to
+    # reach just Zconvey of project refresh
+    #
+    # Reading circural buffer and nprojects
+    # zstyle will still be done, but this can be
+    # justified of willing to output additional
+    # message for -v option :)
+    list=0
+    gen=0
+fi
+
+if [[ ( "$list" = "0" ) && ( "$PWD" = "$HOME" ) && "$zconvey" -lt "2" ]]; then
     print "Cannot set current project to home directory"
     return 1
 fi
@@ -88,15 +106,17 @@ if (( list )); then
     done
 fi
 
-# Always set current project if not $HOME
-ZCMDR[current_project]="$current_project"
-ZCMDR[current_repo]="$( git -C "$current_project" rev-parse --show-toplevel 2>/dev/null )"
-[[ -z "${ZCMDR[current_repo]}" ]] && ZCMDR[current_repo]="$( hg --cwd "$current_project" root 2>/dev/null )"
-ZCMDR[current_tag_file]=""
+if (( zconvey < 2 )); then
+    # Always set current project if not $HOME
+    ZCMDR[current_project]="$current_project"
+    ZCMDR[current_repo]="$( git -C "$current_project" rev-parse --show-toplevel 2>/dev/null )"
+    [[ -z "${ZCMDR[current_repo]}" ]] && ZCMDR[current_repo]="$( hg --cwd "$current_project" root 2>/dev/null )"
+    ZCMDR[current_tag_file]=""
 
-command mkdir -p ~/.config/zcommodore
-echo "${ZCMDR[current_project]}" >! ~/.config/zcommodore/current_project
-echo "${ZCMDR[current_repo]}" >>! ~/.config/zcommodore/current_project
+    command mkdir -p ~/.config/zcommodore
+    echo "${ZCMDR[current_project]}" >! ~/.config/zcommodore/current_project
+    echo "${ZCMDR[current_repo]}" >>! ~/.config/zcommodore/current_project
+fi
 
 #
 # Next establish the tags file
@@ -115,7 +135,7 @@ if (( gen )); then
     else
         (( quiet )) || print "File .zcmdr_tags wasn't created"
     fi
-else
+elif (( zconvey < 2 )); then
     if [[ -e "$current_project/.zcmdr_tags" ]]; then
         ZCMDR[current_tag_file]="$current_project/.zcmdr_tags"
     elif (( quiet == 0 )); then
@@ -141,33 +161,35 @@ else
     fi
 fi
 
-echo "${ZCMDR[current_tag_file]}" >>! ~/.config/zcommodore/current_project
+if (( zconvey < 2 )); then
+    echo "${ZCMDR[current_tag_file]}" >>! ~/.config/zcommodore/current_project
 
-#
-# Repeat the 3 outputs for circular buffer
-#
+    #
+    # Repeat the 3 outputs for circular buffer
+    #
 
-# Oldest used file
-local circular_file_path
-__zcmdr_stdlib_circular_next "last_project" "$nprojects"
-circular_file_path="$REPLY"
+    # Oldest used file
+    local circular_file_path
+    __zcmdr_stdlib_circular_next "last_project" "$nprojects"
+    circular_file_path="$REPLY"
 
-# Reuse existing file if it has the same project
-__zcmdr_stdlib_circular_paths "last_project"
-all_circular_paths=( "${reply[@]}" )
+    # Reuse existing file if it has the same project
+    __zcmdr_stdlib_circular_paths "last_project"
+    all_circular_paths=( "${reply[@]}" )
 
-for p in "${all_circular_paths[@]}"; do
-    entries=( "${(@f)"$(<$p)"}" )
-    if [[ "${entries[1]}" = "${ZCMDR[current_project]}" ]]; then
-        circular_file_path="$p"
-        break
-    fi
-done
+    for p in "${all_circular_paths[@]}"; do
+        entries=( "${(@f)"$(<$p)"}" )
+        if [[ "${entries[1]}" = "${ZCMDR[current_project]}" ]]; then
+            circular_file_path="$p"
+            break
+        fi
+    done
 
-# Output to established path
-echo "${ZCMDR[current_project]}" >! "$circular_file_path"
-echo "${ZCMDR[current_repo]}" >>! "$circular_file_path"
-echo "${ZCMDR[current_tag_file]}" >>! "$circular_file_path"
+    # Output to established path
+    echo "${ZCMDR[current_project]}" >! "$circular_file_path"
+    echo "${ZCMDR[current_repo]}" >>! "$circular_file_path"
+    echo "${ZCMDR[current_tag_file]}" >>! "$circular_file_path"
+fi
 
 #
 # Zconvey the switch
@@ -179,29 +201,31 @@ if (( zconvey )); then
     (( verbose )) && opts+=( '-v' )
     (( force )) && opts+=( '-f' )
 
-    (( quiet )) || print
+    (( quiet || zconvey >= 2 )) || print
     if ! type zc-all 2>/dev/null 1>&2; then
         print "Zconvey is not installed (command zc-all not found): http://github.com/psprint/zconvey"
     else
         (( verbose )) && print "Invoking zc-all ${opts[@]} zcm-refresh"
         zc-all "${opts[@]}" zcm-refresh
     fi
-    (( quiet )) || print
+    (( quiet || zconvey >= 2 )) || print
 fi
 
-#
-# CD to the project if needed
-#
+if (( zconvey < 2 )); then
+    #
+    # CD to the project if needed
+    #
 
-if [[ "$PWD" != "${ZCMDR[current_project]}" ]]; then
-    cd "${ZCMDR[current_project]}"
+    if [[ "$PWD" != "${ZCMDR[current_project]}" ]]; then
+        cd "${ZCMDR[current_project]}"
+    fi
+
+    #
+    # Inform user
+    #
+
+    (( quiet )) || print "Zcommodore Current-Project is now: ${current_project:h}/${fg_bold[green]}${current_project:t}${reset_color}"
 fi
-
-#
-# Inform user
-#
-
-(( quiet )) || print "Zcommodore Current-Project is now: ${current_project:h}/${fg_bold[green]}${current_project:t}${reset_color}"
 
 return 0
 
