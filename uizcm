@@ -125,6 +125,14 @@ __zcmdr_action_zconvey_zcmdr_g() {
     fi
 }
 
+# Hg actions
+
+__zcmdr_action_hg_diff() {
+    local id="$1" ts="$2" cmd="$3" active_path="$4" sha="$5"
+
+    __zcmdr_stdlib_to_cmd_line "hg -R ${(q)active_path} log -p -r $sha"
+}
+
 #
 # Business logic follows
 #
