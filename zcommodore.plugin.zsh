@@ -65,6 +65,13 @@ zle -N tag-search-multi-word-pbackwards tag-search-multi-word
 zle -N tag-search-multi-word-pforwards tag-search-multi-word
 bindkey "^O^K" tag-search-multi-word
 
+# uizcm autoloads
+autoload __zcmdr-process-buffer __zcmdr-usetty-wrapper __zcmdr-list __zcmdr-list-input __zcmdr-list-draw
+autoload __zcmdr_uizcm_last_n_git_log __zcmdr_uizcm_git_modified __zcmdr_action_git_open_commit
+autoload __zcmdr_uizcm_last_nprojects __zcmdr_uizcm_git_header __zcmdr_uizcm_hg_header
+autoload __zcmdr_uizcm_last_n_hg_log __zcmdr_action_hg_open_commit __zcmdr_uizcm_hg_modified
+autoload __zcmdr_uizcm_tree
+
 zle -N uizcm
 bindkey "^O^U" uizcm
 
