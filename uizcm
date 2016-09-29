@@ -274,7 +274,7 @@ then
     if [[ -n "$repo_root_dir" ]]; then
         IS_GIT=1
     else
-        repo_root_dir="$( hg -R "$current_repo" root 2>/dev/null )"
+        repo_root_dir="$( hg --cwd "$current_repo" root 2>/dev/null )"
         [[ -n "$repo_root_dir" ]] && IS_HG=1
     fi
 fi
