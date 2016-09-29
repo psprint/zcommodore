@@ -6,7 +6,6 @@ integer own_LINE_COUNT=0   # Local line count
 
 globout=( "$current_project"/**/*(N) )
 size="${#globout[@]}"
-globout=( "${globout[@]//$HOME/~}" )
 
 output=( "${CMDR_RED}'Tree (select to open) of ${CMDR_RED_E}${CMDR_YELLOW}${current_project:t}${CMDR_YELLOW_E}${CMDR_RED}'${CMDR_RED_E}" )
 own_LINE_COUNT+=1
@@ -18,8 +17,12 @@ hop_indices+=( "$own_LINE_COUNT" )
 #
 
 for (( idx = 1; idx <= size; idx ++ )); do
+    local txt="${globout[idx]/(#s)$current_project\//}"
+    txt="${txt/(#s)$HOME/~}"
+    local passed_path="${globout[idx]/(#s)$HOME/~}"
+
     reply=( )
-    __zcmdr_stdlib_get_std_button "topenA" "" "$selected_editor" "$current_project" "${globout[idx]}" "${globout[idx]}" __zcmdr_action_tree_open
+    __zcmdr_stdlib_get_std_button "topenA" "" "$selected_editor" "$current_project" "$passed_path" "$txt" __zcmdr_action_tree_open
     output+=( "${reply[1]}" )
 done
 
