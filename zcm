@@ -105,6 +105,7 @@ echo "${ZCMDR[current_repo]}" >>! ~/.config/zcommodore/current_project
 if (( gen )); then
     print "Generating tags.."
     (
+        cd "$current_project"
         command rm -f ".zcmdr_tags"
         "${ZCMDR[ctags_bin]}" -e -R --exclude="tags,TAGS" -f ".zcmdr_tags" .
     )
@@ -115,7 +116,7 @@ if (( gen )); then
         (( quiet )) || print "File .zcmdr_tags wasn't created"
     fi
 else
-    if [[ -e ".zcmdr_tags" ]]; then
+    if [[ -e "$current_project/.zcmdr_tags" ]]; then
         ZCMDR[current_tag_file]="$current_project/.zcmdr_tags"
     elif (( quiet == 0 )); then
         print "There are no tags generated (no .zcmdr_tags file)"
@@ -125,6 +126,7 @@ else
         if [[ "$answer" = "y" ]]; then
             print "Generating tags.."
             (
+                cd "$current_project"
                 "${ZCMDR[ctags_bin]}" -e -R --exclude="tags,TAGS" -f ".zcmdr_tags" .
             )
             if [[ -e "$current_project/.zcmdr_tags" ]]; then
