@@ -133,6 +133,11 @@ __zcmdr_action_hg_diff() {
     __zcmdr_stdlib_to_cmd_line "hg -R ${(q)active_path} log -p -r $sha"
 }
 
+__zcmdr_action_hg_same_author() {
+    local id="$1" ts="$2" cmd="$3" active_path="$4" author="$5"
+    __zcmdr_stdlib_to_cmd_line "hg -R ${(q)active_path} log -u ${(q)author} -T'{node|shortest} {desc|firstline} {date|age} {author|emailuser}\n' | ${PAGER:-less}"
+}
+
 #
 # Business logic follows
 #
