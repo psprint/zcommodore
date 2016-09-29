@@ -1,0 +1,84 @@
+local -a hgout             # Unprocessed git output
+local -a hgout2            # Processed git output
+local -a nonselectables     # To be appended, upon making indices global, to ZCMDRLIST_NONSELECTABLE_ELEMENTS
+local -a hop_indices        # To be appended, upon making indices global, to ZCMDRLIST_HOP_INDEXES
+integer own_LINE_COUNT=0    # Local line count
+
+# Read input from GIT
+hgout=( ${(f)"$( hg -R "$repo_root_dir" status -m --no-status 2>/dev/null )"} )
+
+echo "Hgout: ${hgout[@]}" >> /tmp/reply
+
+# Start output: nonselectable HEADER
+hgout2=( "${CMDR_RED}'Modified files of ${CMDR_RED_E}${CMDR_YELLOW}${(q)repo_root_dir:t}${CMDR_YELLOW_E}${CMDR_RED}'${CMDR_RED_E}" )
+own_LINE_COUNT+=1
+nonselectables+=( "$own_LINE_COUNT" )
+hop_indices+=( "$own_LINE_COUNT" )
+
+# Get zstat's at corresponding array's entries
+local -a stat_result
+local mtime
+if [[ "${ZCMDR[stat_available]}" = "1" && "${#hgout}" != "0" ]]; then
+    stat_result=( ${(f)"$( zstat "${repo_root_dir}/${^hgout[@]}" )"} )
+    stat_result=( "${(M)stat_result[@]:#mtime*}" )
+    stat_result=( "${stat_result[@]/mtime[^0-9]#/}" )
+fi
+
+local entry
+integer size=${#hgout[@]}
+integer idx
+for (( idx = 1; idx <= size; idx ++ )); do
+    entry="${hgout[idx]}"
+    mtime="${stat_result[idx]}"
+
+    reply=()
+
+    # Time spec
+    __zcmdr_stdlib_get_timestamp
+    integer days=$(( (REPLY-mtime)/(24*60*60) ))
+    local day_info
+    (( days > 0 )) && day_info="${days}_day(s)" || day_info="today"
+    day_info="${CMDR_CYAN}${day_info}${CMDR_CYAN_E}"
+    day_info="${(r:12:: :)day_info}"
+    [[ "${day_info/${CMDR_CYAN_E}/}" = "$day_info" ]] && day_info="${day_info}${CMDR_CYAN_E}"
+
+    # Main (std) button text
+    local txtentry="${entry:t}"
+    txtentry="${txtentry//\%/%%}"
+    txtentry='%35<...<'"$txtentry"
+    txtentry="$ACC_GREEN${(%)txtentry}$ACC_GREEN_E"
+    txtentry="${(r:40:: :)txtentry}"
+
+    # Button function arguments:
+    # $1 - action ID
+    # $2 - data1, e.g. timestamp
+    # $3 - data2, e.g. command
+    # $4 - data3, e.g. active path
+    # $5 - data4, e.g. file path, file name, URL, other data
+    # $6 - text
+    # $7 - handler function name
+    if [ "$cd_at_edit" = "yes" ]; then
+        __zcmdr_stdlib_get_std_button "gmodA" "$mtime" "$selected_editor" "$repo_root_dir" "$entry" "$day_info" __zcmdr_action_edit_file_cd
+        __zcmdr_stdlib_get_std_button "gmodB" "$mtime" "$selected_editor" "$repo_root_dir" "$entry" "$txtentry" __zcmdr_action_edit_file_cd
+    else
+        __zcmdr_stdlib_get_std_button "gmodA" "$mtime" "$selected_editor" "$repo_root_dir" "$entry" "$day_info" __zcmdr_action_edit_file_abs
+        __zcmdr_stdlib_get_std_button "gmodB" "$mtime" "$selected_editor" "$repo_root_dir" "$entry" "$txtentry" __zcmdr_action_edit_file_abs
+    fi
+
+    __zcmdr_stdlib_get_button "gmodC" "$mtime" "/Diff/" "$repo_root_dir" "$entry" "Diff" __zcmdr_action_git_diff_file_abs
+    __zcmdr_stdlib_get_button "gmodD" "$mtime" "/FileCD/" "$repo_root_dir" "$entry" "FileCD" __zcmdr_action_file_cd
+    __zcmdr_stdlib_get_button "gmodE" "$mtime" "/Backup/" "$repo_root_dir" "$entry" "Backup" __zcmdr_action_backup
+    __zcmdr_stdlib_get_button "gmodF" "$mtime" "/History/" "$repo_root_dir" "$entry" "History" __zcmdr_action_git_history
+    __zcmdr_stdlib_get_button "gmodG" "$mtime" "/Accumulated History/" "$repo_root_dir" "$entry" "AHistory" __zcmdr_action_git_ahistory
+    __zcmdr_stdlib_get_button "gmodH" "$mtime" "/git hash-object/" "$repo_root_dir" "$entry" "StoreAsObject" __zcmdr_action_git_store_as_object
+
+    hgout2+=( "${reply[1]} ${reply[2]} ${reply[3]} ${reply[4]} ${reply[5]} ${reply[6]} ${reply[7]} ${reply[8]}" )
+    own_LINE_COUNT+=1
+done
+
+reply=( "${hgout2[@]}" )
+reply2="$own_LINE_COUNT"
+reply3=( "${nonselectables[@]}" )
+reply4=( "${hop_indices[@]}" )
+
+# vim:ft=zsh
