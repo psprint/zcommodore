@@ -65,7 +65,7 @@ for (( idx = 1; idx <= size; idx ++ )); do
         __zcmdr_stdlib_get_std_button "hmodB" "$mtime" "$selected_editor" "$repo_root_dir" "$entry" "$txtentry" __zcmdr_action_edit_file_abs
     fi
 
-    __zcmdr_stdlib_get_button "hmodC" "$mtime" "/Diff/" "$repo_root_dir" "$entry" "Diff" __zcmdr_action_git_diff_file_abs
+    __zcmdr_stdlib_get_button "hmodC" "$mtime" "/Diff/" "$repo_root_dir" "$entry" "Diff" __zcmdr_action_hg_diff_file_abs
     __zcmdr_stdlib_get_button "hmodD" "$mtime" "/FileCD/" "$repo_root_dir" "$entry" "FileCD" __zcmdr_action_file_cd
     __zcmdr_stdlib_get_button "hmodE" "$mtime" "/Backup/" "$repo_root_dir" "$entry" "Backup" __zcmdr_action_backup
     __zcmdr_stdlib_get_button "hmodF" "$mtime" "/History/" "$repo_root_dir" "$entry" "History" __zcmdr_action_git_history
