@@ -188,6 +188,14 @@ if (( zconvey )); then
 fi
 
 #
+# CD to the project if needed
+#
+
+if [[ "$PWD" != "${ZCMDR[current_project]}" ]]; then
+    cd "${ZCMDR[current_project]}"
+fi
+
+#
 # Inform user
 #
 
