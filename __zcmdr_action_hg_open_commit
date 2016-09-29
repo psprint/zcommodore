@@ -61,7 +61,7 @@ ZCMDRLIST_HOP_INDEXES+=( "$own_LINE_COUNT" )
 
 for (( idx = 1; idx <= size; idx ++ )); do
     reply=( )
-    __zcmdr_stdlib_get_std_button "gopen1A" "${hgout[idx]}" "$selected_editor" "$active_path" "$sha" "${hgout[idx]}" __zcmdr_action_hg_open_commit_a
+    __zcmdr_stdlib_get_std_button "hopen1A" "${hgout[idx]}" "$selected_editor" "$active_path" "$sha" "${hgout[idx]}" __zcmdr_action_hg_open_commit_a
     output+=( "${reply[1]}" )
 done
 
