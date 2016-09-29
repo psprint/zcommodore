@@ -284,6 +284,7 @@ fi
 #
 
 if [[ -z "$REGENERATE" || "$REGENERATE" = *,header,* || "$REGENERATE" = *,all,* ]]; then
+    reply=( ); reply2="0"; reply3=( ); reply4=( )
 
     if (( IS_GIT )); then
         __zcmdr_uizcm_git_header
@@ -302,6 +303,8 @@ fi
 #
 
 if [[ -z "$REGENERATE" || "$REGENERATE" = *,projects,* || "$REGENERATE" = *,all,* ]]; then
+    reply=( ); reply2="0"; reply3=( ); reply4=( )
+
     __zcmdr_uizcm_last_nprojects "$nprojects"
 
     proj_output=( "${reply[@]}" )
@@ -324,6 +327,8 @@ if [[ -z "$REGENERATE" || "$REGENERATE" = *,log,* || "$REGENERATE" = *,all,* ]];
 
     ZCMDR[LOG_SIZE]="$log_count"
 
+    reply=( ); reply2="0"; reply3=( ); reply4=( )
+
     if (( IS_GIT )); then
         __zcmdr_uizcm_last_n_git_log "$log_count"
     elif (( IS_HG )); then
@@ -341,6 +346,7 @@ fi
 #
 
 if [[ -z "$REGENERATE" || "$REGENERATE" = *,modified,* || "$REGENERATE" = *,all,* ]]; then
+    reply=( ); reply2="0"; reply3=( ); reply4=( )
 
     if (( IS_GIT )); then
         __zcmdr_uizcm_git_modified
@@ -359,6 +365,8 @@ fi
 #
 
 if [[ -z "$REGENERATE" || "$REGENERATE" = *,tree,* || "$REGENERATE" = *,all,* ]]; then
+    reply=( ); reply2="0"; reply3=( ); reply4=( )
+
     __zcmdr_uizcm_tree
 
     tree_output=( "${reply[@]}" )
@@ -407,9 +415,11 @@ for n in "header" "proj" "log" "modified" "tree"; do
     var_name="prev_${n}_hops"
     prev_hops=( "${(PA@)var_name}" )
 
-    OUTPUT+=( "" )
-    LINE_COUNT+=1
-    ZCMDRLIST_NONSELECTABLE_ELEMENTS+=( "$LINE_COUNT" )
+    if (( size > 0 )); then
+        OUTPUT+=( "" )
+        LINE_COUNT+=1
+        ZCMDRLIST_NONSELECTABLE_ELEMENTS+=( "$LINE_COUNT" )
+    fi
 
     # Remove previous non-selectables and hops,
     # added on previous creation of this section
