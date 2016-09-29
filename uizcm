@@ -15,6 +15,7 @@ echo "FPATH: $FPATH" >> /tmp/reply-fp
 autoload __zcmdr-process-buffer __zcmdr-usetty-wrapper __zcmdr-list __zcmdr-list-input __zcmdr-list-draw
 autoload __zcmdr_uizcm_last_n_git_log __zcmdr_uizcm_git_modified __zcmdr_action_git_open_commit
 autoload __zcmdr_uizcm_last_nprojects __zcmdr_uizcm_git_header __zcmdr_uizcm_hg_header
+autoload __zcmdr_uizcm_last_n_hg_log
 
 [[ "${ZCMDR[stdlib_sourced]}" != "1" ]] && source "${ZCMDR_REPO_DIR}/lib/stdlib.lcmdr"
 
@@ -302,12 +303,14 @@ if [[ -z "$REGENERATE" || "$REGENERATE" = *,log,* || "$REGENERATE" = *,all,* ]];
 
     if (( IS_GIT )); then
         __zcmdr_uizcm_last_n_git_log "$log_count"
-
-        log_output=( "${reply[@]}" )
-        log_size="$reply2"
-        log_nonselectables=( "${reply3[@]}" )
-        log_hops=( "${reply4[@]}" )
+    elif (( IS_HG )); then
+        __zcmdr_uizcm_last_n_hg_log "$log_count"
     fi
+
+    log_output=( "${reply[@]}" )
+    log_size="$reply2"
+    log_nonselectables=( "${reply3[@]}" )
+    log_hops=( "${reply4[@]}" )
 fi
 
 #

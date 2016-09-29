@@ -1,0 +1,79 @@
+local -a hgcmd             # Hg command to run
+local -a hgout             # Unprocessed hg output
+local -a hgout2            # Processed hg output
+local -a nonselectables    # To be appended, upon making indices global, to ZCMDRLIST_NONSELECTABLE_ELEMENTS
+local -a hop_indices       # To be appended, upon making indices global, to ZCMDRLIST_HOP_INDEXES
+integer own_LINE_COUNT=0   # Local line count
+
+# Input: number of log entries
+local hg_log_count="$1"
+
+hgcmd=( hg -R "$repo_root_dir" log -l "$hg_log_count" -T'{node}\1{desc|firstline}\1{date|age}\1{author|emailuser}\n' )
+hgout=( "${(@f)"$( "${hgcmd[@]}" )"}" )
+
+hgout2=( "${CMDR_RED}'Current Hg commits of ${CMDR_RED_E}${CMDR_YELLOW}${(q)repo_root_dir:t}${CMDR_YELLOW_E}${CMDR_RED}'${CMDR_RED_E}" )
+own_LINE_COUNT+=1
+nonselectables+=( "$own_LINE_COUNT" )
+hop_indices+=( "$own_LINE_COUNT" )
+
+local IFSBKP="$IFS"
+local IFS=$'\1'
+local entry entry3
+local -a arrentry
+integer ecount=0
+for entry in "${hgout[@]}"; do
+    # Count entries
+    ecount+=1
+
+    # hash \1 message \1 date \1 author
+    arrentry=( ${=entry} )
+
+    reply=( )
+    local txt1="${arrentry[1]}"
+    txt1="${CMDR_GREEN}${txt1[1,7]}${CMDR_GREEN_E}"
+    local txt2="${CMDR_CYAN}${(qqq)arrentry[2]}${CMDR_CYAN_E}"
+    local txt3="${CMDR_MAGENTA}((${arrentry[3]}))${CMDR_MAGENTA_E}"
+    local txt4="\`${arrentry[4]}\`"
+
+    __zcmdr_stdlib_get_std_button "glog1A" "0" "/Open commit/" "$repo_root_dir" "${arrentry[1]}" "$txt1" __zcmdr_action_git_open_commit
+    __zcmdr_stdlib_get_std_button "glog1B" "0" "/Diff/" "$repo_root_dir" "${arrentry[1]}" "$txt2" __zcmdr_action_git_diff
+    __zcmdr_stdlib_get_std_button "glog1C" "0" "/Same-files commits/" "$repo_root_dir" "${arrentry[1]}" "$txt3" __zcmdr_action_git_same_files_e
+    __zcmdr_stdlib_get_std_button "glog1D" "0" "/Same-author commits/" "$repo_root_dir" "${arrentry[4]}" "$txt4" __zcmdr_action_git_same_author
+
+    # Before adding new entry - check if a separator is needed
+    if (( ecount > ZCMDR[LOG_SIZE_INITIAL] )); then
+        integer extending_entries=$(( ecount - ZCMDR[LOG_SIZE_INITIAL] ))
+        if (( (extending_entries-1) % 5 == 0 )); then
+            hgout2+=( "${CMDR_RED}---${CMDR_RED_E}" )
+            own_LINE_COUNT+=1
+        fi
+    fi
+
+    hgout2+=( "${reply[1]} ${reply[2]} ${reply[3]} ${reply[4]}" )
+    own_LINE_COUNT+=1
+done
+IFS="$IFSBKP"
+
+# Add "More+5" and "Less-5" buttons to fetch more and less log entries
+reply=( )
+
+# More? Has that "ends exactly at hg_log_count" small flaw
+if [[ "${#hgout[@]}" -ge "$hg_log_count" ]]; then
+__zcmdr_stdlib_get_button "" ",log," "/More +5 commits/" "plus" "" "More+5" ""
+fi
+
+# Less?
+if [[ "$own_LINE_COUNT" -gt 7 ]]; then
+    __zcmdr_stdlib_get_button "" ",log," "/Less -5 commits/" "minus" "" "Less-5" ""
+    reply[2]=" ${reply[2]}"
+fi
+
+hgout2+=( "${reply[1]}${reply[2]}" )
+own_LINE_COUNT+=1
+
+reply=( "${hgout2[@]}" )
+reply2="$own_LINE_COUNT"
+reply3=( "${nonselectables[@]}" )
+reply4=( "${hop_indices[@]}" )
+
+# vim:ft=zsh
