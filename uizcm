@@ -485,6 +485,7 @@ ZCMDRLIST_GENERATION_TIME="${ZCMDRLIST_GENERATION_TIME[1,5]}"
 # Invoke the list, handle outcome
 #
 
+ZCMDRLIST_HOP_INDEXES+=( 1 ) # jump to anchors
 local ZCMDRLIST_WRAPPER_BIT=""
 __zcmdr-usetty-wrapper __zcmdr-list-wrapper "${anchors[*]}" "${OUTPUT[@]}" "$ZCMDRLIST_GENERATION_TIME"
 
