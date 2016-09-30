@@ -121,7 +121,7 @@ function __zcmdr_stdlib_decode_hyperlink() {
         reply[3]="${(Q)cmd}"
         reply[4]="${(Q)active_path}"
         reply[5]="${(Q)file}"
-        return 0;
+        return 0
     fi
 
     return 1
