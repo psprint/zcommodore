@@ -2,7 +2,7 @@ emulate -L zsh
 
 zmodload zsh/curses
 
-setopt typesetsilent
+setopt typesetsilent extendedglob
 
 # Compute first to show index - exact page
 -zcmdrlist_compute_first_to_show_idx() {
@@ -126,9 +126,24 @@ case "$key" in
             # Check if we are at hyperlink. Only then allow selection
             local -a segs
             segs=( "${(z@)list[$current_idx]}" )
-            if [[ "${segs[ZCMDRLIST_CURRENT_SEGMENT]//$'\1'/}" != "${segs[ZCMDRLIST_CURRENT_SEGMENT]}" ]]; then
-                # Save current element in the result variable
-                reply=( $current_idx SELECT )
+
+            local -a replybkp
+            replybkp=( "${reply[@]}" )
+            reply=( )
+            if __zcmdr_stdlib_decode_hyperlink "${segs[ZCMDRLIST_CURRENT_SEGMENT]}"; then
+                local id="${reply[1]}" data2="${reply[2]}"
+                reply=( "${replybkp[@]}" )
+
+                if [[ "$id" = *zcmdr_anchor* ]]; then
+                    current_idx="$data2"
+                    ZCMDRLIST_CURRENT_SEGMENT=1
+                    -zcmdrlist_compute_first_to_show_idx
+                else
+                    # Save current element in the result variable
+                    reply=( $current_idx SELECT )
+                fi
+            else
+                reply=( "${replybkp[@]}" )
             fi
         fi
         ;;

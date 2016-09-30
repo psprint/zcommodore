@@ -384,11 +384,13 @@ ZCMDRLIST_HOP_INDEXES=()
 
 local -a OUTPUT output nonselectables hops
 local -a prev_nonselectables prev_hops
+local -a anchors
 local n var_name
 integer LINE_COUNT size
 
 OUTPUT=( )
 LINE_COUNT=0
+anchors=( )
 
 for n in "header" "proj" "log" "modified" "tree"; do
     # Get output
@@ -418,7 +420,8 @@ for n in "header" "proj" "log" "modified" "tree"; do
     if (( size > 0 )); then
         OUTPUT+=( "" )
         LINE_COUNT+=1
-        ZCMDRLIST_NONSELECTABLE_ELEMENTS+=( "$LINE_COUNT" )
+        # + 1 for the anchors at top
+        ZCMDRLIST_NONSELECTABLE_ELEMENTS+=( "$(( LINE_COUNT + 1 ))" )
     fi
 
     # Remove previous non-selectables and hops,
@@ -427,8 +430,9 @@ for n in "header" "proj" "log" "modified" "tree"; do
     ZCMDRLIST_HOP_INDEXES=( "${ZCMDRLIST_HOP_INDEXES[@]:|prev_hops}" )
 
     # Translate returned indices to global ones
-    nonselectables=( "${nonselectables[@]//(#b)([[:digit:]]##)/$(( ${match[1]} + LINE_COUNT ))}" )
-    hops=( "${hops[@]//(#b)([[:digit:]]##)/$(( ${match[1]} + LINE_COUNT ))}" )
+    # The + 1 is for anchors at the top
+    nonselectables=( "${nonselectables[@]//(#b)([[:digit:]]##)/$(( ${match[1]} + LINE_COUNT + 1 ))}" )
+    hops=( "${hops[@]//(#b)([[:digit:]]##)/$(( ${match[1]} + LINE_COUNT + 1 ))}" )
 
     # Add current hops
     ZCMDRLIST_NONSELECTABLE_ELEMENTS+=( "${nonselectables[@]}" )
@@ -448,6 +452,19 @@ for n in "header" "proj" "log" "modified" "tree"; do
     : "${(PA)var_name::=${hops[@]}}";
     var_name="prev_${n}_size"
     : "${(P)var_name::=${size}}";
+
+    # Create anchors for selected sections
+    reply=( )
+    if [[ "$n" = "proj" ]]; then
+        :
+    elif [[ "$n" = "log" ]]; then
+        [[ -n "${hops[1]}" ]] && __zcmdr_stdlib_get_button "zcmdr_anchor" "${hops[1]}" "/Jump/" "" "" "Log" ""
+    elif [[ "$n" = "modified" ]]; then
+        [[ -n "${hops[1]}" ]] && __zcmdr_stdlib_get_button "zcmdr_anchor" "${hops[1]}" "/Jump/" "" "" "Modified" ""
+    elif [[ "$n" = "tree" ]]; then
+        [[ -n "${hops[1]}" ]] && __zcmdr_stdlib_get_button "zcmdr_anchor" "${hops[1]}" "/Jump/" "" "" "Tree" ""
+    fi
+    anchors+=( "${reply[@]}" )
 
     OUTPUT+=( "${output[@]}" )
     LINE_COUNT+=size
@@ -469,7 +486,7 @@ ZCMDRLIST_GENERATION_TIME="${ZCMDRLIST_GENERATION_TIME[1,5]}"
 #
 
 local ZCMDRLIST_WRAPPER_BIT=""
-__zcmdr-usetty-wrapper __zcmdr-list-wrapper "${OUTPUT[@]}" "$ZCMDRLIST_GENERATION_TIME"
+__zcmdr-usetty-wrapper __zcmdr-list-wrapper "${anchors[*]}" "${OUTPUT[@]}" "$ZCMDRLIST_GENERATION_TIME"
 
 if [ -z "$ZCMDRLIST_WRAPPER_BIT" ]; then
     zle && { zle .redisplay; zle .reset-prompt; }
