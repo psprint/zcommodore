@@ -458,11 +458,11 @@ for n in "header" "proj" "log" "modified" "tree"; do
     if [[ "$n" = "proj" ]]; then
         :
     elif [[ "$n" = "log" ]]; then
-        [[ -n "${hops[1]}" ]] && __zcmdr_stdlib_get_button "zcmdr_anchor" "${hops[1]}" "/Jump/" "" "" "Log" ""
+        [[ -n "${hops[1]}" ]] && __zcmdr_stdlib_get_button "zcmdr_anchor" "${hops[1]}" "/Jump/" "" "" "${CMDR_MAGENTA}Log${CMDR_MAGENTA_E}" ""
     elif [[ "$n" = "modified" ]]; then
-        [[ -n "${hops[1]}" ]] && __zcmdr_stdlib_get_button "zcmdr_anchor" "${hops[1]}" "/Jump/" "" "" "Modified" ""
+        [[ -n "${hops[1]}" ]] && __zcmdr_stdlib_get_button "zcmdr_anchor" "${hops[1]}" "/Jump/" "" "" "${CMDR_GREEN}Modified${CMDR_GREEN_E}" ""
     elif [[ "$n" = "tree" ]]; then
-        [[ -n "${hops[1]}" ]] && __zcmdr_stdlib_get_button "zcmdr_anchor" "${hops[1]}" "/Jump/" "" "" "Tree" ""
+        [[ -n "${hops[1]}" ]] && __zcmdr_stdlib_get_button "zcmdr_anchor" "${hops[1]}" "/Jump/" "" "" "${CMDR_CYAN}Tree${CMDR_CYAN_E}" ""
     fi
     anchors+=( "${reply[@]}" )
 
