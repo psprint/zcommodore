@@ -95,7 +95,13 @@ autoload __zcmdr-list-draw __zcmdr-list-input __zcmdr-process-buffer
 -zcmdrlist_verify_vars() {
     [ "$ZCMDRLIST_CURRENT_IDX" -gt "$last_element" ] && ZCMDRLIST_CURRENT_IDX="$last_element"
     [[ "$ZCMDRLIST_CURRENT_IDX" -eq 0 && "$last_element" -ne 0 ]] && ZCMDRLIST_CURRENT_IDX=1
-    (( ZCMDRLIST_FROM_WHAT_IDX_LIST_IS_SHOWN=0+((ZCMDRLIST_CURRENT_IDX-1)/page_height)*page_height+1 ))
+
+    # Verify that element is just visible, if not then compute exact page
+    if [[ "$ZCMDRLIST_CURRENT_IDX" -lt "$ZCMDRLIST_FROM_WHAT_IDX_LIST_IS_SHOWN" ||
+        "$ZCMDRLIST_CURRENT_IDX" -gt "$(( ZCMDRLIST_FROM_WHAT_IDX_LIST_IS_SHOWN + page_height + 1 ))" ]]
+    then
+        (( ZCMDRLIST_FROM_WHAT_IDX_LIST_IS_SHOWN = ((ZCMDRLIST_CURRENT_IDX-1)/page_height) * page_height + 1 ))
+    fi
 }
 
 # Compute the variables which are shown to the user
