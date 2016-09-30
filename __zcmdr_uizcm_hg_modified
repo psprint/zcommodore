@@ -7,8 +7,6 @@ integer own_LINE_COUNT=0    # Local line count
 # Read input from GIT
 hgout=( ${(f)"$( hg --cwd "$repo_root_dir" status -m --no-status 2>/dev/null )"} )
 
-echo "Hgout: ${hgout[@]}" >> /tmp/reply
-
 # Start output: nonselectable HEADER
 hgout2=( "${CMDR_RED}'Modified files of ${CMDR_RED_E}${CMDR_YELLOW}${(q)repo_root_dir:t}${CMDR_YELLOW_E}${CMDR_RED}'${CMDR_RED_E}" )
 own_LINE_COUNT+=1
