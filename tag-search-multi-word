@@ -249,11 +249,18 @@ if [ "$__tsmw_hcw_call_count" -eq "1" ]; then
             taglinebyte="${match[1]}"
 
             # CD vs absolute path
-            if [[ "$cd_at_edit" = "yes" ]];then
-                cmd+=( "cd" "${(q)ZCMDR[current_project]}" ";" )
-                tagfile="${match[2]}"
+            if [[ "$PWD" != "${ZCMDR[current_project]}" ]]; then
+                if [[ "$cd_at_edit" = "yes" ]];then
+                    cmd+=( "cd" "${(q)ZCMDR[current_project]}" ";" )
+                    tagfile="${match[2]}"
+                else
+                    tagfile="${ZCMDR[current_project]}/${match[2]}"
+                fi
             else
-                tagfile="${ZCMDR[current_project]}/${match[2]}"
+                # Already at required path, CD vs absolute path
+                # decision is not needed - no absolute path,
+                # no cd, just edit
+                tagfile="${match[2]}"
             fi
 
             # Editor command
