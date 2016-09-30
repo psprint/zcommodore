@@ -185,7 +185,7 @@ autoload __zcmdr-list-draw __zcmdr-list-input __zcmdr-process-buffer
         [[ -z "$ZCMDRLIST_SEARCH_BUFFER" && "${ZCMDRLIST_NONSELECTABLE_ELEMENTS[(r)$ZCMDRLIST_CURRENT_IDX]}" = "$ZCMDRLIST_CURRENT_IDX" ]] && return
 
         # There will be no colorifying for current element
-        integer ZCMDRLIST_CURRENT_PAGE_IDX=$(( (ZCMDRLIST_CURRENT_IDX-1)%page_height+1 ))
+        integer ZCMDRLIST_CURRENT_PAGE_IDX=$(( ZCMDRLIST_CURRENT_IDX - ZCMDRLIST_FROM_WHAT_IDX_LIST_IS_SHOWN + 1 ))
         local element="$list[ZCMDRLIST_CURRENT_IDX]"
         local output=""
 
@@ -431,7 +431,7 @@ while (( 1 )); do
         disp_list2=( "${disp_list2[@]//$'\1'[^$'\1']#$'\1'[^$'\1']#$'\1'[^$'\1']#$'\1'[^$'\1']#$'\1'[^$'\1']#$'\2'/}" )
 
         # Output colored list
-        __zcmdr-list-draw "$(( (ZCMDRLIST_CURRENT_IDX-1) % page_height + 1 ))" \
+        __zcmdr-list-draw "$(( ZCMDRLIST_CURRENT_IDX - ZCMDRLIST_FROM_WHAT_IDX_LIST_IS_SHOWN + 1 ))" \
             "$page_height" "$page_width" 1 2 "$ZCMDRLIST_TEXT_OFFSET" "$wname_main" \
             "$disp_list2[@]"
     else
@@ -496,7 +496,7 @@ while (( 1 )); do
         disp_list2=( "${disp_list2[@]//$'\1'[^$'\1']#$'\1'[^$'\1']#$'\1'[^$'\1']#$'\1'[^$'\1']#$'\1'[^$'\1']#$'\2'/}" )
 
         # Output the list
-        __zcmdr-list-draw "$(( (ZCMDRLIST_CURRENT_IDX-1) % page_height + 1 ))" \
+        __zcmdr-list-draw "$(( ZCMDRLIST_CURRENT_IDX - ZCMDRLIST_FROM_WHAT_IDX_LIST_IS_SHOWN + 1 ))" \
             "$page_height" "$page_width" 1 2 "$ZCMDRLIST_TEXT_OFFSET" "$wname_main" \
             "$disp_list2[@]"
     fi
