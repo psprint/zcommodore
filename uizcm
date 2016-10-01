@@ -477,7 +477,7 @@ OUTPUT=( )
 LINE_COUNT=0
 anchors=( )
 
-for n in "header" "proj" "log" "modified" "tree"; do
+for n in "header" "proj" "tree" "log" "modified"; do
     # Get output
     var_name="${n}_output"
     output=( "${(PA@)var_name}" )

@@ -647,6 +647,69 @@ while (( 1 )); do
             typeset -g ZCMDRLIST_REGENERATE_DISP_LIST
             ZCMDRLIST_REGENERATE_DISP_LIST="1"
 
+            # How many elements push down (up if negative)
+            # indices that are after the modified section
+            integer size_diff=$(( ZCMDRLIST_REPLY_LIST_SIZE - ZCMDRLIST_REPLY_TO_OVERWRITE_SIZE ))
+
+            # Remove indices that lay inside the block being overwritten
+            # NONSELECTABLES
+            local index el
+            integer mysize
+            mysize="${#ZCMDRLIST_NONSELECTABLE_ELEMENTS[@]}"
+            for (( index = 1; index <= mysize; index ++ )); do
+                el="${ZCMDRLIST_NONSELECTABLE_ELEMENTS[index]}"
+                if [[ "$el" -ge "$ZCMDRLIST_REPLY_HEADER_IDX" &&
+                        "$el" -le "$(( ZCMDRLIST_REPLY_HEADER_IDX + ZCMDRLIST_REPLY_TO_OVERWRITE_SIZE - 1 ))" ]]
+                then
+                    ZCMDRLIST_NONSELECTABLE_ELEMENTS[index]=()
+                fi
+            done
+
+            # Push down (up) elements that are after the growed (shrinked) section
+            # NONSELECTABLES
+            mysize="${#ZCMDRLIST_NONSELECTABLE_ELEMENTS[@]}"
+            for (( index = 1; index <= mysize; index ++ )); do
+                el="${ZCMDRLIST_NONSELECTABLE_ELEMENTS[index]}"
+                # No need to check if it lays inside the range
+                # as ones that did have been removed above
+                if [[ "$el" -gt "$ZCMDRLIST_REPLY_HEADER_IDX" ]]; then
+                    (( ZCMDRLIST_NONSELECTABLE_ELEMENTS[index] += size_diff ))
+                fi
+            done
+
+            # Remove indices that lay inside the block being overwritten
+            # HOPS
+            mysize="${#ZCMDRLIST_HOP_INDEXES[@]}"
+            for (( index = 1; index <= mysize; index ++ )); do
+                el="${ZCMDRLIST_HOP_INDEXES[index]}"
+                if [[ "$el" -ge "$ZCMDRLIST_REPLY_HEADER_IDX" &&
+                        "$el" -le "$(( ZCMDRLIST_REPLY_HEADER_IDX + ZCMDRLIST_REPLY_TO_OVERWRITE_SIZE - 1 ))" ]]
+                then
+                    ZCMDRLIST_HOP_INDEXES[index]=()
+                fi
+            done
+
+            # Push down (up) elements that are after the growed (shrinked) section
+            # HOPS
+            mysize="${#ZCMDRLIST_HOP_INDEXES[@]}"
+            for (( index = 1; index <= mysize; index ++ )); do
+                el="${ZCMDRLIST_HOP_INDEXES[index]}"
+                # No need to check if it lays inside the range
+                # as ones that did have been removed above
+                if [[ "$el" -gt "$ZCMDRLIST_REPLY_HEADER_IDX" ]]; then
+                    (( ZCMDRLIST_HOP_INDEXES[index] += size_diff ))
+                fi
+            done
+
+            # Now add new hops and nonselectables
+            # first translating to global indices
+            ZCMDRLIST_REPLY_NONSELECTABLES=( "${ZCMDRLIST_REPLY_NONSELECTABLES[@]//(#b)([[:digit:]]##)/$(( ${match[1]} + ZCMDRLIST_REPLY_HEADER_IDX - 1 ))}" )
+            ZCMDRLIST_REPLY_HOPS=( "${ZCMDRLIST_REPLY_HOPS[@]//(#b)([[:digit:]]##)/$(( ${match[1]} + ZCMDRLIST_REPLY_HEADER_IDX - 1 ))}" )
+
+            ZCMDRLIST_NONSELECTABLE_ELEMENTS+=( "${ZCMDRLIST_REPLY_NONSELECTABLES[@]}" )
+            ZCMDRLIST_HOP_INDEXES+=( "${ZCMDRLIST_REPLY_HOPS[@]}" )
+
+            # Cleanup
             unset ZCMDRLIST_REPLY_LIST_PART ZCMDRLIST_REPLY_LIST_SIZE ZCMDRLIST_REPLY_NONSELECTABLES
             unset ZCMDRLIST_REPLY_HOPS ZCMDRLIST_REPLY_HEADER_IDX ZCMDRLIST_REPLY_TO_OVERWRITE_SIZE
         fi
