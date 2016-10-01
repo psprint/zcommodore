@@ -365,18 +365,22 @@ fi
 # Tree of project
 #
 
-if [[ -z "$REGENERATE" || "$REGENERATE" = *,tree,* || "$REGENERATE" = *,all,* ]]; then
+if [[ -z "$REGENERATE" || "$REGENERATE" = *,tree,* || "$REGENERATE" = *,treeload,* || "$REGENERATE" = *,all,* ]]; then
     local main_tree_path="$ZCMDR_CONFIG_DIR/tree.$$"
     local -a tree
     tree=()
 
     if [[ "$current_project" = "$prev_current_project" ]]; then
         # Project is current - data available?
+        [[ ! -f "$main_tree_path".ready && "$REGENERATE" = *,treeload,* ]] && sleep 1
         if [[ -f "$main_tree_path".ready ]]; then
             tree=( "${(@f)"$(<$main_tree_path)"}" )
             command rm -f "$main_tree_path" "$main_tree_path".ready "$main_tree_path".busy
         elif [[ ! -f "$main_tree_path".busy ]]; then
             ( __zcmdr_uizcm_load_tree & )
+        else
+            # TODO: a message about tree still loading
+            :
         fi
     else
         # Project changed, ignore any result from
@@ -385,6 +389,8 @@ if [[ -z "$REGENERATE" || "$REGENERATE" = *,tree,* || "$REGENERATE" = *,all,* ]]
         tree=( )
         command rm -f "$main_tree_path" "$main_tree_path".ready "$main_tree_path".busy
         ( __zcmdr_uizcm_load_tree & )
+
+        # TODO: if ,treeload, then try to wait 1 second?
     fi
 
     reply=( ); reply2="0"; reply3=( ); reply4=( )
