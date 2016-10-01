@@ -251,7 +251,7 @@ then
     if [[ "$REGENERATE" = *,load_project,* || "$REGENERATE" = *,switch_project,* ]]; then
         input_data=( "${(@f)"$(<$REGENERATE_ARG)"}" )
     elif [[ -n "$REGENERATE" ]]; then
-        input_data=( "${(@f)"$(<$HOME/.config/zcommodore/current_project)"}" )
+        input_data=( "${(@f)"$(<$ZCMDR_CONFIG_DIR/current_project)"}" )
     fi
 
     if [[ -n "$REGENERATE" ]]; then

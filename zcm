@@ -113,9 +113,9 @@ if (( zconvey < 2 )); then
     [[ -z "${ZCMDR[current_repo]}" ]] && ZCMDR[current_repo]="$( hg --cwd "$current_project" root 2>/dev/null )"
     ZCMDR[current_tag_file]=""
 
-    command mkdir -p ~/.config/zcommodore
-    echo "${ZCMDR[current_project]}" >! ~/.config/zcommodore/current_project
-    echo "${ZCMDR[current_repo]}" >>! ~/.config/zcommodore/current_project
+    command mkdir -p "$ZCMDR_CONFIG_DIR"
+    echo "${ZCMDR[current_project]}" >! "$ZCMDR_CONFIG_DIR/current_project"
+    echo "${ZCMDR[current_repo]}" >>! "$ZCMDR_CONFIG_DIR/current_project"
 fi
 
 #
@@ -162,7 +162,7 @@ elif (( zconvey < 2 )); then
 fi
 
 if (( zconvey < 2 )); then
-    echo "${ZCMDR[current_tag_file]}" >>! ~/.config/zcommodore/current_project
+    echo "${ZCMDR[current_tag_file]}" >>! "$ZCMDR_CONFIG_DIR/current_project"
 
     #
     # Repeat the 3 outputs for circular buffer

@@ -239,7 +239,7 @@ function __zcmdr_stdlib_circular_next() {
     local base="$1" count="$2"
 
     # Circular buffers' directory
-    local circpath="$HOME/.config/zcommodore/var/circular_buffers"
+    local circpath="$ZCMDR_CONFIG_DIR/var/circular_buffers"
     command mkdir -p "$circpath"
 
     local -a circular_buffer
@@ -275,7 +275,7 @@ function __zcmdr_stdlib_circular_paths() {
     reply=( )
 
     # Circular buffers' directory
-    local circpath="$HOME/.config/zcommodore/var/circular_buffers"
+    local circpath="$ZCMDR_CONFIG_DIR/var/circular_buffers"
     [[ ! -d "$circpath" ]] && return 1
 
     reply=( "$circpath"/"$base".[[:digit:]]##(omN) )

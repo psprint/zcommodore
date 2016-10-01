@@ -86,9 +86,9 @@ ZCMDR[current_tag_file]=""
 ZCMDR[ctags_bin]="${ZCMDR_REPO_DIR}/myctags/ctags"
 typeset -gAH ZCMDR_ACTION_IDS_TO_HANDLERS
 
-if [[ -f "$HOME/.config/zcommodore/current_project" ]]; then
+if [[ -f "$ZCMDR_CONFIG_DIR/current_project" ]]; then
     local -a input_data
-    input_data=( "${(@f)"$(<$HOME/.config/zcommodore/current_project)"}" )
+    input_data=( "${(@f)"$(<$ZCMDR_CONFIG_DIR/current_project)"}" )
 
     ZCMDR[current_project]="${input_data[1]}"
     ZCMDR[current_repo]="${input_data[2]}"
@@ -134,12 +134,12 @@ function zcm-cd() {
 #
 function zcm-refresh() {
     local -a input_data
-    input_data=( "${(@f)"$(<$HOME/.config/zcommodore/current_project)"}" )
+    input_data=( "${(@f)"$(<$ZCMDR_CONFIG_DIR/current_project)"}" )
     ZCMDR[current_project]="${input_data[1]}"
     ZCMDR[current_repo]="${input_data[2]}"
     ZCMDR[current_tag_file]="${input_data[3]}"
 
-    print "Obtained data from ~/.config/zcommodore/current_project"
+    print "Obtained data from $ZCMDR_CONFIG_DIR/current_project"
 
     local p="${ZCMDR[current_repo]:t}"
     [[ -z "$p" ]] && p="${ZCMDR[current_project]:t}"
