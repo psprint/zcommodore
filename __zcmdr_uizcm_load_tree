@@ -1,0 +1,17 @@
+local main_tree_path="$ZCMDR_CONFIG_DIR/tree.$$"
+
+echo >! "$main_tree_path".busy
+command rm -f "$main_tree_path".ready
+
+local -a tree
+tree=( "$current_project"/**/*(N) )
+
+[[ -z "${tree[1]}" ]] && { command rm -f "$main_tree_path".busy; return 1; }
+
+print -rl -- "${tree[@]}" >! "$main_tree_path"
+echo >! "$main_tree_path".ready
+command rm -f "$main_tree_path".busy
+
+return 0
+
+# vim:ft=zsh
