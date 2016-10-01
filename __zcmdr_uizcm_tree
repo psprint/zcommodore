@@ -24,6 +24,7 @@ for (( idx = 1; idx <= size; idx ++ )); do
     reply=( )
     __zcmdr_stdlib_get_std_button "topenA" "" "$selected_editor" "$current_project" "$passed_path" "$txt" __zcmdr_action_tree_open
     output+=( "${reply[1]}" )
+    own_LINE_COUNT+=1
 done
 
 # Add "More+5" and "Less-5" buttons to fetch more and less log entries
