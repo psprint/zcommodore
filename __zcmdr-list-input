@@ -13,7 +13,7 @@ setopt typesetsilent extendedglob
 -zcmdrlist_compute_exact_page_if_needed() {
     # Fallback: in case of any problems compute exact page
     if [[ "$from_what_idx_list_is_shown" -lt "1" ||
-        "$(( from_what_idx_list_is_shown + page_height -1 ))" -gt "$last_element" ]]
+        "$from_what_idx_list_is_shown" -gt "$last_element" ]]
     then
         from_what_idx_list_is_shown=0+((current_idx-1)/page_height)*page_height+1
     fi
