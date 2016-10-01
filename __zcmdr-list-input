@@ -9,17 +9,21 @@ setopt typesetsilent extendedglob
     from_what_idx_list_is_shown=0+((current_idx-1)/page_height)*page_height+1
 }
 
-# Compute first to show index - page
-# scrolled to center to show index
--zcmdrlist_compute_first_to_show_idx_center() {
-    from_what_idx_list_is_shown=current_idx-page_height/2
-
+# Conditional, fully robust page-to-show computation
+-zcmdrlist_compute_exact_page_if_needed() {
     # Fallback: in case of any problems compute exact page
     if [[ "$from_what_idx_list_is_shown" -lt "0" ||
         "$(( from_what_idx_list_is_shown + page_height -1 ))" -gt "$last_element" ]]
     then
         from_what_idx_list_is_shown=0+((current_idx-1)/page_height)*page_height+1
     fi
+}
+
+# Compute first to show index - page
+# scrolled to center to show index
+-zcmdrlist_compute_first_to_show_idx_center() {
+    from_what_idx_list_is_shown=current_idx-page_height/2
+    -zcmdrlist_compute_exact_page_if_needed
 }
 
 # Calling this function means passing information
@@ -31,13 +35,7 @@ setopt typesetsilent extendedglob
         "$current_idx" -gt "$(( from_what_idx_list_is_shown + page_height -1 ))" ]]
     then
         from_what_idx_list_is_shown=from_what_idx_list_is_shown-7
-
-        # Fallback: in case of any problems compute exact page
-        if [[ "$from_what_idx_list_is_shown" -lt "0" ||
-            "$(( from_what_idx_list_is_shown + page_height -1 ))" -gt "$last_element" ]]
-        then
-            from_what_idx_list_is_shown=0+((current_idx-1)/page_height)*page_height+1
-        fi
+        -zcmdrlist_compute_exact_page_if_needed
     fi
 }
 
@@ -47,13 +45,7 @@ setopt typesetsilent extendedglob
         "$current_idx" -gt "$(( from_what_idx_list_is_shown + page_height -1 ))" ]]
     then
         from_what_idx_list_is_shown=from_what_idx_list_is_shown+7
-
-        # Fallback: in case of any problems compute exact page
-        if [[ "$from_what_idx_list_is_shown" -lt "0" ||
-            "$(( from_what_idx_list_is_shown + page_height -1 ))" -gt "$last_element" ]]
-        then
-            from_what_idx_list_is_shown=0+((current_idx-1)/page_height)*page_height+1
-        fi
+        -zcmdrlist_compute_exact_page_if_needed
     fi
 }
 
