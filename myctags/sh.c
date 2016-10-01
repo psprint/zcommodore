@@ -150,7 +150,7 @@ static void findShTags (void) {
             // This is in fact to detect ; or end of line
             while ( isalnum( (int) *cp ) || *cp == '_' || *cp == '-' ) {
                 // Skip any options
-                while ( *cp == '-' ) {
+                while ( *cp == '-' || *cp == '+' ) {
                     ++ cp;
 
                     // Skip letters of options
