@@ -3,7 +3,7 @@
 The values being set are the defaults.
 
 ```zsh
-zstyle ":plugin:zcommodore" nprojects "5"                       # How many past projects to remember
+zstyle ":plugin:zcommodore" nprojects "7"                       # How many past projects to remember
 zstyle ":plugin:zcommodore" log_count "7"                       # Show 7 last commits in the UI (opened with Ctrl-O Ctrl-U)
 zstyle ":plugin:zcommodore" cd_at_edit "yes"                    # "cd PROJECT; vim source.cpp" instead of "vim PROJECT/source.cpp"
 zstyle ":plugin:zcommodore" page-size "$(( LINES / 2 ))"        # Value of $LINES / 2 that is evaluated at runtime

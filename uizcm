@@ -272,8 +272,8 @@ else
 fi
 
 local nprojects
-zstyle -s ":plugin:zcommodore" nprojects nprojects || nprojects="5"
-[[ "$nprojects" != <-> ]] && nprojects="5"
+zstyle -s ":plugin:zcommodore" nprojects nprojects || nprojects="7"
+[[ "$nprojects" != <-> ]] && nprojects="7"
 [[ "$nprojects" = "0" ]] && nprojects="1"
 
 #
