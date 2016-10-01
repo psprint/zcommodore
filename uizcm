@@ -149,6 +149,63 @@ __zcmdr_action_tree_open() {
 }
 
 #
+# Internal actions
+#
+__zcmdr_internal_action_load_tree() {
+    local id="$1" header_idx="$2" cmd="$3" active_path="$4" section_size="$5"
+
+    local main_tree_path="$ZCMDR_CONFIG_DIR/tree.$$"
+    local -a tree
+    tree=()
+
+    if [[ -f "$main_tree_path".ready ]]; then
+        : # No-op, loading is below if
+    elif [[ -f "$main_tree_path".busy ]]; then
+        integer max_loops="3"
+        while [[ -f "$main_tree_path".busy && "$max_loops" -gt "0" ]]; do
+            (( max_loops -- ))
+            sleep 1
+        done
+        if [[ ! -f "$main_tree_path".ready ]]; then
+            command rm -f "$main_tree_path" "$main_tree_path".ready "$main_tree_path".busy
+            # Trees shouldn't generate more than 3 seconds and
+            # if they do, then here we wait infinitely, but not
+            # for .busy file to be deleted (might never happen)
+            # - directly for the function to end
+            __zcmdr_uizcm_load_tree
+        fi
+    else
+        command rm -f "$main_tree_path" "$main_tree_path".ready "$main_tree_path".busy
+        __zcmdr_uizcm_load_tree
+    fi
+
+    # Either there was .ready file or busy timed out, or no .ready nor .busy files
+    tree=( "${(@f)"$(<$main_tree_path)"}" )
+    command rm -f "$main_tree_path" "$main_tree_path".ready "$main_tree_path".busy
+
+    reply=( ); reply2="0"; reply3=( ); reply4=( )
+
+    __zcmdr_uizcm_tree "${tree[@]}"
+
+    tree_output=( "${reply[@]}" )
+    tree_size="$reply2"
+    tree_nonselectables=( "${reply3[@]}" )
+    tree_hops=( "${reply4[@]}" )
+
+    # Return list part, its size, nonselectables and hops
+    # Main function __zcmdr-list will update $@, etc.
+    typeset -ga ZCMDRLIST_REPLY_LIST_PART
+    ZCMDRLIST_REPLY_LIST_PART=( "${reply[@]}" )
+    typeset -g ZCMDRLIST_REPLY_LIST_SIZE="$reply2"
+    typeset -ga ZCMDRLIST_REPLY_NONSELECTABLES
+    ZCMDRLIST_REPLY_NONSELECTABLES=( "${reply3[@]}" )
+    typeset -ga ZCMDRLIST_REPLY_HOPS
+    ZCMDRLIST_REPLY_HOPS=( "${reply4[@]}" )
+    typeset -g ZCMDRLIST_REPLY_HEADER_IDX="$header_idx"
+    typeset -g ZCMDRLIST_REPLY_TO_OVERWRITE_SIZE="$section_size"
+}
+
+#
 # Business logic follows
 #
 
@@ -481,11 +538,11 @@ for n in "header" "proj" "log" "modified" "tree"; do
     if [[ "$n" = "proj" ]]; then
         :
     elif [[ "$n" = "log" ]]; then
-        [[ -n "${hops[1]}" ]] && __zcmdr_stdlib_get_button "zcmdr_anchor" "${hops[1]}" "/Jump/" "" "" "${CMDR_MAGENTA}Log${CMDR_MAGENTA_E}" ""
+        [[ -n "${hops[1]}" ]] && __zcmdr_stdlib_get_button "zcmdr_anchor_1" "${hops[1]}" "/Jump/" "" "$size" "${CMDR_MAGENTA}Log${CMDR_MAGENTA_E}" ""
     elif [[ "$n" = "modified" ]]; then
-        [[ -n "${hops[1]}" ]] && __zcmdr_stdlib_get_button "zcmdr_anchor" "${hops[1]}" "/Jump/" "" "" "${CMDR_GREEN}Modified${CMDR_GREEN_E}" ""
+        [[ -n "${hops[1]}" ]] && __zcmdr_stdlib_get_button "zcmdr_anchor_2" "${hops[1]}" "/Jump/" "" "$size" "${CMDR_GREEN}Modified${CMDR_GREEN_E}" ""
     elif [[ "$n" = "tree" ]]; then
-        [[ -n "${hops[1]}" ]] && __zcmdr_stdlib_get_button "zcmdr_anchor" "${hops[1]}" "/Jump/" "" "" "${CMDR_CYAN}Tree${CMDR_CYAN_E}" ""
+        [[ -n "${hops[1]}" ]] && __zcmdr_stdlib_get_button "zcmdr_anchor_3" "${hops[1]}" "/Jump & Load/" "" "$size" "${CMDR_CYAN}Tree${CMDR_CYAN_E}" __zcmdr_internal_action_load_tree
     fi
     anchors+=( "${reply[@]}" )
 

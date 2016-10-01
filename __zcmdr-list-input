@@ -157,13 +157,19 @@ case "$key" in
             replybkp=( "${reply[@]}" )
             reply=( )
             if __zcmdr_stdlib_decode_hyperlink "${segs[ZCMDRLIST_CURRENT_SEGMENT]}"; then
-                local id="${reply[1]}" data2="${reply[2]}"
+                local id="${reply[1]}" idx="${reply[2]}" cmd="${reply[3]}" active_path="${reply[4]}" section_size="${reply[5]}"
                 reply=( "${replybkp[@]}" )
 
                 if [[ "$id" = *zcmdr_anchor* ]]; then
-                    current_idx="$data2"
+                    current_idx="$idx"
                     ZCMDRLIST_CURRENT_SEGMENT=1
                     -zcmdrlist_compute_first_to_show_idx_center
+
+                    # Is there additional hook?
+                    if [[ -n "${ZCMDR_ACTION_IDS_TO_HANDLERS[$id]}" ]]; then
+                        "${ZCMDR_ACTION_IDS_TO_HANDLERS[$id]}" "$id" "$idx" "$cmd" "$active_path" "$section_size"
+                        reply=( "${replybkp[@]}" )
+                    fi
                 else
                     # Save current element in the result variable
                     reply=( $current_idx SELECT )
