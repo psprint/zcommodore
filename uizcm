@@ -452,11 +452,6 @@ for n in "header" "proj" "log" "modified" "tree"; do
         ZCMDRLIST_NONSELECTABLE_ELEMENTS+=( "$(( LINE_COUNT + 1 ))" )
     fi
 
-    # Remove previous non-selectables and hops,
-    # added on previous creation of this section
-    ZCMDRLIST_NONSELECTABLE_ELEMENTS=( "${ZCMDRLIST_NONSELECTABLE_ELEMENTS[@]:|prev_nonselectables}" )
-    ZCMDRLIST_HOP_INDEXES=( "${ZCMDRLIST_HOP_INDEXES[@]:|prev_hops}" )
-
     # Translate returned indices to global ones
     # The + 1 is for anchors at the top
     nonselectables=( "${nonselectables[@]//(#b)([[:digit:]]##)/$(( ${match[1]} + LINE_COUNT + 1 ))}" )
