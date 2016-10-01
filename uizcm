@@ -523,6 +523,9 @@ for n in "header" "proj" "tree" "log" "modified"; do
     if [[ "$n" = "log" && "$REGENERATE" = *,log,* ]]; then
         integer delta=$(( log_size-prev_log_size ))
         ZCMDRLIST_CURRENT_IDX=$(( ZCMDRLIST_CURRENT_IDX + delta ))
+    elif [[ "$n" = "proj" && ( "$REGENERATE" = *,load_project,* || "$REGENERATE" = *,switch_project,* ) ]]; then
+        ZCMDRLIST_CURRENT_IDX="4"
+        ZCMDRLIST_CURRENT_SEGMENT="1"
     fi
 
     # Also store the indices into prev_* arrays
