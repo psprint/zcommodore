@@ -709,6 +709,25 @@ while (( 1 )); do
             ZCMDRLIST_NONSELECTABLE_ELEMENTS+=( "${ZCMDRLIST_REPLY_NONSELECTABLES[@]}" )
             ZCMDRLIST_HOP_INDEXES+=( "${ZCMDRLIST_REPLY_HOPS[@]}" )
 
+            # Last thing: update anchors
+            local -a asegs
+            asegs=( "${(z@)1}" )
+            mysize="${#asegs}"
+            local aseg
+            for (( index = 1; index <= mysize; index ++ )); do
+                aseg="${asegs[index]}"
+                [[ -z "$aseg" ]] && continue
+                __zcmdr_stdlib_decode_hyperlink "$aseg"
+                local _id="${reply[1]}" _idx="${reply[2]}" _cmd="${reply[3]}" _active_path="${reply[4]}" _section_size="${reply[5]}"
+                if [[ "$_idx" -gt "$ZCMDRLIST_REPLY_HEADER_IDX" ]]; then
+                    # Plainly replace the hyperlink fragment
+                    local _new_idx
+                    (( _new_idx = _idx + size_diff ))
+                    asegs[index]="${aseg/(#b)($'\1')$_idx$'\1'/${match[1]}$_new_idx${match[1]}}"
+                fi
+            done
+            1="${asegs[*]}"
+
             # Cleanup
             unset ZCMDRLIST_REPLY_LIST_PART ZCMDRLIST_REPLY_LIST_SIZE ZCMDRLIST_REPLY_NONSELECTABLES
             unset ZCMDRLIST_REPLY_HOPS ZCMDRLIST_REPLY_HEADER_IDX ZCMDRLIST_REPLY_TO_OVERWRITE_SIZE
