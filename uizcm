@@ -233,6 +233,7 @@ local current_tag_file="${ZCMD[current_tag_file]}"
 ###
 
 local REGENERATE="" REGENERATE_ARG=""
+local prev_current_project=""
 
 while (( 1 )); do
 
@@ -365,9 +366,30 @@ fi
 #
 
 if [[ -z "$REGENERATE" || "$REGENERATE" = *,tree,* || "$REGENERATE" = *,all,* ]]; then
+    local main_tree_path="$ZCMDR_CONFIG_DIR/tree.$$"
+    local -a tree
+    tree=()
+
+    if [[ "$current_project" = "$prev_current_project" ]]; then
+        # Project is current - data available?
+        if [[ -f "$main_tree_path".ready ]]; then
+            tree=( "${(@f)"$(<$main_tree_path)"}" )
+            command rm -f "$main_tree_path" "$main_tree_path".ready "$main_tree_path".busy
+        elif [[ ! -f "$main_tree_path".busy ]]; then
+            ( __zcmdr_uizcm_load_tree & )
+        fi
+    else
+        # Project changed, ignore any result from
+        # previous project, load the tree of current
+        # one. This is also the path of first generation
+        tree=( )
+        command rm -f "$main_tree_path" "$main_tree_path".ready "$main_tree_path".busy
+        ( __zcmdr_uizcm_load_tree & )
+    fi
+
     reply=( ); reply2="0"; reply3=( ); reply4=( )
 
-    __zcmdr_uizcm_tree
+    __zcmdr_uizcm_tree "${tree[@]}"
 
     tree_output=( "${reply[@]}" )
     tree_size="$reply2"
@@ -470,9 +492,11 @@ for n in "header" "proj" "log" "modified" "tree"; do
     LINE_COUNT+=size
 done
 
-# Reset regeneration variables
+# Reset regeneration variables and prev_current_project
 REGENERATE=""
 REGENERATE_ARG=""
+prev_current_project="$current_project"
+
 
 #
 # Generation time

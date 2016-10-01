@@ -4,7 +4,7 @@ local -a nonselectables    # To be appended, upon making indices global, to ZCMD
 local -a hop_indices       # To be appended, upon making indices global, to ZCMDRLIST_HOP_INDEXES
 integer own_LINE_COUNT=0   # Local line count
 
-globout=( "$current_project"/**/*(N) )
+globout=( "$@" )
 size="${#globout[@]}"
 
 output=( "${CMDR_RED}'Tree (select to open) of ${CMDR_RED_E}${CMDR_YELLOW}${current_project:t}${CMDR_YELLOW_E}${CMDR_RED}'${CMDR_RED_E}" )
