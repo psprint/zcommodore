@@ -9,6 +9,19 @@ setopt typesetsilent extendedglob
     from_what_idx_list_is_shown=0+((current_idx-1)/page_height)*page_height+1
 }
 
+# Compute first to show index - page
+# scrolled to center to show index
+-zcmdrlist_compute_first_to_show_idx_center() {
+    from_what_idx_list_is_shown=current_idx-page_height/2
+
+    # Fallback: in case of any problems compute exact page
+    if [[ "$from_what_idx_list_is_shown" -lt "0" ||
+        "$(( from_what_idx_list_is_shown + page_height -1 ))" -gt "$last_element" ]]
+    then
+        from_what_idx_list_is_shown=0+((current_idx-1)/page_height)*page_height+1
+    fi
+}
+
 # Calling this function means passing information
 # that we move up in the list (to lower index)
 # This means we can move page start as few as one
@@ -137,7 +150,7 @@ case "$key" in
                 if [[ "$id" = *zcmdr_anchor* ]]; then
                     current_idx="$data2"
                     ZCMDRLIST_CURRENT_SEGMENT=1
-                    -zcmdrlist_compute_first_to_show_idx
+                    -zcmdrlist_compute_first_to_show_idx_center
                 else
                     # Save current element in the result variable
                     reply=( $current_idx SELECT )
