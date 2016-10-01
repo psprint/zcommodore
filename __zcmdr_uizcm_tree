@@ -27,8 +27,13 @@ for (( idx = 1; idx <= size; idx ++ )); do
     own_LINE_COUNT+=1
 done
 
-# Add "More+5" and "Less-5" buttons to fetch more and less log entries
-reply=( )
+# Button to load tree when having no results
+if [[ "$size" -eq "0" ]]; then
+    reply=( )
+    __zcmdr_stdlib_get_button "" ",tree," "/Load if ready/" "load" "" "Load" ""
+    output+=( "${reply[1]}" )
+    own_LINE_COUNT+=1
+fi
 
 reply=( "${output[@]}" )
 reply2="$own_LINE_COUNT"
