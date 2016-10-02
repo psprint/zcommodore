@@ -296,6 +296,10 @@ if [ "$__tsmw_hcw_call_count" -eq "1" ]; then
     # Full reinitialisation at next call
     __tsmw_hcw_call_count="0"
 
+    # Free memory
+    __tsmw_hcw_found=( )
+    __tsmw_tag_data=( )
+
     # Is there a command to run?
     if [[ "${#cmd}" != "0" ]]; then
         local auto_run
