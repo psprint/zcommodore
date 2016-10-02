@@ -26,6 +26,7 @@ typeset -g __tsmw_hcw_widget_name __tsmw_hcw_restart __tsmw_hcw_call_count
 typeset -g __tsmw_page_size __tsmw_hl_color
 typeset -gaU __tsmw_hcw_found
 typeset -ga __tsmw_tag_data
+typeset -g __tsmw_repo_or_project
 
 _tsmw_main() {
     # First call or restart?
@@ -40,6 +41,13 @@ _tsmw_main() {
                 __tsmw_tag_data=( "${(@f)"$(<${ZCMDR[current_tag_file]})"}" ) 
                 __tsmw_tag_data=( "${__tsmw_tag_data[@]:#(#s)!*}" )
             fi
+
+            # Read current project
+            local -a entries
+            entries=( "${(@f)"$(<$ZCMDR_CONFIG_DIR/current_project)"}" )
+            __tsmw_repo_or_project="${entries[2]}"
+            [[ -z "$__tsmw_repo_or_project" ]] && __tsmw_repo_or_project="${entries[1]}"
+            __tsmw_repo_or_project="${__tsmw_repo_or_project:t}"
         fi
 
         # '0' will get changed into $to_display limit
@@ -120,7 +128,7 @@ _tsmw_main() {
     # Colorify
     #
 
-    local preamble=$'\n'"Searching for: $BUFFER"$'\n'"Element #$__tsmw_hcw_index of $max_index"$'\n'
+    local preamble=$'\n'"Searching in $__tsmw_repo_or_project"$'\n'"Element #$__tsmw_hcw_index of $max_index"$'\n'
     local text="${(F)disp_list}"
     integer offset=${#preamble}+${#BUFFER}
 
@@ -131,6 +139,10 @@ _tsmw_main() {
         # Following line is taken from Zaw (GH zsh-users/zaw) – license is named "Zaw", it is in LICENSE file
         region_highlight+=( "${(f)${(S)text//*(#bi)(${~colsearch_pattern})/$(( offset + mbegin[1] - 1 )) $(( offset + mend[1] )) ${__tsmw_hl_color}${nl}}%$nl*}" )
     fi
+
+    # Also highlight project name
+    local rh="$(( 14 + ${#BUFFER} )) $(( 14 + ${#BUFFER} + ${#__tsmw_repo_or_project} )) ${__tsmw_hl_color}"
+    region_highlight+=( "$rh" )
 }
 
 (( __tsmw_hcw_call_count ++ ))
