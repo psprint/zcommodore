@@ -201,7 +201,7 @@ case "$key" in
         for idx in "${(n)ZCMDRLIST_HOP_INDEXES[@]}"; do
             if [ "$idx" -gt "$current_idx" ]; then
                 current_idx=$idx
-                -zcmdrlist_compute_first_to_show_idx
+                -zcmdrlist_compute_first_to_show_idx_center
                 break
             fi
         done
@@ -218,7 +218,7 @@ case "$key" in
         for idx in "${(nO)ZCMDRLIST_HOP_INDEXES[@]}"; do
             if [ "$idx" -lt "$current_idx" ]; then
                 current_idx=$idx
-                -zcmdrlist_compute_first_to_show_idx
+                -zcmdrlist_compute_first_to_show_idx_center
                 break
             fi
         done
