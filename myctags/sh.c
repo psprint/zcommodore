@@ -143,14 +143,14 @@ static void findShTags (void) {
         //
 
         if ( localVariableFound ) {
-            // After 'local +' if there's no [[:alnum:]_-] then next line
-            if ( ! ( isalnum( (int) *cp ) || *cp == '_' || *cp == '-' ) )
+            // After 'local ##' if there's no [[:alnum:]_+-] then next line
+            if ( ! ( isalnum( (int) *cp ) || *cp == '_' || *cp == '-' || *cp == '+' ) )
                 continue;
 
             // This is in fact to detect ; or end of line
-            while ( isalnum( (int) *cp ) || *cp == '_' || *cp == '-' ) {
+            while ( isalnum( (int) *cp ) || *cp == '_' || *cp == '-' || *cp == '+' ) {
                 // Skip any options
-                while ( *cp == '-' ) {
+                while ( *cp == '-' || *cp == '+' ) {
                     ++ cp;
 
                     // Skip letters of options
