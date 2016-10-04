@@ -58,6 +58,43 @@ fi
 
 local features_path="$ZCMDR_CONFIG_DIR/var/features"
 [[ ! -d "$features_path" ]] && command mkdir -p "$features_path"
+integer retcode
+
+#
+# Functions
+#
+
+__zcmdr_verify_feature() {
+    local feature="$1"
+
+    if [[ "$feature" != [[:alnum:]_-]## ]]; then
+        print "Improper feature name: \`$feature'. Allowed are letters, _, - and digits."
+        return 2
+    fi
+
+    local feature_file="${features_path}/${feature}.conf"
+
+    if [[ ! -d "${ZCMDR[current_project]}" ]]; then
+        print "Current project points to incorrect path, aborting: \`${ZCMDR[current_project]}'"
+        print "(consider running zcm in a project directory or zcm -l)"
+        return 3
+    fi
+
+    if [[ -f "$feature_file" ]]; then
+        local -a entries
+        entries=( "${(@f)"$(<$feature_file)"}" )
+
+        local project_path="${entries[2]/(#s)$HOME/~}"
+        print "Feature \`$feature' already exists, belongs to project ${project_path}"
+        return 4
+    fi
+
+    return 0
+}
+
+#
+# List
+#
 
 if (( list )); then
     local -a features
@@ -110,10 +147,14 @@ if (( list )); then
     return 0
 fi
 
+#
+# Create
+#
+
 if (( create )); then
     if [[ "$#" -lt "2" ]]; then
         print "At least 2 arguments are needed, feature to create and a file to attach to the feature"
-        return 1
+        return 2
     fi
 
     local feature="$1"
@@ -122,26 +163,12 @@ if (( create )); then
     local -a files
     files=( "$@" )
 
-    if [[ "$feature" != [[:alnum:]_-]## ]]; then
-        print "Improper feature name: \`$feature'. Allowed are letters, _ and -, digits."
-        return 1
-    fi
-
     local feature_file="${features_path}/${feature}.conf"
 
-    if [[ ! -d "${ZCMDR[current_project]}" ]]; then
-        print "Current project points to incorrect path, aborting: \`${ZCMDR[current_project]}'"
-        print "(consider running zcm in a project directory or zcm -l)"
-        return 2
-    fi
-
-    if [[ -f "$feature_file" ]]; then
-        local -a entries
-        entries=( "${(@f)"$(<$feature_file)"}" )
-
-        local project_path="${entries[2]/(#s)$HOME/~}"
-        print "Feature \`$feature' already exists, belongs to project ${project_path}"
-        return 3
+    __zcmdr_verify_feature "$feature"
+    retcode=$?
+    if (( retcode )) ; then
+        return $retcode
     fi
 
     local project_line="${ZCMDR[current_project]}"
