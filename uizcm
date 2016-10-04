@@ -435,6 +435,7 @@ if [[ -z "$REGENERATE" || "$REGENERATE" = *,tree,* || "$REGENERATE" = *,treeload
             tree=( "${(@f)"$(<$main_tree_path)"}" )
             command rm -f "$main_tree_path" "$main_tree_path".ready "$main_tree_path".busy
         elif [[ ! -f "$main_tree_path".busy ]]; then
+            echo "Forcefully started tree load:" "$( date )" >>! /tmp/treeload.txt
             ( __zcmdr_uizcm_load_tree & )
         else
             # TODO: a message about tree still loading
