@@ -444,6 +444,43 @@ if (( delete )); then
     return 0
 fi
 
+if (( delete_feature )); then
+    if [[ "$#" -ne "1" ]]; then
+        print "Exactly one argument is needed: name of feature to delete"
+        return 15
+    fi
+
+    local feature="$1"
+
+    __zcmdr_verify_feature "$feature" "must_exist"
+    retcode=$?
+    (( retcode )) && return $retcode
+
+    local feature_file="${features_path}/${feature}.conf"
+    if (( quiet == 0 )); then
+        local -a entries
+        entries=( "${(@f)"$(<$feature_file)"}" )
+        local project_path="${entries[2]/(#s)$HOME/~}"
+
+        print "Are you sure want to delete ${fg_bold[green]}\`$feature'${reset_color} belonging to project ${fg_bold[green]}\`$project_path'${reset_color}? [y/n]"
+        local answer="n"
+        read -qs answer
+        if [[ "$answer" = "y" ]]; then
+            (( verbose )) && print "Removing feature \`$feature'..."
+            command rm -f "$feature_file"
+            print "Done."
+        else
+            print "Aborting."
+        fi
+    else
+        (( verbose )) && print "Removing feature \`$feature'..."
+        command rm -f "$feature_file"
+        (( verbose )) && print "Done."
+    fi
+
+    return 0
+fi
+
 return 0
 
 # vim:ft=zsh
