@@ -9,7 +9,7 @@ __zcmdr_usage_zcm_feature() {
     print -- "or from *commit*, UPDATE files of a feature and DELETE whole feature."
     print
     print -- "${fg_bold[green]}Usage: zcm-feature [-q] [-v] [-h|--help] {feature-name}${reset_color}"
-    print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-l|--list} ${reset_color}"
+    print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-l|--list} [project name]${reset_color}"
     print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-c|--create} {feature-name} {file1} {file2} ...${reset_color}"
     print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-C|--create-from-commits} {feature-name} {file1} {file2} ...${reset_color}"
     print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-a|--add} {feature-name} {file1} {file2} ...${reset_color}"
@@ -105,10 +105,12 @@ if (( list )); then
     fi
 
     local -a found entries
-    local pth
+    local pth project_query="$1"
     for pth in "${features[@]}"; do
         entries=( "${(@f)"$(<$pth)"}" )
-        if [[ "${entries[2]}" = "${ZCMDR[current_project]}" ]]; then
+        if [[ -n "$project_query" && "${entries[2]}" = *$~project_query* ]]; then
+            found+=( "$pth" )
+        elif [[ -z "$project_query" && "${entries[2]}" = "${ZCMDR[current_project]}" ]]; then
             found+=( "$pth" )
         fi
     done
@@ -121,8 +123,16 @@ if (( list )); then
     local -a files commits
     for pth in "${found[@]}"; do
         entries=( "${(@f)"$(<$pth)"}" )
+
         local feature="${pth:t:r}"
         print -- "${fg_bold[magenta]}$feature${reset_color}"
+
+        local project_name="${entries[2]}"
+        project_name="${project_name:t:r}"
+
+        if [[ -n "$project_query" ]]; then
+            print -- "(${fg_bold[red]}$project_name${reset_color})"
+        fi
 
         files=( "${(z@)entries[3]}" )
         if [[ "${files[1]}" != "files" ]]; then
