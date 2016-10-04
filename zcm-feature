@@ -339,6 +339,106 @@ if (( add )); then
     return 0
 fi
 
+if (( delete )); then
+    if [[ "$#" -lt "2" ]]; then
+        print "At least 2 arguments are needed, feature to update and a file to remove from the feature"
+        return 12
+    fi
+
+    local feature="$1"
+    shift
+
+    # Files to remove
+    local -aU files
+    files=( "$@" )
+
+    __zcmdr_verify_feature "$feature" "can_exist"
+    retcode=$?
+    (( retcode )) && return $retcode
+
+    local feature_file="${features_path}/${feature}.conf"
+    local -a entries
+    entries=( "${(@f)"$(<$feature_file)"}" )
+
+    local project_line="${ZCMDR[current_project]}"
+
+    if [[ "${entries[2]}" != "$project_line" ]]; then
+        print "The feature \`$feature' belongs to project: ${fg_bold[green]}\`${entries[2]:t:r}'${reset_color}. Proceed with deletion of files? [y/n]"
+        local answer="n"
+        read -qs answer
+        if [[ "$answer" = "n" ]]; then
+            echo "Aborting.."
+            return 13
+        else
+            project_line="${entries[2]}"
+        fi
+    fi
+
+    # Split current files to keep them uniq
+    local -a current
+    current=( "${(z@)entries[3]}" )
+    # z-flag can do tricks IIRC
+    if [[ -z "${current[1]}" ]]; then
+        current=( )
+    else
+        shift current
+    fi
+
+    files=( "${files[@]}" )
+
+    local f f2
+    integer before_count="${#current}" found_idx
+    for f in "${files[@]}"; do
+        f2="${f/(#s)$project_line\//}"
+        f2="${(qq)f2}"
+        f="${(qq)f}"
+
+        # Absolute path
+        found_idx="${current[(I)$f]}"
+        if [[ "$found_idx" != "0" ]]; then
+            (( quiet )) || echo "Removing ${(Q)f}..."
+            current[found_idx]=()
+        fi
+
+        # Relative path
+        found_idx="${current[(I)$f2]}"
+        if [[ "$found_idx" != "0" ]]; then
+            (( quiet )) || echo "Removing ${(Q)f2}..."
+            current[found_idx]=()
+        fi
+    done
+
+    integer after_count="${#current}"
+
+    local files_line="files ${current[*]}"
+    local commits_line="${entries[4]}"
+
+    print -rl -- "# Feature \`$feature'" >! "$feature_file"
+    print -rl -- "$project_line" >>! "$feature_file"
+    print -rl -- "$files_line" >>! "$feature_file"
+    print -rl -- "$commits_line" >>! "$feature_file"
+
+    if (( quiet == 0 )); then
+        [[ "$before_count" != "$after_count" || "$answer" = "y" ]] && print
+
+        if (( verbose == 1 )); then
+            if [[ "$before_count" = "$after_count" ]]; then
+                print -- "Feature ${fg_bold[green]}$feature${reset_color} remained the same (no files deleted):"
+            else
+                print -- "Feature ${fg_bold[green]}$feature${reset_color} updated, has the files / directories:"
+            fi
+            print -rl -- "${(Q)current[@]}"
+        else
+            if [[ "$before_count" = "$after_count" ]]; then
+                print -- "Feature ${fg_bold[green]}$feature${reset_color} remained the same (no files deleted)"
+            else
+                print -- "Feature ${fg_bold[green]}$feature${reset_color} updated (files deleted)"
+            fi
+        fi
+    fi
+    return 0
+fi
+
 return 0
 
 # vim:ft=zsh
