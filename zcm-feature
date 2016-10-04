@@ -651,7 +651,14 @@ if (( list + create + create_from_commits + add + delete + delete_feature + set_
     zstyle -s ":plugin:zcommodore" editor selected_editor || selected_editor="${EDITOR:-vim}"
     zstyle -b ":plugin:zcommodore" cd_at_edit cd_at_edit || cd_at_edit="yes"
 
-    cd "$project_line"
+    # If at correct location or if going to CD
+    if [[ "$project_line" = "$PWD" || "$cd_at_edit" = "yes" ]]; then
+        files=( "${files[@]/(#s)$project_line\//}" )
+    else
+        files=( "${files[@]/(#b)(#s)([^\/]*)/${project_line}/${match[1]}}" )
+    fi
+
+    [[ "$cd_at_edit" = "yes" ]] && cd "$project_line"
     "$selected_editor" -p "${files[@]}"
 fi
 
