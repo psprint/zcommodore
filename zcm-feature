@@ -80,7 +80,7 @@ __zcmdr_verify_feature() {
         return 4
     fi
 
-    if [[ -f "$feature_file" ]]; then
+    if [[ "$2" != "can_exist" && -f "$feature_file" ]]; then
         local -a entries
         entries=( "${(@f)"$(<$feature_file)"}" )
 
