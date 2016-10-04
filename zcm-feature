@@ -167,9 +167,7 @@ if (( create )); then
 
     __zcmdr_verify_feature "$feature"
     retcode=$?
-    if (( retcode )) ; then
-        return $retcode
-    fi
+    (( retcode )) && return $retcode
 
     local project_line="${ZCMDR[current_project]}"
     files=( "${(qq)files[@]}" )
