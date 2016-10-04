@@ -227,6 +227,9 @@ if [ "$__tsmw_hcw_call_count" -eq "1" ]; then
 
     # Removal of default Ctrl-R binding
     bindkey -M tsmw '^R' "$down_widget"
+    # If one would like to re-open
+    bindkey -M tsmw '^O' "$down_widget"
+    bindkey -M tsmw '^O^K' "$down_widget"
 
     # Substitute self-insert, backward-delete-char, delete-char
     zle -A self-insert saved-self-insert
