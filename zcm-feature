@@ -489,6 +489,7 @@ if (( delete_feature )); then
             print "Done."
         else
             print "Aborting."
+            return 16
         fi
     else
         (( verbose )) && print "Removing feature \`$feature'..."
