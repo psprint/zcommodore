@@ -187,6 +187,10 @@ fi
 #
 # Create from commits
 #
+# This is specific as it copies files from commits
+# as feature's original files. This doesn't happen
+# when setting commits of a feature (-S).
+#
 
 if (( create_from_commits )); then
     if [[ "$#" -lt "2" ]]; then
@@ -213,15 +217,26 @@ if (( create_from_commits )); then
     local cmt
     local -a files
     local -aU save_files
-    integer nfiles
-    for cmt in "${commits[@]}"; do
-        # Get list of files (3 steps) of a commit
-        files=( ${(f)"$( git -C "$root_dir" show --name-status --no-renames "$cmt" 2>/dev/null )"} )
-        files=( "${(@M)files:#((#s)[ADM][ADM]#[[:space:]]##*|(#s)[ ][ADM][[:space:]]##*)}" )
-        files=( "${files[@]/(#b)(#s)[[:alpha:]]##[[:space:]]##(*)(#e)/${match[1]}}" )
+    if [[ -d "$root_dir"/.git ]]; then
+        for cmt in "${commits[@]}"; do
+            # Get list of files (3 steps) of a commit
+            files=( ${(f)"$( git -C "$root_dir" show --name-status --no-renames "$cmt" )"} )
+            files=( "${(@M)files:#((#s)[ADM][ADM]#[[:space:]]##*|(#s)[ ][ADM][[:space:]]##*)}" )
+            files=( "${files[@]/(#b)(#s)[[:alpha:]]##[[:space:]]##(*)(#e)/${match[1]}}" )
 
-        save_files+=( "${files[@]}" )
-    done
+            save_files+=( "${files[@]}" )
+        done
+    elif [[ -d "$root_dir"/.hg ]]; then
+        for cmt in "${commits[@]}"; do
+            # Get list of files (3 steps) of a commit
+            files=( ${(f)"$( hg --cwd "$root_dir" log -r "$cmt" -T {files}\\n )"} )
+
+            save_files+=( "${files[@]}" )
+        done
+    else
+        print "Cannot create feature from given commits – project isn't Git nor Hg repository"
+        return 9
+    fi
 
     local project_line="${ZCMDR[current_project]}"
     files=( "${(qq)save_files[@]}" )
