@@ -232,8 +232,15 @@ if (( create_from_commits )); then
     local cmt
     local -a files
     local -aU save_files
+    integer error=0
     if [[ -d "$root_dir"/.git ]]; then
         for cmt in "${commits[@]}"; do
+            files=( ${(f)"$( git -C "$root_dir" rev-parse --verify "${cmt}^{commit}" 2>/dev/null )"} )
+            if [[ "${#files}" = "0" ]]; then
+                print "${fg_bold[red]}Commit $cmt doesn't exist${reset_color}"
+                error+=1
+                continue
+            fi
             # Get list of files (3 steps) of a commit
             files=( ${(f)"$( git -C "$root_dir" show --name-status --no-renames "$cmt" )"} )
             files=( "${(@M)files:#((#s)[ADM][ADM]#[[:space:]]##*|(#s)[ ][ADM][[:space:]]##*)}" )
@@ -251,6 +258,11 @@ if (( create_from_commits )); then
     else
         print "Cannot create feature from given commits – project isn't Git nor Hg repository"
         return 10
+    fi
+
+    if (( error > 0 )); then
+        print "${fg_bold[red]}$error commit(s) not found, refusing to create feature"
+        return 16
     fi
 
     local project_line="${ZCMDR[current_project]}"
