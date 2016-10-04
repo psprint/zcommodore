@@ -184,6 +184,59 @@ if (( create )); then
     return 0
 fi
 
+#
+# Create from commits
+#
+
+if (( create_from_commits )); then
+    if [[ "$#" -lt "2" ]]; then
+        print "At least 2 arguments are needed, name of feature to create and a commit SHA"
+        return 7
+    fi
+
+    local feature="$1"
+    shift
+
+    local -a commits
+    commits=( "$@" )
+
+    local feature_file="${features_path}/${feature}.conf"
+
+    __zcmdr_verify_feature "$feature"
+    retcode=$?
+    (( retcode )) && return $retcode
+
+    local root_dir="${ZCMDR[current_repo]}"
+
+    [[ ! -d "$root_dir" ]] && { print "Repository dir doesn't exist or isn't directory (\`$root_dir')"; return 8; }
+
+    local cmt
+    local -a files
+    local -aU save_files
+    integer nfiles
+    for cmt in "${commits[@]}"; do
+        # Get list of files (3 steps) of a commit
+        files=( ${(f)"$( git -C "$root_dir" show --name-status --no-renames "$cmt" 2>/dev/null )"} )
+        files=( "${(@M)files:#((#s)[ADM][ADM]#[[:space:]]##*|(#s)[ ][ADM][[:space:]]##*)}" )
+        files=( "${files[@]/(#b)(#s)[[:alpha:]]##[[:space:]]##(*)(#e)/${match[1]}}" )
+
+        save_files+=( "${files[@]}" )
+    done
+
+    local project_line="${ZCMDR[current_project]}"
+    files=( "${(qq)save_files[@]}" )
+    local files_line="files ${files[*]}"
+    commits=( "${(q)commits[@]}" )
+    local commits_line="commits ${commits[*]}"
+
+    print -rl -- "# Feature \`$feature'" >! "$feature_file"
+    print -rl -- "$project_line" >>! "$feature_file"
+    print -rl -- "$files_line" >>! "$feature_file"
+    print -rl -- "$commits_line" >>! "$feature_file"
+
+    print "Feature ${fg_bold[green]}\`$feature'${reset_color} created"
+fi
+
 return 0
 
 # vim:ft=zsh
