@@ -262,6 +262,82 @@ if (( create_from_commits )); then
     print "Feature ${fg_bold[green]}\`$feature'${reset_color} created"
 fi
 
+if (( add )); then
+    if [[ "$#" -lt "2" ]]; then
+        print "At least 2 arguments are needed, feature to update and a file to attach to the feature"
+        return 10
+    fi
+
+    local feature="$1"
+    shift
+
+    local -aU files
+    files=( "$@" )
+
+    __zcmdr_verify_feature "$feature" "can_exist"
+    retcode=$?
+    (( retcode )) && return $retcode
+
+    local feature_file="${features_path}/${feature}.conf"
+    local -a entries
+    entries=( "${(@f)"$(<$feature_file)"}" )
+
+    local project_line="${ZCMDR[current_project]}"
+
+    if [[ "${entries[2]}" != "$project_line" ]]; then
+        print "The feature \`$feature' belongs to project: ${fg_bold[green]}\`${entries[2]:t:r}'${reset_color}. Proceed with update? [y/n]"
+        local answer="n"
+        read -qs answer
+        if [[ "$answer" = "n" ]]; then
+            echo "Aborting.."
+            return 11
+        else
+            project_line="${entries[2]}"
+        fi
+    fi
+
+    # Split current files to keep them uniq
+    local -a current
+    current=( "${(z@)entries[3]}" )
+    # z-flag can do tricks IIRC
+    if [[ -z "${current[1]}" ]]; then
+        current=( )
+    else
+        shift current
+    fi
+
+    files=( "${files[@]//(#s)$project_line\//}" )
+    integer before_count="${#current}"
+    files=( "${(qq)files[@]}" "${current[@]}" )
+    integer after_count="${#files}"
+
+    local files_line="files ${files[*]}"
+    local commits_line="${entries[4]}"
+
+    print -rl -- "# Feature \`$feature'" >! "$feature_file"
+    print -rl -- "$project_line" >>! "$feature_file"
+    print -rl -- "$files_line" >>! "$feature_file"
+    print -rl -- "$commits_line" >>! "$feature_file"
+
+    if (( quiet == 0 )); then
+        if (( verbose == 1 )); then
+            if [[ "$before_count" = "$after_count" ]]; then
+                print -- "Feature ${fg_bold[green]}$feature${reset_color} remained the same (no new files):"
+            else
+                print -- "Feature ${fg_bold[green]}$feature${reset_color} updated, has the files / directories:"
+            fi
+            print -rl -- "${(Q)files[@]}"
+        else
+            if [[ "$before_count" = "$after_count" ]]; then
+                print -- "Feature ${fg_bold[green]}$feature${reset_color} remained the same (no new files)"
+            else
+                print -- "Feature ${fg_bold[green]}$feature${reset_color} updated"
+            fi
+        fi
+    fi
+    return 0
+fi
+
 return 0
 
 # vim:ft=zsh
