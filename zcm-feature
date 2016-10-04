@@ -503,7 +503,7 @@ fi
 if (( set_commits )); then
     if [[ "$#" -lt "2" ]]; then
         print "At least 2 arguments are needed, feature to update and a commit to set the feature to"
-        return 11
+        return 17
     fi
 
     local feature="$1"
@@ -528,10 +528,42 @@ if (( set_commits )); then
         read -qs answer
         if [[ "$answer" = "n" ]]; then
             echo "Aborting.."
-            return 17
+            return 18
         else
             project_line="${entries[2]}"
         fi
+    fi
+
+    local root_dir="${ZCMDR[current_repo]}"
+    [[ ! -d "$root_dir" ]] && { print "Repository dir doesn't exist or isn't directory (\`$root_dir')"; return 19; }
+
+    local -a revision
+    local cmt
+    integer error=0
+    if [[ -d "$root_dir"/.git ]]; then
+        for cmt in "${commits[@]}"; do
+            revision=( ${(f)"$( git -C "$root_dir" rev-parse --verify "${cmt}^{commit}" 2>/dev/null )"} )
+            if [[ "${#revision}" = "0" ]]; then
+                print "${fg_bold[red]}Commit $cmt doesn't exist${reset_color}"
+                error+=1
+            fi
+        done
+    elif [[ -d "$root_dir"/.hg ]]; then
+        for cmt in "${commits[@]}"; do
+            revision=( ${(f)"$( hg --cwd "$root_dir" log -r "${cmt}" -T {node}\\n 2>/dev/null )"} )
+            if [[ "${#revision}" = "0" ]]; then
+                print "${fg_bold[red]}Commit $cmt doesn't exist${reset_color}"
+                error+=1
+            fi
+        done
+    else
+        print "Cannot set given commits – project isn't Git nor Hg repository"
+        return 19
+    fi
+
+    if (( error > 0 )); then
+        print "${fg_bold[red]}$error commit(s) not found, refusing to perform the update"
+        return 20
     fi
 
     local files_line="${entries[3]}"
