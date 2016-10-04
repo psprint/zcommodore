@@ -250,6 +250,12 @@ if (( create_from_commits )); then
         done
     elif [[ -d "$root_dir"/.hg ]]; then
         for cmt in "${commits[@]}"; do
+            files=( ${(f)"$( hg --cwd "$root_dir" log -r "${cmt}" -T {node}\\n 2>/dev/null )"} )
+            if [[ "${#files}" = "0" ]]; then
+                print "${fg_bold[red]}Commit $cmt doesn't exist${reset_color}"
+                error+=1
+                continue
+            fi
             # Get list of files (3 steps) of a commit
             files=( ${(f)"$( hg --cwd "$root_dir" log -r "$cmt" -T {files}\\n )"} )
 
