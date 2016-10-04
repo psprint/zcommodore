@@ -1,3 +1,6 @@
+emulate -LR zsh
+setopt extendedglob typesetsilent
+
 __zcmdr_usage_zcm() {
     print -- "Project switching tool. With no arguments will switch to current directory."
     print -- "With -g will also generate tags. With -l will list last N projects. With"
