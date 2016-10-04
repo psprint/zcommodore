@@ -636,6 +636,10 @@ if (( list + create + create_from_commits + add + delete + delete_feature + set_
         project_line="${entries[2]}"
     fi
 
+    #
+    # Direct files of the feature
+    #
+
     local -a files
     files=( "${(z@)entries[3]}" )
     # z-flag can do tricks IIRC
@@ -647,9 +651,80 @@ if (( list + create + create_from_commits + add + delete + delete_feature + set_
 
     files=( "${(Q)files[@]}" )
 
+    #
+    # From-commit files of the feature
+    #
+
+    local -a commits
+    commits=( "${(z@)entries[4]}" )
+    if [[ -z "${commits[1]}" ]]; then
+        commits=( )
+    else
+        shift commits
+    fi
+
+    commits=( "${(Q)commits[@]}" )
+
+    if [[ -n "${commits[1]}" ]]; then
+        local root_dir="${ZCMDR[current_repo]}"
+        local -aU save_files
+
+        if [[ ! -d "$root_dir" || ( ! -d "$root_dir"/.git && ! -d "$root_dir"/.hg ) ]]; then
+            print "Warning: feature has commits but project's dir isn't a Git nor Hg repository"
+        else
+            local cmt
+            local -a files2
+            integer error=0
+            if [[ -d "$root_dir"/.git ]]; then
+                for cmt in "${commits[@]}"; do
+                    files2=( ${(f)"$( git -C "$root_dir" rev-parse --verify "${cmt}^{commit}" 2>/dev/null )"} )
+                    if [[ "${#files2[@]}" = "0" ]]; then
+                        print "${fg_bold[red]}Commit $cmt doesn't exist${reset_color}"
+                        error+=1
+                        continue
+                    fi
+                    # Get list of files (3 steps) of the commit
+                    files2=( ${(f)"$( git -C "$root_dir" show --name-status --no-renames "$cmt" )"} )
+                    files2=( "${(@M)files2:#((#s)[ADM][ADM]#[[:space:]]##*|(#s)[ ][ADM][[:space:]]##*)}" )
+                    files2=( "${files2[@]/(#b)(#s)[[:alpha:]]##[[:space:]]##(*)(#e)/${match[1]}}" )
+
+                    save_files+=( "${files2[@]}" )
+                done
+            elif [[ -d "$root_dir"/.hg ]]; then
+                for cmt in "${commits[@]}"; do
+                    files2=( ${(f)"$( hg --cwd "$root_dir" log -r "${cmt}" -T {node}\\n 2>/dev/null )"} )
+                    if [[ "${#files2[@]}" = "0" ]]; then
+                        print "${fg_bold[red]}Commit $cmt (Hg) doesn't exist${reset_color}"
+                        error+=1
+                        continue
+                    fi
+                    # Get list of files of the commit
+                    files2=( ${(f)"$( hg --cwd "$root_dir" log -r "$cmt" -T {files}\\n )"} )
+
+                    save_files+=( "${files2[@]}" )
+                done
+            fi
+
+            # Add from-commits gathered files
+            files+=( "${save_files[@]}" )
+
+            if (( error > 0 )); then
+                print "${fg_bold[red]}$error commit(s) not found"
+            fi
+        fi
+    fi
+
+    #
+    # Configuration of editing
+    #
+
     local selected_editor cd_at_edit
     zstyle -s ":plugin:zcommodore" editor selected_editor || selected_editor="${EDITOR:-vim}"
     zstyle -b ":plugin:zcommodore" cd_at_edit cd_at_edit || cd_at_edit="yes"
+
+    #
+    # Paths and editing
+    #
 
     # If at correct location or if going to CD
     if [[ "$project_line" = "$PWD" || "$cd_at_edit" = "yes" ]]; then
