@@ -259,7 +259,8 @@ if (( create_from_commits )); then
     print -rl -- "$files_line" >>! "$feature_file"
     print -rl -- "$commits_line" >>! "$feature_file"
 
-    print "Feature ${fg_bold[green]}\`$feature'${reset_color} created"
+    print "Feature ${fg_bold[green]}\`$feature'${reset_color} created with files from the commits"
+    return 0
 fi
 
 if (( add )); then
