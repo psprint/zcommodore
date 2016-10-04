@@ -80,13 +80,18 @@ __zcmdr_verify_feature() {
         return 4
     fi
 
-    if [[ "$2" != "can_exist" && -f "$feature_file" ]]; then
+    if [[ "$2" != "can_exist" && "$2" != "must_exist" && -f "$feature_file" ]]; then
         local -a entries
         entries=( "${(@f)"$(<$feature_file)"}" )
 
         local project_path="${entries[2]/(#s)$HOME/~}"
         print "Feature \`$feature' already exists, belongs to project ${project_path}"
         return 5
+    fi
+
+    if [[ "$2" = "must_exist" && ! -f "$feature_file" ]]; then
+        print "Feature \`$feature' doesn't exist (at any project)"
+        return 6
     fi
 
     return 0
