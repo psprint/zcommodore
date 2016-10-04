@@ -32,7 +32,8 @@ __zcmdr_usage_zcm_feature() {
 }
 
 local -A opthash
-zparseopts -D -A opthash l -list c -create C -create-from-commits a -add d -delete D -delete-feature S -set-commits q -quiet v -verbose h -help || { __zcmdr_usage_zcm; return 1; }
+local -a optarr
+zparseopts -D -A opthash l+=optarr -list c -create C -create-from-commits a -add d -delete D -delete-feature S -set-commits q -quiet v -verbose h -help || { __zcmdr_usage_zcm; return 1; }
 
 integer list=0 create=0 create_from_commits=0 add=0 delete=0 delete_feature=0 set_commits=0 quiet=0 verbose=0
 
@@ -49,12 +50,17 @@ integer list=0 create=0 create_from_commits=0 add=0 delete=0 delete_feature=0 se
 (( quiet = ${+opthash[-q]} + ${+opthash[--quiet]} ))
 (( verbose = ${+opthash[-v]} + ${+opthash[--verbose]} ))
 
-[[ "${ZCMDR[stdlib_sourced]}" != "1" ]] && source "${ZCMDR_REPO_DIR}/lib/stdlib.lcmdr"
-
 if (( list + create + create_from_commits + add + delete + delete_feature + set_commits > 1 )); then
     print "Conflicting options given, please use single operation specifier (like -c, -C, -a, etc.)"
     return 2
 fi
+
+# Multiple -l option
+if [[ "${optarr[(I)-l]}" != "0" && "${optarr[(I)-l]}" != "${optarr[(i)-l]}" ]]; then
+    (( list += 1 ))
+fi
+
+[[ "${ZCMDR[stdlib_sourced]}" != "1" ]] && source "${ZCMDR_REPO_DIR}/lib/stdlib.lcmdr"
 
 local features_path="$ZCMDR_CONFIG_DIR/var/features"
 [[ ! -d "$features_path" ]] && command mkdir -p "$features_path"
@@ -102,15 +108,28 @@ __zcmdr_verify_feature() {
 #
 
 if (( list )); then
+    local project_query="$1"
+    if [[ -n "$project_query" ]]; then
+        if [[ "$project_query" = "*" ]]; then
+            print "Current project: ${fg_bold[green]}${ZCMDR[current_project]:t:r}${reset_color}, features of projects \`*' follow:"
+        else
+            print "Current project: ${fg_bold[green]}${ZCMDR[current_project]:t:r}${reset_color}, features of projects *${project_query}* follow:"
+        fi
+    else
+        print "Current project: ${fg_bold[green]}${ZCMDR[current_project]:t:r}${reset_color}, features follow:"
+    fi
+    print
+
+
     local -a features
     features=( "${features_path}"/*.conf(N) )
     if [[ -z "${features[1]}" ]]; then
-        print "No features currently defined"
+        print "No features currently defined (for any project)"
         return 0
     fi
 
     local -a found entries
-    local pth project_query="$1"
+    local pth
     for pth in "${features[@]}"; do
         entries=( "${(@f)"$(<$pth)"}" )
         if [[ -n "$project_query" && "${entries[2]}" = *$~project_query* ]]; then
@@ -130,34 +149,42 @@ if (( list )); then
         entries=( "${(@f)"$(<$pth)"}" )
 
         local feature="${pth:t:r}"
-        print -- "${fg_bold[magenta]}$feature${reset_color}"
+        if (( list < 2 )); then
+            print -n -- "${fg_bold[magenta]}$feature${reset_color}"
+        else
+            print -n -- "${fg_bold[magenta]}=== $feature ===${reset_color}"
+        fi
 
         local project_name="${entries[2]}"
         project_name="${project_name:t:r}"
 
         if [[ -n "$project_query" ]]; then
-            print -- "(${fg_bold[red]}$project_name${reset_color})"
+            print -- " (${fg_bold[red]}$project_name${reset_color})"
+        else
+            print
         fi
 
-        files=( "${(z@)entries[3]}" )
-        if [[ "${files[1]}" != "files" ]]; then
-            print -- "Improper 3rd line in the feature file, should begin with \`files' string"
-        elif [[ "${#files}" -gt 1 ]]; then
-            shift files
-            print -- "${fg_bold[green]}Files${reset_color}:"
-            print -rl -- "${(Q)files[@]}"
-        fi
+        if (( list > 1 )); then
+            files=( "${(z@)entries[3]}" )
+            if [[ "${files[1]}" != "files" ]]; then
+                print -- "Improper 3rd line in the feature file, should begin with \`files' string"
+            elif [[ "${#files}" -gt 1 ]]; then
+                shift files
+                print -- "${fg_bold[green]}Files${reset_color}:"
+                print -rl -- "${(Q)files[@]}"
+            fi
 
-        commits=( "${(z@)entries[4]}" )
-        if [[ "${commits[1]}" != "commits" ]]; then
-            print -- "Improper 4th line in the feature file, should begin with \`commits' string"
-        elif [[ "${#commits}" -gt 1 ]]; then
-            shift commits
-            print -- "${fg_bold[green]}Commits${reset_color}:"
-            print -rl -- "${(Q)commits[@]}"
-        fi
+            commits=( "${(z@)entries[4]}" )
+            if [[ "${commits[1]}" != "commits" ]]; then
+                print -- "Improper 4th line in the feature file, should begin with \`commits' string"
+            elif [[ "${#commits}" -gt 1 ]]; then
+                shift commits
+                print -- "${fg_bold[green]}Commits${reset_color}:"
+                print -rl -- "${(Q)commits[@]}"
+            fi
 
-        print
+            print
+        fi
     done
     return 0
 fi
