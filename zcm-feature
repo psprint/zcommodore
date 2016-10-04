@@ -306,7 +306,7 @@ if (( add )); then
         shift current
     fi
 
-    files=( "${files[@]//(#s)$project_line\//}" )
+    files=( "${files[@]/(#s)$project_line\//}" )
     integer before_count="${#current}"
     files=( "${(qq)files[@]}" "${current[@]}" )
     integer after_count="${#files}"
