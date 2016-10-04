@@ -53,7 +53,7 @@ integer list=0 create=0 create_from_commits=0 add=0 delete=0 delete_feature=0 se
 
 if (( list + create + create_from_commits + add + delete + delete_feature + set_commits > 1 )); then
     print "Conflicting options given, please use single operation specifier (like -c, -C, -a, etc.)"
-    return 1
+    return 2
 fi
 
 local features_path="$ZCMDR_CONFIG_DIR/var/features"
@@ -69,7 +69,7 @@ __zcmdr_verify_feature() {
 
     if [[ "$feature" != [[:alnum:]_-]## ]]; then
         print "Improper feature name: \`$feature'. Allowed are letters, _, - and digits."
-        return 2
+        return 3
     fi
 
     local feature_file="${features_path}/${feature}.conf"
@@ -77,7 +77,7 @@ __zcmdr_verify_feature() {
     if [[ ! -d "${ZCMDR[current_project]}" ]]; then
         print "Current project points to incorrect path, aborting: \`${ZCMDR[current_project]}'"
         print "(consider running zcm in a project directory or zcm -l)"
-        return 3
+        return 4
     fi
 
     if [[ -f "$feature_file" ]]; then
@@ -86,7 +86,7 @@ __zcmdr_verify_feature() {
 
         local project_path="${entries[2]/(#s)$HOME/~}"
         print "Feature \`$feature' already exists, belongs to project ${project_path}"
-        return 4
+        return 5
     fi
 
     return 0
@@ -154,7 +154,7 @@ fi
 if (( create )); then
     if [[ "$#" -lt "2" ]]; then
         print "At least 2 arguments are needed, feature to create and a file to attach to the feature"
-        return 2
+        return 6
     fi
 
     local feature="$1"
