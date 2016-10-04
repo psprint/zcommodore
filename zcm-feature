@@ -85,7 +85,7 @@ __zcmdr_verify_feature() {
         entries=( "${(@f)"$(<$feature_file)"}" )
 
         local project_path="${entries[2]/(#s)$HOME/~}"
-        print "Feature \`$feature' already exists, belongs to project ${project_path}"
+        print "Feature \`$feature' already exists, belongs to project ${fg_bold[green]}${project_path}${reset_color}"
         return 5
     fi
 
@@ -194,7 +194,7 @@ if (( create )); then
     print -rl -- "$files_line" >>! "$feature_file"
     print -rl -- "$commits_line" >>! "$feature_file"
 
-    print -- "Feature ${fg_bold[green]}$feature${reset_color} created, has the files / directories:"
+    print -- "Feature ${fg_bold[green]}$feature${reset_color} created (project: ${fg_bold[green]}${project_line:t:r}${reset_color}), has the files / directories:"
     print -rl -- "${(Q)files[@]}"
     return 0
 fi
@@ -264,7 +264,7 @@ if (( create_from_commits )); then
     print -rl -- "$files_line" >>! "$feature_file"
     print -rl -- "$commits_line" >>! "$feature_file"
 
-    print "Feature ${fg_bold[green]}\`$feature'${reset_color} created with files from the commits"
+    print "Feature ${fg_bold[green]}\`$feature'${reset_color} created (project: ${fg_bold[green]}${project_line:t:r}${reset_color}) with files from the commit(s)"
     return 0
 fi
 
