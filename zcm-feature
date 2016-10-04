@@ -11,7 +11,7 @@ __zcmdr_usage_zcm_feature() {
     print -- "${fg_bold[green]}Usage: zcm-feature [-q] [-v] [-h|--help] {feature-name}${reset_color}"
     print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-l|--list} ${reset_color}"
     print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-c|--create} {feature-name} {file1} {file2} ...${reset_color}"
-    print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-C|--create-from-commit} {feature-name} {file1} {file2} ...${reset_color}"
+    print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-C|--create-from-commits} {feature-name} {file1} {file2} ...${reset_color}"
     print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-a|--add} {feature-name} {file1} {file2} ...${reset_color}"
     print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-d|--delete} {feature-name} {file1} {file2} ...${reset_color}"
     print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-D|--delete-feature} {feature-name}${reset_color}"
