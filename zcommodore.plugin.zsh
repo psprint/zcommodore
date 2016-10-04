@@ -58,7 +58,8 @@ fi
 # Setup
 #
 
-autoload tag-search-multi-word zcm __zcmdr-list __zcmdr-list-draw __zcmdr-list-input __zcmdr-list-wrapper __zcmdr-process-buffer __zcmdr-usetty-wrapper uizcm
+autoload tag-search-multi-word zcm __zcmdr-list __zcmdr-list-draw __zcmdr-list-input __zcmdr-list-wrapper
+autoload __zcmdr-process-buffer __zcmdr-usetty-wrapper uizcm zcm-feature
 zle -N tag-search-multi-word
 zle -N tag-search-multi-word-backwards tag-search-multi-word
 zle -N tag-search-multi-word-pbackwards tag-search-multi-word

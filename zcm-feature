@@ -1,0 +1,164 @@
+emulate -LR zsh
+setopt extendedglob typesetsilent
+
+[[ -z "${fg_bold[green]}" ]] && builtin autoload -Uz colors && colors
+
+__zcmdr_usage_zcm_feature() {
+    print -- "Feature management tool. You can EDIT files belonging to feature (with"
+    print -- "editor from e.g. \$EDITOR variable), CREATE feature from set of files"
+    print -- "or from *commit*, UPDATE files of a feature and DELETE whole feature."
+    print
+    print -- "${fg_bold[green]}Usage: zcm-feature [-q] [-v] [-h|--help] {feature-name}${reset_color}"
+    print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-l|--list} ${reset_color}"
+    print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-c|--create} {feature-name} {file1} {file2} ...${reset_color}"
+    print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-C|--create-from-commit} {feature-name} {file1} {file2} ...${reset_color}"
+    print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-a|--add} {feature-name} {file1} {file2} ...${reset_color}"
+    print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-d|--delete} {feature-name} {file1} {file2} ...${reset_color}"
+    print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-D|--delete-feature} {feature-name}${reset_color}"
+    print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-S|--set-commits} {feature-name} {commit SHA} [commit SHA] ...${reset_color}"
+    print
+    print -- "-h|--help                This message"
+    print -- "-l/--list                List features of current project and allow selection (for editing)"
+    print -- "-c/--create              Create new feature from supplied files"
+    print -- "-C/--create-from-commits Create new feature from files of given commits, attach the commits"
+    print -- "-a/--add                 Add given files to given feature"
+    print -- "-d/--delete              Delte given files from given feature"
+    print -- "-D/--delete-feature      Forget given feature"
+    print -- "-S/--set-commits         Attach given commits to given feature, replacing previous ones"
+    print
+    print -- "-q/--quiet      Operate without outputting messages"
+    print -- "-v/--verbose    Print more status messages"
+    return 0
+}
+
+local -A opthash
+zparseopts -D -A opthash l -list c -create C -create-from-commits a -add d -delete D -delete-feature S -set-commits q -quiet v -verbose h -help || { __zcmdr_usage_zcm; return 1; }
+
+integer list=0 create=0 create_from_commits=0 add=0 delete=0 delete_feature=0 set_commits=0 quiet=0 verbose=0
+
+# Help
+(( ${+opthash[-h]} + ${+opthash[--help]} )) && { __zcmdr_usage_zcm_feature; return 0; }
+
+(( list = ${+opthash[-l]} + ${+opthash[--list]} ))
+(( create = ${+opthash[-c]} + ${+opthash[--create]} ))
+(( create_from_commits = ${+opthash[-C]} + ${+opthash[--create-from-commits]} ))
+(( add = ${+opthash[-a]} + ${+opthash[--add]} ))
+(( delete = ${+opthash[-d]} + ${+opthash[--delete]} ))
+(( delete_feature = ${+opthash[-D]} + ${+opthash[--delete-feature]} ))
+(( set_commits = ${+opthash[-S]} + ${+opthash[--set-commits]} ))
+(( quiet = ${+opthash[-q]} + ${+opthash[--quiet]} ))
+(( verbose = ${+opthash[-v]} + ${+opthash[--verbose]} ))
+
+[[ "${ZCMDR[stdlib_sourced]}" != "1" ]] && source "${ZCMDR_REPO_DIR}/lib/stdlib.lcmdr"
+
+if (( list + create + create_from_commits + add + delete + delete_feature + set_commits > 1 )); then
+    print "Conflicting options given, please use single operation specifier (like -c, -C, -a, etc.)"
+    return 1
+fi
+
+local features_path="$ZCMDR_CONFIG_DIR/var/features"
+[[ ! -d "$features_path" ]] && command mkdir -p "$features_path"
+
+if (( list )); then
+    local -a features
+    features=( "${features_path}"/*.conf(N) )
+    if [[ -z "${features[1]}" ]]; then
+        print "No features currently defined"
+        return 0
+    fi
+
+    local -a found entries
+    local pth
+    for pth in "${features[@]}"; do
+        entries=( "${(@f)"$(<$pth)"}" )
+        if [[ "${entries[2]}" = "${ZCMDR[current_project]}" ]]; then
+            found+=( "$pth" )
+        fi
+    done
+
+    if [[ -z "${found[1]}" ]]; then
+        print "Project ${fg_bold[green]}${ZCMDR[current_project]}${reset_color} doesn't have features defined"
+        return 0
+    fi
+
+    local -a files commits
+    for pth in "${found[@]}"; do
+        entries=( "${(@f)"$(<$pth)"}" )
+        local feature="${pth:t:r}"
+        print -- "${fg_bold[magenta]}$feature${reset_color}"
+
+        files=( "${(z@)entries[3]}" )
+        if [[ "${files[1]}" != "files" ]]; then
+            print -- "Improper 3rd line in the feature file, should begin with \`files' string"
+        elif [[ "${#files}" -gt 1 ]]; then
+            shift files
+            print -- "${fg_bold[green]}Files${reset_color}:"
+            print -rl -- "${(Q)files[@]}"
+        fi
+
+        commits=( "${(z@)entries[4]}" )
+        if [[ "${commits[1]}" != "commits" ]]; then
+            print -- "Improper 4th line in the feature file, should begin with \`commits' string"
+        elif [[ "${#commits}" -gt 1 ]]; then
+            shift commits
+            print -- "${fg_bold[green]}Commits${reset_color}:"
+            print -rl -- "${(Q)commits[@]}"
+        fi
+
+        print
+    done
+    return 0
+fi
+
+if (( create )); then
+    if [[ "$#" -lt "2" ]]; then
+        print "At least 2 arguments are needed, feature to create and a file to attach to the feature"
+        return 1
+    fi
+
+    local feature="$1"
+    shift
+
+    local -a files
+    files=( "$@" )
+
+    if [[ "$feature" != [[:alnum:]_-]## ]]; then
+        print "Improper feature name: \`$feature'. Allowed are letters, _ and -, digits."
+        return 1
+    fi
+
+    local feature_file="${features_path}/${feature}.conf"
+
+    if [[ ! -d "${ZCMDR[current_project]}" ]]; then
+        print "Current project points to incorrect path, aborting: \`${ZCMDR[current_project]}'"
+        print "(consider running zcm in a project directory or zcm -l)"
+        return 2
+    fi
+
+    if [[ -f "$feature_file" ]]; then
+        local -a entries
+        entries=( "${(@f)"$(<$feature_file)"}" )
+
+        local project_path="${entries[2]/(#s)$HOME/~}"
+        print "Feature \`$feature' already exists, belongs to project ${project_path}"
+        return 3
+    fi
+
+    local project_line="${ZCMDR[current_project]}"
+    files=( "${(qq)files[@]}" )
+    local files_line="files ${files[*]}"
+    local commits_line="commits"
+
+    print -rl -- "# Feature \`$feature'" >! "$feature_file"
+    print -rl -- "$project_line" >>! "$feature_file"
+    print -rl -- "$files_line" >>! "$feature_file"
+    print -rl -- "$commits_line" >>! "$feature_file"
+
+    print -- "Feature ${fg_bold[green]}$feature${reset_color} created, has the files / directories:"
+    print -rl -- "${(Q)files[@]}"
+    return 0
+fi
+
+return 0
+
+# vim:ft=zsh
