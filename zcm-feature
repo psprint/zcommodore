@@ -8,7 +8,7 @@ __zcmdr_usage_zcm_feature() {
     print -- "editor from e.g. \$EDITOR variable), CREATE feature from set of files"
     print -- "or from *commit*, UPDATE files of a feature and DELETE whole feature."
     print
-    print -- "${fg_bold[green]}Usage: zcm-feature [-q] [-v] [-h|--help] {feature-name}${reset_color}"
+    print -- "${fg_bold[green]}Usage: zcm-feature [-q] [-v] {feature-name}${reset_color}"
     print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-l|--list} [project name]${reset_color}"
     print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-c|--create} {feature-name} {file1} {file2} ...${reset_color}"
     print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-C|--create-from-commits} {feature-name} {file1} {file2} ...${reset_color}"
