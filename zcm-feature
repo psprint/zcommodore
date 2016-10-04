@@ -500,6 +500,59 @@ if (( delete_feature )); then
     return 0
 fi
 
+if (( set_commits )); then
+    if [[ "$#" -lt "2" ]]; then
+        print "At least 2 arguments are needed, feature to update and a commit to set the feature to"
+        return 11
+    fi
+
+    local feature="$1"
+    shift
+
+    local -aU commits
+    commits=( "$@" )
+
+    __zcmdr_verify_feature "$feature" "must_exist"
+    retcode=$?
+    (( retcode )) && return $retcode
+
+    local feature_file="${features_path}/${feature}.conf"
+    local -a entries
+    entries=( "${(@f)"$(<$feature_file)"}" )
+
+    local project_line="${ZCMDR[current_project]}"
+
+    if [[ "${entries[2]}" != "$project_line" ]]; then
+        print "The feature \`$feature' belongs to project: ${fg_bold[green]}\`${entries[2]:t:r}'${reset_color}. Proceed with update? [y/n]"
+        local answer="n"
+        read -qs answer
+        if [[ "$answer" = "n" ]]; then
+            echo "Aborting.."
+            return 17
+        else
+            project_line="${entries[2]}"
+        fi
+    fi
+
+    local files_line="${entries[3]}"
+    local commits_line="commits ${commits[*]}"
+
+    print -rl -- "# Feature \`$feature'" >! "$feature_file"
+    print -rl -- "$project_line" >>! "$feature_file"
+    print -rl -- "$files_line" >>! "$feature_file"
+    print -rl -- "$commits_line" >>! "$feature_file"
+
+    if (( quiet == 0 )); then
+        if (( verbose == 1 )); then
+            print -- "Feature ${fg_bold[green]}$feature${reset_color} (project: ${fg_bold[green]}${project_line:t:r}${reset_color}) updated, has the commits:"
+            print -rl -- "${(Q)commits[@]}"
+        else
+            print -- "Feature ${fg_bold[green]}$feature${reset_color} (project: ${fg_bold[green]}${project_line:t:r}${reset_color}) updated"
+        fi
+    fi
+    return 0
+fi
+
 return 0
 
 # vim:ft=zsh
