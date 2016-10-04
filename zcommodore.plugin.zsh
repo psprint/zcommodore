@@ -121,7 +121,7 @@ function zcm-cd() {
     if [[ -n "${ZCMDR[current_project]}" ]]; then
         if [[ -d "${ZCMDR[current_project]}" ]]; then
             builtin cd "${ZCMDR[current_project]}"
-            print "Switched to ${fg_bold[green]}${ZCMDR[current_project]:t}${reset_color}"
+            print "Current directory is now: ${fg_bold[green]}${ZCMDR[current_project]:t}${reset_color}"
         else
             print "The project's directory doesn't exist: ${ZCMDR[current_project]}"
         fi
