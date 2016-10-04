@@ -169,7 +169,7 @@ fi
 if (( create )); then
     if [[ "$#" -lt "2" ]]; then
         print "At least 2 arguments are needed, feature to create and a file to attach to the feature"
-        return 6
+        return 7
     fi
 
     local feature="$1"
@@ -210,7 +210,7 @@ fi
 if (( create_from_commits )); then
     if [[ "$#" -lt "2" ]]; then
         print "At least 2 arguments are needed, name of feature to create and a commit SHA"
-        return 7
+        return 8
     fi
 
     local feature="$1"
@@ -227,7 +227,7 @@ if (( create_from_commits )); then
 
     local root_dir="${ZCMDR[current_repo]}"
 
-    [[ ! -d "$root_dir" ]] && { print "Repository dir doesn't exist or isn't directory (\`$root_dir')"; return 8; }
+    [[ ! -d "$root_dir" ]] && { print "Repository dir doesn't exist or isn't directory (\`$root_dir')"; return 9; }
 
     local cmt
     local -a files
@@ -250,7 +250,7 @@ if (( create_from_commits )); then
         done
     else
         print "Cannot create feature from given commits – project isn't Git nor Hg repository"
-        return 9
+        return 10
     fi
 
     local project_line="${ZCMDR[current_project]}"
@@ -271,7 +271,7 @@ fi
 if (( add )); then
     if [[ "$#" -lt "2" ]]; then
         print "At least 2 arguments are needed, feature to update and a file to attach to the feature"
-        return 10
+        return 11
     fi
 
     local feature="$1"
@@ -296,7 +296,7 @@ if (( add )); then
         read -qs answer
         if [[ "$answer" = "n" ]]; then
             echo "Aborting.."
-            return 11
+            return 12
         else
             project_line="${entries[2]}"
         fi
@@ -347,7 +347,7 @@ fi
 if (( delete )); then
     if [[ "$#" -lt "2" ]]; then
         print "At least 2 arguments are needed, feature to update and a file to remove from the feature"
-        return 12
+        return 13
     fi
 
     local feature="$1"
@@ -373,7 +373,7 @@ if (( delete )); then
         read -qs answer
         if [[ "$answer" = "n" ]]; then
             echo "Aborting.."
-            return 13
+            return 14
         else
             project_line="${entries[2]}"
         fi
