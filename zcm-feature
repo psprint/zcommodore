@@ -612,6 +612,49 @@ if (( set_commits )); then
     return 0
 fi
 
+if (( list + create + create_from_commits + add + delete + delete_feature + set_commits == 0 )); then
+    if [[ "$#" != "1" ]]; then
+        print "Exactly 1 arguments is needed – feature to edit"
+        return 21
+    fi
+
+    local feature="$1"
+    shift
+
+    __zcmdr_verify_feature "$feature" "must_exist"
+    retcode=$?
+    (( retcode )) && return $retcode
+
+    local feature_file="${features_path}/${feature}.conf"
+    local -a entries
+    entries=( "${(@f)"$(<$feature_file)"}" )
+
+    local project_line="${ZCMDR[current_project]}"
+
+    if [[ "${entries[2]}" != "$project_line" ]]; then
+        print "Warning: editing not current project ${entries[2]:t:r}"
+        project_line="${entries[2]}"
+    fi
+
+    local -a files
+    files=( "${(z@)entries[3]}" )
+    # z-flag can do tricks IIRC
+    if [[ -z "${files[1]}" ]]; then
+        files=( )
+    else
+        shift files
+    fi
+
+    files=( "${(Q)files[@]}" )
+
+    local selected_editor cd_at_edit
+    zstyle -s ":plugin:zcommodore" editor selected_editor || selected_editor="${EDITOR:-vim}"
+    zstyle -b ":plugin:zcommodore" cd_at_edit cd_at_edit || cd_at_edit="yes"
+
+    cd "$project_line"
+    "$selected_editor" -p "${files[@]}"
+fi
+
 return 0
 
 # vim:ft=zsh
