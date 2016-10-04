@@ -125,7 +125,7 @@ function zcm-cd() {
             print "The project's directory doesn't exist: ${ZCMDR[current_project]}"
         fi
     else
-        print "No Current-Project set (it is done with command: zcmdr, from project's directory)"
+        print "No Current-Project set (it is done with command: zcm -g, from project's directory)"
     fi
 }
 
