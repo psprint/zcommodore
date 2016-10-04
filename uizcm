@@ -427,9 +427,10 @@ if [[ -z "$REGENERATE" || "$REGENERATE" = *,tree,* || "$REGENERATE" = *,treeload
     local -a tree
     tree=()
 
-    if [[ "$current_project" = "$prev_current_project" ]]; then
-        # Project is current - data available?
-        [[ ! -f "$main_tree_path".ready && "$REGENERATE" = *,treeload,* ]] && sleep 1
+    if [[ "$current_project" = "$prev_current_project" && "$REGENERATE" = *,treeload,* ]]; then
+        # Current project had chance to gather data - is it available?
+        [[ ! -f "$main_tree_path".ready ]] && sleep 1
+
         if [[ -f "$main_tree_path".ready ]]; then
             tree=( "${(@f)"$(<$main_tree_path)"}" )
             command rm -f "$main_tree_path" "$main_tree_path".ready "$main_tree_path".busy
