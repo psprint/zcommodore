@@ -268,7 +268,7 @@ if (( create_from_commits )); then
                 error+=1
                 continue
             fi
-            # Get list of files (3 steps) of a commit
+            # Get list of files (3 steps) of the commit
             files=( ${(f)"$( git -C "$root_dir" show --name-status --no-renames "$cmt" )"} )
             files=( "${(@M)files:#((#s)[ADM][ADM]#[[:space:]]##*|(#s)[ ][ADM][[:space:]]##*)}" )
             files=( "${files[@]/(#b)(#s)[[:alpha:]]##[[:space:]]##(*)(#e)/${match[1]}}" )
@@ -283,7 +283,7 @@ if (( create_from_commits )); then
                 error+=1
                 continue
             fi
-            # Get list of files (3 steps) of a commit
+            # Get list of files of the commit
             files=( ${(f)"$( hg --cwd "$root_dir" log -r "$cmt" -T {files}\\n )"} )
 
             save_files+=( "${files[@]}" )
@@ -614,7 +614,7 @@ fi
 
 if (( list + create + create_from_commits + add + delete + delete_feature + set_commits == 0 )); then
     if [[ "$#" != "1" ]]; then
-        print "Exactly 1 arguments is needed – feature to edit"
+        print "Exactly 1 arguments is needed – a feature to edit"
         return 21
     fi
 
