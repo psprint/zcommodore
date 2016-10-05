@@ -11,6 +11,8 @@ __zcmdr_usage_zcm_feature() {
     print -- "${fg_bold[green]}Usage: zcm-feature [-q] [-v] {feature-name}${reset_color}"
     print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-l|--list} [project name, can be pattern]${reset_color}"
     print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-ll|-l -l} [project name, can be pattern]${reset_color}"
+    print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-L} [feature name, can be pattern]${reset_color}"
+    print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-LL|-L -L} [feature name, can be pattern]${reset_color}"
     print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-c|--create} {feature-name} {file1} {file2} ...${reset_color}"
     print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-C|--create-from-commits} {feature-name} {file1} {file2} ...${reset_color}"
     print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-a|--add} {feature-name} {file1} {file2} ...${reset_color}"
@@ -21,6 +23,8 @@ __zcmdr_usage_zcm_feature() {
     print -- "-h|--help                This message"
     print -- "-l/--list                List features of current or given project"
     print -- "-ll/-l -l                Long list – shows attached files and commits"
+    print -- "-L                       Match and list features of all projects"
+    print -- "-LL/-L -L                Long list – shows attached files and commits"
     print -- "-c/--create              Create new feature from supplied files"
     print -- "-C/--create-from-commits Create new feature from files of given commits, attach the commits"
     print -- "-a/--add                 Add given files to given feature"
@@ -35,14 +39,15 @@ __zcmdr_usage_zcm_feature() {
 
 local -A opthash
 local -a optarr
-zparseopts -D -A opthash l+=optarr -list c -create C -create-from-commits a -add d -delete D -delete-feature S -set-commits q -quiet v -verbose h -help || { __zcmdr_usage_zcm; return 1; }
+zparseopts -D -A opthash l+=optarr -list L+=optarr c -create C -create-from-commits a -add d -delete D -delete-feature S -set-commits q -quiet v -verbose h -help || { __zcmdr_usage_zcm; return 1; }
 
-integer list=0 create=0 create_from_commits=0 add=0 delete=0 delete_feature=0 set_commits=0 quiet=0 verbose=0
+integer list=0 LIST=0 create=0 create_from_commits=0 add=0 delete=0 delete_feature=0 set_commits=0 quiet=0 verbose=0
 
 # Help
 (( ${+opthash[-h]} + ${+opthash[--help]} )) && { __zcmdr_usage_zcm_feature; return 0; }
 
 (( list = ${+opthash[-l]} + ${+opthash[--list]} ))
+(( LIST = ${+opthash[-L]} ))
 (( create = ${+opthash[-c]} + ${+opthash[--create]} ))
 (( create_from_commits = ${+opthash[-C]} + ${+opthash[--create-from-commits]} ))
 (( add = ${+opthash[-a]} + ${+opthash[--add]} ))
@@ -52,7 +57,7 @@ integer list=0 create=0 create_from_commits=0 add=0 delete=0 delete_feature=0 se
 (( quiet = ${+opthash[-q]} + ${+opthash[--quiet]} ))
 (( verbose = ${+opthash[-v]} + ${+opthash[--verbose]} ))
 
-if (( list + create + create_from_commits + add + delete + delete_feature + set_commits > 1 )); then
+if (( LIST + list + create + create_from_commits + add + delete + delete_feature + set_commits > 1 )); then
     print "Conflicting options given, please use single operation specifier (like -c, -C, -a, etc.)"
     return 2
 fi
@@ -60,6 +65,11 @@ fi
 # Multiple -l option
 if [[ "${optarr[(I)-l]}" != "0" && "${optarr[(I)-l]}" != "${optarr[(i)-l]}" ]]; then
     (( list += 1 ))
+fi
+
+# Multiple -L option
+if [[ "${optarr[(I)-L]}" != "0" && "${optarr[(I)-L]}" != "${optarr[(i)-L]}" ]]; then
+    (( LIST += 1 ))
 fi
 
 [[ "${ZCMDR[stdlib_sourced]}" != "1" ]] && source "${ZCMDR_REPO_DIR}/lib/stdlib.lcmdr"
@@ -181,13 +191,44 @@ if (( list )); then
         print "Project ${fg_bold[green]}${ZCMDR[current_project]}${reset_color} doesn't have features defined"
         return 0
     fi
+elif (( LIST )); then
+    local feature_query="$1"
+    if [[ -n "$feature_query" ]]; then
+        if [[ "$feature_query" = "*" ]]; then
+            print "Features matching \`*' follow:"
+        else
+            print "Features matching *${feature_query}* follow:"
+        fi
+    else
+        print "All features for all projects follow:"
+    fi
+    print
 
+
+    local -a found
+    if [[ -z "$feature_query" ]]; then
+        found=( "${features_path}"/*.conf(N) )
+    else
+        found=( "${features_path}"/*$~feature_query*.conf(N) )
+    fi
+
+    if [[ -z "${found[1]}" ]]; then
+        if [[ -z "$feature_query" ]]; then
+            print "No features currently defined (for any project)"
+        else
+            print "No matching features"
+        fi
+        return 0
+    fi
+fi
+
+if (( list + LIST )); then
     local -a files commits
     for pth in "${found[@]}"; do
         entries=( "${(@f)"$(<$pth)"}" )
 
         local feature="${pth:t:r}"
-        if (( list < 2 )); then
+        if (( list < 2 && LIST < 2 )); then
             print -n -- "${fg_bold[magenta]}$feature${reset_color}"
         else
             print -n -- "${fg_bold[magenta]}=== $feature ===${reset_color}"
@@ -196,13 +237,13 @@ if (( list )); then
         local project_name="${entries[2]}"
         project_name="${project_name:t:r}"
 
-        if [[ -n "$project_query" ]]; then
+        if [[ -n "$project_query" || -n "$feature_query" ]]; then
             print -- " (${fg_bold[red]}$project_name${reset_color})"
         else
             print
         fi
 
-        if (( list > 1 )); then
+        if (( list > 1 || LIST > 1 )); then
             files=( "${(z@)entries[3]}" )
             if [[ "${files[1]}" != "files" ]]; then
                 print -- "Improper 3rd line in the feature file, should begin with \`files' string"
