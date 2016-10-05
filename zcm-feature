@@ -718,9 +718,10 @@ if (( list + create + create_from_commits + add + delete + delete_feature + set_
     # Configuration of editing
     #
 
-    local selected_editor cd_at_edit
+    local selected_editor cd_at_edit editor_use_tabs
     zstyle -s ":plugin:zcommodore" editor selected_editor || selected_editor="${EDITOR:-vim}"
     zstyle -b ":plugin:zcommodore" cd_at_edit cd_at_edit || cd_at_edit="yes"
+    zstyle -b ":plugin:zcommodore" editor_use_tabs editor_use_tabs || editor_use_tabs="yes"
 
     #
     # Paths and editing
@@ -734,7 +735,23 @@ if (( list + create + create_from_commits + add + delete + delete_feature + set_
     fi
 
     [[ "$cd_at_edit" = "yes" && "$project_line" != "$PWD" ]] && cd "$project_line"
-    "$selected_editor" -p "${files[@]}"
+
+    local -a opts
+    case "$selected_editor" in
+        (vim|gvim|mvim|nvim)
+            [[ "$editor_use_tabs" ]] && opts+=( "-p" )
+            ;;
+        (emacs|emacsclient)
+            ;;
+        (gedit)
+            ;;
+        (nano)
+            ;;
+        (editor)
+            # TODO
+            ;;
+    esac
+    "$selected_editor" "${opts[@]}" "${files[@]}"
 fi
 
 return 0
