@@ -113,6 +113,32 @@ __zcmdr_verify_feature() {
     return 0
 }
 
+# Search through recently used projects
+# to find the path to repository of the
+# project given as input
+#
+# $1 - $ZCMDR[current_project]
+__zcmdr_find_repo_path_in_recents() {
+    local project="$1" p found="no"
+    local -a all_circular_paths last_entries
+
+    __zcmdr_stdlib_circular_paths "last_project"
+    all_circular_paths=( "${reply[@]}" )
+
+    REPLY=""
+    for p in "${all_circular_paths[@]}"; do
+        last_entries=( "${(@f)"$(<$p)"}" )
+        if [[ "${last_entries[1]}" = "$project" ]]; then
+            REPLY="${last_entries[2]}"
+            found="yes"
+            break
+        fi
+    done
+
+    # Testable
+    [[ "$found" = "yes" ]] && return 0 || return 1
+}
+
 #
 # List
 #
@@ -646,25 +672,7 @@ if (( list + create + create_from_commits + add + delete + delete_feature + set_
         print "${fg_bold[red]}Warning: editing not current project \`${entries[2]:t:r}'${reset_color}"
         project_line="${entries[2]}"
 
-        # Search through recently used projects
-        # to find the path to repository
-
-        local -a all_circular_paths last_entries
-        local p found="no"
-
-        __zcmdr_stdlib_circular_paths "last_project"
-        all_circular_paths=( "${reply[@]}" )
-
-        for p in "${all_circular_paths[@]}"; do
-            last_entries=( "${(@f)"$(<$p)"}" )
-            if [[ "${last_entries[1]}" = "$project_line" ]]; then
-                root_dir="${last_entries[2]}"
-                found="yes"
-                break
-            fi
-        done
-
-        if [[ "$found" = "no" ]]; then
+        if ! __zcmdr_find_repo_path_in_recents "$project_line"; then
             print "Could not find repository of project \`${entries[2]:t:r}\' because"
             print "the project is not remembered in recent-projects database."
             print "Cannot use feature's commits, will only open feature's files."
@@ -677,6 +685,8 @@ if (( list + create + create_from_commits + add + delete + delete_feature + set_
             fi
 
             root_dir=""
+        else
+            root_dir="$REPLY"
         fi
     fi
 
