@@ -128,6 +128,16 @@ __zcmdr_action_feature_edit_cd() {
     fi
 }
 
+__zcmdr_action_feature_edit_abs() {
+    local id="$1" opt="$2" cmd="$3" repo_path="$4" feat_name="$5"
+
+    if [[ "$opt" = "commits" ]]; then
+        __zcmdr_stdlib_to_cmd_line "zcm-feature --nocd -x ${(q)feat_name}"
+    else
+        __zcmdr_stdlib_to_cmd_line "zcm-feature --nocd ${(q)feat_name}"
+    fi
+}
+
 # Hg actions
 
 __zcmdr_action_hg_diff() {
