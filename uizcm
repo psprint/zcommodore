@@ -249,6 +249,11 @@ local -a modified_output modified_nonselectables modified_hops
 local -a prev_modified_nonselectables prev_modified_hops
 integer modified_size prev_modified_size
 
+# Features files
+local -a features_output features_nonselectables features_hops
+local -a prev_features_nonselectables prev_features_hops
+integer features_size prev_features_size
+
 #
 # Parameters for modules
 #
@@ -419,6 +424,21 @@ if [[ -z "$REGENERATE" || "$REGENERATE" = *,modified,* || "$REGENERATE" = *,all,
 fi
 
 #
+# List of features
+#
+
+if [[ -z "$REGENERATE" || "$REGENERATE" = *,features,* || "$REGENERATE" = *,all,* ]]; then
+    reply=( ); reply2="0"; reply3=( ); reply4=( )
+
+    __zcmdr_uizcm_features
+
+    features_output=( "${reply[@]}" )
+    features_size="$reply2"
+    features_nonselectables=( "${reply3[@]}" )
+    features_hops=( "${reply4[@]}" )
+fi
+
+#
 # Tree of project
 #
 
@@ -479,7 +499,7 @@ OUTPUT=( )
 LINE_COUNT=0
 anchors=( )
 
-for n in "header" "proj" "tree" "log" "modified"; do
+for n in "header" "proj" "tree" "log" "modified" "features"; do
     # Get output
     var_name="${n}_output"
     output=( "${(PA@)var_name}" )
@@ -548,6 +568,8 @@ for n in "header" "proj" "tree" "log" "modified"; do
         [[ -n "${hops[1]}" ]] && __zcmdr_stdlib_get_button "zcmdr_anchor_2" "${hops[1]}" "/Jump/" "" "$size" "${CMDR_GREEN}Modified${CMDR_GREEN_E}" ""
     elif [[ "$n" = "tree" ]]; then
         [[ -n "${hops[1]}" ]] && __zcmdr_stdlib_get_button "zcmdr_anchor_3" "${hops[1]}" "/Jump & Load/" "" "$size" "${CMDR_CYAN}Tree${CMDR_CYAN_E}" __zcmdr_internal_action_load_tree
+    elif [[ "$n" = "features" ]]; then
+        [[ -n "${hops[1]}" ]] && __zcmdr_stdlib_get_button "zcmdr_anchor_4" "${hops[1]}" "/Jump/" "" "$size" "${CMDR_CYAN}Features${CMDR_CYAN_E}"
     fi
     anchors+=( "${reply[@]}" )
 

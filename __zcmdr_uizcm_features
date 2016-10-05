@@ -1,0 +1,65 @@
+local -a features           # All features are globbed here
+local -a entries            # Feature files target read array
+local -a output             # Processed output
+local -a nonselectables     # To be appended, upon making indices global, to ZCMDRLIST_NONSELECTABLE_ELEMENTS
+local -a hop_indices        # To be appended, upon making indices global, to ZCMDRLIST_HOP_INDEXES
+integer own_LINE_COUNT=0    # Local line count
+
+# Start output: nonselectable HEADER
+output=( "${CMDR_RED}'Features of ${CMDR_RED_E}${CMDR_YELLOW}${(q)repo_root_dir:t}${CMDR_YELLOW_E}${CMDR_RED}'${CMDR_RED_E}" )
+own_LINE_COUNT+=1
+nonselectables+=( "$own_LINE_COUNT" )
+hop_indices+=( "$own_LINE_COUNT" )
+
+local features_path="$ZCMDR_CONFIG_DIR/var/features"
+[[ ! -d "$features_path" ]] && command mkdir -p "$features_path"
+
+features=( "${features_path}"/*.conf(Nom) )
+
+integer size=${#features[@]}
+integer idx
+local featp
+for (( idx = 1; idx <= size; idx ++ )); do
+    featp="${features[idx]}"
+    entries=( "${(@f)"$(<$featp)"}" )
+    [[ "${entries[2]}" != "$current_project" ]] && continue
+
+    reply=()
+
+    local feat_name="${featp:t:r}"
+    local txtentry="$feat_name"
+    txtentry="${txtentry//\%/%%}"
+    txtentry='%30<...<'"$txtentry"
+    txtentry="$ACC_GREEN${(%)txtentry}$ACC_GREEN_E"
+    txtentry="${(r:35:: :)txtentry}"
+
+    # Button function arguments:
+    # $1 - action ID
+    # $2 - data1, e.g. timestamp
+    # $3 - data2, e.g. command
+    # $4 - data3, e.g. active path
+    # $5 - data4, e.g. file path, file name, URL, other data
+    # $6 - text
+    # $7 - handler function name
+    if [ "$cd_at_edit" = "yes" ]; then
+        __zcmdr_stdlib_get_std_button "featA" "" "$selected_editor" "$repo_root_dir" "$name" "$txtentry" __zcmdr_action_feature_edit_cd
+        __zcmdr_stdlib_get_button "featB" "commits" "$selected_editor" "$repo_root_dir" "$name" "WithCommits" __zcmdr_action_feature_edit_cd
+    else
+        __zcmdr_stdlib_get_std_button "featA" "" "$selected_editor" "$repo_root_dir" "$name" "$txtentry" __zcmdr_action_feature_edit_abs
+        __zcmdr_stdlib_get_button "featB" "commits" "$selected_editor" "$repo_root_dir" "$name" "WithCommits" __zcmdr_action_feature_edit_abs
+    fi
+
+    __zcmdr_stdlib_get_button "featC" "" "/Diff/" "$repo_root_dir" "$name" "Diff" __zcmdr_action_feature_diff
+    __zcmdr_stdlib_get_button "featD" "" "/Files/" "$repo_root_dir" "$name" "ShowFiles" __zcmdr_action_feature_files
+    __zcmdr_stdlib_get_button "featE" "" "/Backup/" "$repo_root_dir" "$name" "Backup" __zcmdr_action_feature_backup
+
+    output+=( "${reply[1]} ${reply[2]} ${reply[3]} ${reply[4]}" )
+    own_LINE_COUNT+=1
+done
+
+reply=( "${output[@]}" )
+reply2="$own_LINE_COUNT"
+reply3=( "${nonselectables[@]}" )
+reply4=( "${hop_indices[@]}" )
+
+# vim:ft=zsh
