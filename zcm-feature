@@ -8,7 +8,7 @@ __zcmdr_usage_zcm_feature() {
     print -- "editor from e.g. \$EDITOR variable), CREATE feature from set of files"
     print -- "or from *commit*, UPDATE files of a feature and DELETE whole feature."
     print
-    print -- "${fg_bold[green]}Usage: zcm-feature [-q] [-v] {feature-name}${reset_color}"
+    print -- "${fg_bold[green]}Usage: zcm-feature [-q] [-v] [-x|--extract] [--[no]cd] {feature-name}${reset_color}"
     print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-l|--list} [project name, can be pattern]${reset_color}"
     print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-ll|-l -l} [project name, can be pattern]${reset_color}"
     print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-L} [feature name, can be pattern]${reset_color}"
@@ -21,6 +21,9 @@ __zcmdr_usage_zcm_feature() {
     print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-S|--set-commits} {feature-name} {commit SHA} [commit SHA] ...${reset_color}"
     print
     print -- "-h|--help                This message"
+    print -- "-e|--extract             Take files also from commits (for editing)"
+    print -- "--cd                     CD to project's dir before editing (overrides \"cd_at_edit\" Zstyle)"
+    print -- "--nocd                   Don't CD, use absolute paths (overrides \"cd_at_edit\" Zstyle)"
     print -- "-l/--list                List features of current or given project"
     print -- "-ll/-l -l                Long list – shows attached files and commits"
     print -- "-L                       Match and list features of all projects"
@@ -39,13 +42,17 @@ __zcmdr_usage_zcm_feature() {
 
 local -A opthash
 local -a optarr
-zparseopts -D -A opthash l+=optarr -list L+=optarr c -create C -create-from-commits a -add d -delete D -delete-feature S -set-commits q -quiet v -verbose h -help || { __zcmdr_usage_zcm; return 1; }
+zparseopts -D -A opthash x -extract -cd -nocd l+=optarr -list L+=optarr c -create C -create-from-commits a -add d -delete D -delete-feature S -set-commits q -quiet v -verbose h -help || { __zcmdr_usage_zcm; return 1; }
 
 integer list=0 LIST=0 create=0 create_from_commits=0 add=0 delete=0 delete_feature=0 set_commits=0 quiet=0 verbose=0
+integer extract=0 cdopt=0 nocdopt=0
 
 # Help
 (( ${+opthash[-h]} + ${+opthash[--help]} )) && { __zcmdr_usage_zcm_feature; return 0; }
 
+(( extract = ${+opthash[-x]} + ${+opthash[--extract]} ))
+(( cdopt = ${+opthash[--cd]} ))
+(( nocdopt = ${+opthash[--nocd]} ))
 (( list = ${+opthash[-l]} + ${+opthash[--list]} ))
 (( LIST = ${+opthash[-L]} ))
 (( create = ${+opthash[-c]} + ${+opthash[--create]} ))
@@ -82,6 +89,9 @@ local selected_editor cd_at_edit editor_use_tabs
 zstyle -s ":plugin:zcommodore" editor selected_editor || selected_editor="${EDITOR:-vim}"
 zstyle -b ":plugin:zcommodore" cd_at_edit cd_at_edit || cd_at_edit="yes"
 zstyle -b ":plugin:zcommodore" editor_use_tabs editor_use_tabs || editor_use_tabs="yes"
+
+(( cdopt )) && cd_at_edit="yes"
+(( nocdopt )) && cd_at_edit="no"
 
 local nprojects
 zstyle -s ":plugin:zcommodore" nprojects nprojects || nprojects="7"
@@ -723,22 +733,23 @@ if (( list + LIST + create + create_from_commits + add + delete + delete_feature
     if [[ "${entries[2]}" != "$project_line" ]]; then
         print "${fg_bold[red]}Warning: editing not current project \`${entries[2]:t:r}'${reset_color}"
         project_line="${entries[2]}"
+        root_dir=""
 
-        if ! __zcmdr_find_repo_path_in_recents "$project_line"; then
-            print "Could not find repository of project \`${entries[2]:t:r}\' because"
-            print "the project is not remembered in recent-projects database."
-            print "Cannot use feature's commits, will only open feature's files."
-            print "Proceed? [y/n]"
-            local answer="n"
-            read -qs answer
-            if [[ "$answer" = "n" ]]; then
-                echo "Aborting."
-                return 22
+        if (( extract )); then
+            if ! __zcmdr_find_repo_path_in_recents "$project_line"; then
+                print "Could not find repository of project \`${entries[2]:t:r}\' because"
+                print "the project is not remembered in recent-projects database."
+                print "Cannot use feature's commits, will only open feature's files."
+                print "Proceed? [y/n]"
+                local answer="n"
+                read -qs answer
+                if [[ "$answer" = "n" ]]; then
+                    echo "Aborting."
+                    return 22
+                fi
+            else
+                root_dir="$REPLY"
             fi
-
-            root_dir=""
-        else
-            root_dir="$REPLY"
         fi
     fi
 
@@ -772,7 +783,7 @@ if (( list + LIST + create + create_from_commits + add + delete + delete_feature
     commits=( "${(Q)commits[@]}" )
 
     if [[ -n "${commits[1]}" ]]; then
-        if [[ -z "$root_dir" || ! -d "$root_dir" || ( ! -d "$root_dir"/.git && ! -d "$root_dir"/.hg ) ]]; then
+        if [[ "$extract" -eq "0" || -z "$root_dir" || ! -d "$root_dir" || ( ! -d "$root_dir"/.git && ! -d "$root_dir"/.hg ) ]]; then
             if [[ -n "$root_dir" ]]; then
                 print "${fg_bold[red]}Warning: feature has commits but project's dir isn't a Git nor Hg repository${reset_color}"
             fi
