@@ -9,7 +9,8 @@ __zcmdr_usage_zcm_feature() {
     print -- "or from *commit*, UPDATE files of a feature and DELETE whole feature."
     print
     print -- "${fg_bold[green]}Usage: zcm-feature [-q] [-v] {feature-name}${reset_color}"
-    print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-l|--list} [project name]${reset_color}"
+    print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-l|--list} [project name, can be pattern]${reset_color}"
+    print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-ll|-l -l} [project name, can be pattern]${reset_color}"
     print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-c|--create} {feature-name} {file1} {file2} ...${reset_color}"
     print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-C|--create-from-commits} {feature-name} {file1} {file2} ...${reset_color}"
     print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-a|--add} {feature-name} {file1} {file2} ...${reset_color}"
@@ -18,7 +19,8 @@ __zcmdr_usage_zcm_feature() {
     print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-S|--set-commits} {feature-name} {commit SHA} [commit SHA] ...${reset_color}"
     print
     print -- "-h|--help                This message"
-    print -- "-l/--list                List features of current project and allow selection (for editing)"
+    print -- "-l/--list                List features of current or given project"
+    print -- "-ll/-l -l                Long list – shows attached files and commits"
     print -- "-c/--create              Create new feature from supplied files"
     print -- "-C/--create-from-commits Create new feature from files of given commits, attach the commits"
     print -- "-a/--add                 Add given files to given feature"
