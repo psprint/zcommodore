@@ -584,6 +584,7 @@ if (( set_commits )); then
     entries=( "${(@f)"$(<$feature_file)"}" )
 
     local project_line="${ZCMDR[current_project]}"
+    local root_dir="${ZCMDR[current_repo]}"
 
     if [[ "${entries[2]}" != "$project_line" ]]; then
         print "The feature \`$feature' belongs to project: ${fg_bold[green]}\`${entries[2]:t:r}'${reset_color}. Proceed with update? [y/n]"
@@ -594,16 +595,24 @@ if (( set_commits )); then
             return 18
         else
             project_line="${entries[2]}"
+            if ! __zcmdr_find_repo_path_in_recents "$project_line"; then
+                print "Could not find repository of project \`${entries[2]:t:r}\' because"
+                print "the project is not remembered in recent-projects database."
+                print "Will perform without commit verification."
+                root_dir=""
+            else
+                root_dir="$REPLY"
+            fi
         fi
     fi
-
-    local root_dir="${ZCMDR[current_repo]}"
-    [[ ! -d "$root_dir" ]] && { print "Repository dir doesn't exist or isn't directory (\`$root_dir')"; return 19; }
 
     local -a revision
     local cmt
     integer error=0
-    if [[ -d "$root_dir"/.git ]]; then
+    if [[ -z "$root_dir" ]]; then
+        # No-op, no commit verification
+        :
+    elif [[ -d "$root_dir"/.git ]]; then
         for cmt in "${commits[@]}"; do
             revision=( ${(f)"$( git -C "$root_dir" rev-parse --verify "${cmt}^{commit}" 2>/dev/null )"} )
             if [[ "${#revision}" = "0" ]]; then
