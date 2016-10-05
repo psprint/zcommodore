@@ -709,7 +709,7 @@ if (( list + create + create_from_commits + add + delete + delete_feature + set_
             files+=( "${save_files[@]}" )
 
             if (( error > 0 )); then
-                print "${fg_bold[red]}$error commit(s) not found"
+                print "${fg_bold[red]}$error commit(s) not found${reset_color}"
             fi
         fi
     fi
