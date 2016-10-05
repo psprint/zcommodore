@@ -42,8 +42,8 @@ for (( idx = 1; idx <= size; idx ++ )); do
     # $6 - text
     # $7 - handler function name
     if [ "$cd_at_edit" = "yes" ]; then
-        __zcmdr_stdlib_get_std_button "featA" "" "$selected_editor" "$repo_root_dir" "$name" "$txtentry" __zcmdr_action_feature_edit_cd
-        __zcmdr_stdlib_get_button "featB" "commits" "$selected_editor" "$repo_root_dir" "$name" "WithCommits" __zcmdr_action_feature_edit_cd
+        __zcmdr_stdlib_get_std_button "featA" "" "$selected_editor" "$repo_root_dir" "$feat_name" "$txtentry" __zcmdr_action_feature_edit_cd
+        __zcmdr_stdlib_get_button "featB" "commits" "$selected_editor" "$repo_root_dir" "$feat_name" "WithCommits" __zcmdr_action_feature_edit_cd
     else
         __zcmdr_stdlib_get_std_button "featA" "" "$selected_editor" "$repo_root_dir" "$name" "$txtentry" __zcmdr_action_feature_edit_abs
         __zcmdr_stdlib_get_button "featB" "commits" "$selected_editor" "$repo_root_dir" "$name" "WithCommits" __zcmdr_action_feature_edit_abs

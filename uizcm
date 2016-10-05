@@ -118,6 +118,16 @@ __zcmdr_action_zconvey_zcmdr_g() {
     fi
 }
 
+__zcmdr_action_feature_edit_cd() {
+    local id="$1" opt="$2" cmd="$3" repo_path="$4" feat_name="$5"
+
+    if [[ "$opt" = "commits" ]]; then
+        __zcmdr_stdlib_to_cmd_line "zcm-feature --cd -x ${(q)feat_name}"
+    else
+        __zcmdr_stdlib_to_cmd_line "zcm-feature --cd ${(q)feat_name}"
+    fi
+}
+
 # Hg actions
 
 __zcmdr_action_hg_diff() {
