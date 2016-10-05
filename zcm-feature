@@ -710,12 +710,12 @@ if (( list + create + create_from_commits + add + delete + delete_feature + set_
     commits=( "${(Q)commits[@]}" )
 
     if [[ -n "${commits[1]}" ]]; then
-        local -aU save_files
         if [[ -z "$root_dir" || ! -d "$root_dir" || ( ! -d "$root_dir"/.git && ! -d "$root_dir"/.hg ) ]]; then
             if [[ -n "$root_dir" ]]; then
                 print "${fg_bold[red]}Warning: feature has commits but project's dir isn't a Git nor Hg repository${reset_color}"
             fi
         else
+            local -aU save_files
             local cmt
             local -a files2
             integer error=0
