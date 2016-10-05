@@ -700,7 +700,7 @@ if (( set_commits )); then
     return 0
 fi
 
-if (( list + create + create_from_commits + add + delete + delete_feature + set_commits == 0 )); then
+if (( list + LIST + create + create_from_commits + add + delete + delete_feature + set_commits == 0 )); then
     if [[ "$#" != "1" ]]; then
         print "Exactly 1 arguments is needed – a feature to edit"
         return 21
