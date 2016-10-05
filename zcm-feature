@@ -694,7 +694,7 @@ if (( list + create + create_from_commits + add + delete + delete_feature + set_
     # Direct files of the feature
     #
 
-    local -a files
+    local -aU files
     files=( "${(z@)entries[3]}" )
     # z-flag can do tricks IIRC
     if [[ -z "${files[1]}" ]]; then
