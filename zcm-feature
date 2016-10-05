@@ -66,6 +66,16 @@ local features_path="$ZCMDR_CONFIG_DIR/var/features"
 [[ ! -d "$features_path" ]] && command mkdir -p "$features_path"
 integer retcode
 
+local selected_editor cd_at_edit editor_use_tabs
+zstyle -s ":plugin:zcommodore" editor selected_editor || selected_editor="${EDITOR:-vim}"
+zstyle -b ":plugin:zcommodore" cd_at_edit cd_at_edit || cd_at_edit="yes"
+zstyle -b ":plugin:zcommodore" editor_use_tabs editor_use_tabs || editor_use_tabs="yes"
+
+local nprojects
+zstyle -s ":plugin:zcommodore" nprojects nprojects || nprojects="7"
+[[ "$nprojects" != <-> ]] && nprojects="7"
+[[ "$nprojects" = "0" ]] && nprojects="1"
+
 #
 # Functions
 #
@@ -713,15 +723,6 @@ if (( list + create + create_from_commits + add + delete + delete_feature + set_
             fi
         fi
     fi
-
-    #
-    # Configuration of editing
-    #
-
-    local selected_editor cd_at_edit editor_use_tabs
-    zstyle -s ":plugin:zcommodore" editor selected_editor || selected_editor="${EDITOR:-vim}"
-    zstyle -b ":plugin:zcommodore" cd_at_edit cd_at_edit || cd_at_edit="yes"
-    zstyle -b ":plugin:zcommodore" editor_use_tabs editor_use_tabs || editor_use_tabs="yes"
 
     #
     # Paths and editing
