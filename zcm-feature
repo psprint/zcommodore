@@ -733,7 +733,7 @@ if (( list + create + create_from_commits + add + delete + delete_feature + set_
         files=( "${files[@]/(#b)(#s)([^\/]*)/${project_line}/${match[1]}}" )
     fi
 
-    [[ "$cd_at_edit" = "yes" ]] && cd "$project_line"
+    [[ "$cd_at_edit" = "yes" && "$project_line" != "$PWD" ]] && cd "$project_line"
     "$selected_editor" -p "${files[@]}"
 fi
 
