@@ -1,5 +1,9 @@
 local main_tree_path="$ZCMDR_CONFIG_DIR/tree.$$"
 
+# A guard for having no project selected
+# This should be also handled elsewhere
+[[ -z "$current_project" ]] && return 0
+
 echo >! "$main_tree_path".busy
 command rm -f "$main_tree_path".ready
 

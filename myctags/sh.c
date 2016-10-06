@@ -86,7 +86,7 @@ static int appendNewName( vString *names[], int current_size ) {
 
 static void findShTags (void) {
     vString * names[ MAX_NAMES + 1 ] = { 0 };
-    int nidx = 0;
+    int nidx = 0, i;
     const unsigned char *line;
 
     while ((line = fileReadLine ()) != NULL)
@@ -278,11 +278,11 @@ static void findShTags (void) {
 
         // Function found?
         if ( functionFound ) {
-            for ( int i = 0; i < nidx; ++ i )
+            for ( i = 0; i < nidx; ++ i )
                 makeSimpleTag( names[ i ], ShKinds, K_FUNCTION );
         }
         if ( localVariableFound ) {
-            for ( int i = 0; i < nidx; ++ i )
+            for ( i = 0; i < nidx; ++ i )
                 makeSimpleTag( names[ i ], ShKinds, K_VARIABLE );
         }
 
