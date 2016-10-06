@@ -847,7 +847,7 @@ if (( list + LIST + create + create_from_commits + add + delete + delete_feature
     local -a opts
     case "$selected_editor" in
         (vim|gvim|mvim|nvim)
-            [[ "$editor_use_tabs" ]] && opts+=( "-p" )
+            [[ "$editor_use_tabs" = "yes" ]] && opts+=( "-p" )
             ;;
         (emacs|emacsclient)
             ;;
