@@ -281,6 +281,18 @@ function __zcmdr_stdlib_circular_paths() {
     reply=( "$circpath"/"$base".[[:digit:]]##(omN) )
 }
 
+function __zcmdr_stdlib_filter_diff() {
+    local line
+    while read line; do
+        if [[ "$line" != (#s)($'\033'[^m]#m)#(diff|index|---|+++)* ]]; then
+            print -r -- "$line"
+        else
+            if [[ "$line" = (#b)(#s)($'\033'[^m]#m)#+++[[:space:]]b/(*) ]]; then
+                print -r -- "${fg_bold[magenta]}FILE: ${match[2]}${reset_color}"
+            fi
+        fi
+    done
+}
 ZCMDR[stdlib_sourced]="1"
 
 # vim:ft=zsh
