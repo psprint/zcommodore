@@ -138,6 +138,12 @@ __zcmdr_action_feature_edit_abs() {
     fi
 }
 
+__zcmdr_action_feature_diff() {
+    local id="$1" opt="$2" cmd="$3" repo_path="$4" feat_name="$5"
+
+    __zcmdr_stdlib_to_cmd_line "zcm-feature --diff ${(q)feat_name}"
+}
+
 # Hg actions
 
 __zcmdr_action_hg_diff() {

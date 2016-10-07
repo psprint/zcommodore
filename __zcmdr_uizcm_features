@@ -49,7 +49,7 @@ for (( idx = 1; idx <= size; idx ++ )); do
         __zcmdr_stdlib_get_button "featB" "commits" "$selected_editor" "$repo_root_dir" "$feat_name" "WithCommits" __zcmdr_action_feature_edit_abs
     fi
 
-    __zcmdr_stdlib_get_button "featC" "" "/Diff/" "$repo_root_dir" "$name" "Diff" __zcmdr_action_feature_diff
+    __zcmdr_stdlib_get_button "featC" "" "/Diff/" "$repo_root_dir" "$feat_name" "Diff" __zcmdr_action_feature_diff
     __zcmdr_stdlib_get_button "featD" "" "/Files/" "$repo_root_dir" "$name" "ShowFiles" __zcmdr_action_feature_files
     __zcmdr_stdlib_get_button "featE" "" "/Backup/" "$repo_root_dir" "$name" "Backup" __zcmdr_action_feature_backup
 
