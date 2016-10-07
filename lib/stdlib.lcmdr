@@ -98,7 +98,7 @@ function __zcmdr_stdlib_to_cmd_line() {
 # $REPLY - date and time string "Y_m_d_H.M.S"
 #
 function __zcmdr_stdlib_get_date_and_time_string() {
-    REPLY=$( date +%Y_%m_%d_%H.%M.%S )
+    REPLY=$( date +%Y%m%d_%H.%M.%S )
 }
 
 # Decodes given hyperlink and returns data contained. Testable
