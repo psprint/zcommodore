@@ -287,8 +287,13 @@ function __zcmdr_stdlib_filter_diff() {
         if [[ "$line" != (#s)($'\033'[^m]#m)#(diff|index|---|+++)* ]]; then
             print -r -- "$line"
         else
-            if [[ "$line" = (#b)(#s)($'\033'[^m]#m)#+++[[:space:]]b/(*) ]]; then
+            if [[ "$line" = (#b)(#s)($'\033'[^m]#m)#+++[[:space:]]b/(*)$'\033'* ]]; then
+                integer len="${#match[2]}"
+                local hr=""
+                hr="${(l:len+6::-:)hr}"
+                print -r -- "${fg_bold[magenta]}$hr${reset_color}"
                 print -r -- "${fg_bold[magenta]}FILE: ${match[2]}${reset_color}"
+                print -r -- "${fg_bold[magenta]}$hr${reset_color}"
             fi
         fi
     done
