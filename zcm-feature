@@ -31,8 +31,8 @@ __zcmdr_usage_zcm_feature() {
     print -- "-c/--create              Create new feature from supplied files"
     print -- "-C/--create-from-commits Create new feature from files of given commits, attach the commits"
     print -- "-a/--add                 Add given files to given feature"
-    print -- "-d/--delete              Delte given files from given feature"
-    print -- "-D/--delete-feature      Forget given feature"
+    print -- "-y/--delete              Delete given files from given feature"
+    print -- "-Y/--delete-feature      Forget given feature"
     print -- "-S/--set-commits         Attach given commits to given feature, replacing previous ones"
     print
     print -- "-q/--quiet      Operate without outputting messages"
