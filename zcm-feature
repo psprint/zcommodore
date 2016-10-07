@@ -16,8 +16,8 @@ __zcmdr_usage_zcm_feature() {
     print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-c|--create} {feature-name} {file1} {file2} ...${reset_color}"
     print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-C|--create-from-commits} {feature-name} {file1} {file2} ...${reset_color}"
     print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-a|--add} {feature-name} {file1} {file2} ...${reset_color}"
-    print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-d|--delete} {feature-name} {file1} {file2} ...${reset_color}"
-    print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-D|--delete-feature} {feature-name}${reset_color}"
+    print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-y|--delete} {feature-name} {file1} {file2} ...${reset_color}"
+    print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-Y|--delete-feature} {feature-name}${reset_color}"
     print -- "${fg_bold[green]}       zcm-feature [-q] [-v] {-S|--set-commits} {feature-name} {commit SHA} [commit SHA] ...${reset_color}"
     print
     print -- "-h|--help                This message"
@@ -42,7 +42,7 @@ __zcmdr_usage_zcm_feature() {
 
 local -A opthash
 local -a optarr
-zparseopts -D -A opthash x -extract -cd -nocd l+=optarr -list L+=optarr c -create C -create-from-commits a -add d -delete D -delete-feature S -set-commits q -quiet v -verbose h -help || { __zcmdr_usage_zcm; return 1; }
+zparseopts -D -A opthash x -extract -cd -nocd l+=optarr -list L+=optarr c -create C -create-from-commits a -add y -delete Y -delete-feature S -set-commits q -quiet v -verbose h -help || { __zcmdr_usage_zcm; return 1; }
 
 integer list=0 LIST=0 create=0 create_from_commits=0 add=0 delete=0 delete_feature=0 set_commits=0 quiet=0 verbose=0
 integer extract=0 cdopt=0 nocdopt=0
@@ -58,8 +58,8 @@ integer extract=0 cdopt=0 nocdopt=0
 (( create = ${+opthash[-c]} + ${+opthash[--create]} ))
 (( create_from_commits = ${+opthash[-C]} + ${+opthash[--create-from-commits]} ))
 (( add = ${+opthash[-a]} + ${+opthash[--add]} ))
-(( delete = ${+opthash[-d]} + ${+opthash[--delete]} ))
-(( delete_feature = ${+opthash[-D]} + ${+opthash[--delete-feature]} ))
+(( delete = ${+opthash[-y]} + ${+opthash[--delete]} ))
+(( delete_feature = ${+opthash[-Y]} + ${+opthash[--delete-feature]} ))
 (( set_commits = ${+opthash[-S]} + ${+opthash[--set-commits]} ))
 (( quiet = ${+opthash[-q]} + ${+opthash[--quiet]} ))
 (( verbose = ${+opthash[-v]} + ${+opthash[--verbose]} ))
