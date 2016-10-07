@@ -20,6 +20,7 @@ __zcmdr_usage_zcm_feature() {
     print -- "${fg_bold[green]}       zcm-feature {-Y|--delete-feature} {feature-name}${reset_color}"
     print -- "${fg_bold[green]}       zcm-feature {-S|--set-commits} {feature-name} {commit SHA} [commit SHA] ...${reset_color}"
     print -- "${fg_bold[green]}       zcm-feature {-d|--diff} {feature-name}${reset_color}"
+    print -- "${fg_bold[green]}       zcm-feature {-f|--files} {feature-name}${reset_color}"
     print
     print -- "-h|--help                This message"
     print -- "-e|--extract             Take files also from commits (for editing)"
@@ -36,6 +37,7 @@ __zcmdr_usage_zcm_feature() {
     print -- "-Y/--delete-feature      Forget given feature (delete)"
     print -- "-S/--set-commits         Attach given commits to given feature, replacing previous ones"
     print -- "-d/--diff                Show contents of commits of given features (diffs)"
+    print -- "-f/--files               Show files attached via commits"
     print
     print -- "-q/--quiet      Operate without outputting messages"
     print -- "-v/--verbose    Print more status messages"
@@ -44,9 +46,9 @@ __zcmdr_usage_zcm_feature() {
 
 local -A opthash
 local -a optarr
-zparseopts -D -A opthash x -extract -cd -nocd l+=optarr -list L+=optarr c -create C -create-from-commits a -add y -delete Y -delete-feature S -set-commits d -diff q -quiet v -verbose h -help || { __zcmdr_usage_zcm; return 1; }
+zparseopts -D -A opthash x -extract -cd -nocd l+=optarr -list L+=optarr c -create C -create-from-commits a -add y -delete Y -delete-feature S -set-commits d -diff f -files q -quiet v -verbose h -help || { __zcmdr_usage_zcm; return 1; }
 
-integer list=0 LIST=0 create=0 create_from_commits=0 add=0 delete=0 delete_feature=0 set_commits=0 diff quiet=0 verbose=0
+integer list=0 LIST=0 create=0 create_from_commits=0 add=0 delete=0 delete_feature=0 set_commits=0 diff=0 files=0 quiet=0 verbose=0
 integer extract=0 cdopt=0 nocdopt=0
 
 # Help
@@ -64,10 +66,11 @@ integer extract=0 cdopt=0 nocdopt=0
 (( delete_feature = ${+opthash[-Y]} + ${+opthash[--delete-feature]} ))
 (( set_commits = ${+opthash[-S]} + ${+opthash[--set-commits]} ))
 (( diff = ${+opthash[-d]} + ${+opthash[--diff]} ))
+(( files = ${+opthash[-f]} + ${+opthash[--files]} ))
 (( quiet = ${+opthash[-q]} + ${+opthash[--quiet]} ))
 (( verbose = ${+opthash[-v]} + ${+opthash[--verbose]} ))
 
-if (( LIST + list + create + create_from_commits + add + delete + delete_feature + set_commits + diff > 1 )); then
+if (( LIST + list + create + create_from_commits + add + delete + delete_feature + set_commits + diff + files > 1 )); then
     print "Conflicting options given, please use single operation specifier (like -c, -C, -a, etc.)"
     return 2
 fi
@@ -806,7 +809,116 @@ if (( diff )); then
     fi
 fi
 
-if (( list + LIST + create + create_from_commits + add + delete + delete_feature + set_commits + diff == 0 )); then
+if (( files )); then
+    if [[ "$#" -ne "1" ]]; then
+        print "Exactly 1 argument is needed – a feature name commits of which will have files listed"
+        return 21
+    fi
+
+    local feature="$1"
+    shift
+
+    __zcmdr_verify_feature "$feature" "must_exist"
+    retcode=$?
+    (( retcode )) && return $retcode
+
+    local feature_file="${features_path}/${feature}.conf"
+    local -a entries
+    entries=( "${(@f)"$(<$feature_file)"}" )
+
+    local project_line="${ZCMDR[current_project]}"
+    local root_dir="${ZCMDR[current_repo]}"
+
+    if [[ "${entries[2]}" != "$project_line" ]]; then
+        print "${fg_bold[red]}Warning: editing not current project \`${entries[2]:t:r}'${reset_color}"
+        project_line="${entries[2]}"
+        root_dir=""
+
+        if ! __zcmdr_find_repo_path_in_recents "$project_line"; then
+            print "Could not find repository of project \`${entries[2]:t:r}\' because"
+            print "the project is not remembered in recent-projects database."
+            print "Cannot read feature's commits (to list files), aborting.."
+            return 28
+        else
+            root_dir="$REPLY"
+        fi
+    fi
+
+    local -A commit_to_files_txt
+
+    #
+    # From-commit files of the feature
+    #
+
+    local -a commits
+    commits=( "${(z@)entries[4]}" )
+    if [[ -z "${commits[1]}" ]]; then
+        commits=( )
+    else
+        shift commits
+    fi
+
+    commits=( "${(Q)commits[@]}" )
+
+    if [[ -n "${commits[1]}" ]]; then
+        if [[ -z "$root_dir" || ! -d "$root_dir" || ( ! -d "$root_dir"/.git && ! -d "$root_dir"/.hg ) ]]; then
+            print "${fg_bold[red]}Error: feature has commits but project's dir isn't a Git nor Hg repository, aborting..${reset_color}"
+            return 29
+        else
+            local cmt
+            local -a files
+            integer error=0
+            if [[ -d "$root_dir"/.git ]]; then
+                for cmt in "${commits[@]}"; do
+                    files=( ${(f)"$( git -C "$root_dir" rev-parse --verify "${cmt}^{commit}" 2>/dev/null )"} )
+                    if [[ "${#files[@]}" = "0" ]]; then
+                        print "${fg_bold[red]}Commit $cmt doesn't exist${reset_color}"
+                        error+=1
+                        continue
+                    fi
+                    # Get list of files (3 steps) of the commit
+                    files=( ${(f)"$( git -C "$root_dir" show --name-status --no-renames "$cmt" )"} )
+                    files=( "${(@M)files:#((#s)[ADM][ADM]#[[:space:]]##*|(#s)[ ][ADM][[:space:]]##*)}" )
+                    files=( "${files[@]/(#b)(#s)[[:alpha:]]##[[:space:]]##(*)(#e)/${match[1]}}" )
+
+                    commit_to_files_txt[$cmt]+="${(F)files[@]}"$'\n'
+                done
+            elif [[ -d "$root_dir"/.hg ]]; then
+                for cmt in "${commits[@]}"; do
+                    files=( ${(f)"$( hg --cwd "$root_dir" log -r "${cmt}" -T {node}\\n 2>/dev/null )"} )
+                    if [[ "${#files[@]}" = "0" ]]; then
+                        print "${fg_bold[red]}Commit $cmt (Hg) doesn't exist${reset_color}"
+                        error+=1
+                        continue
+                    fi
+                    # Get list of files of the commit
+                    files=( ${(f)"$( hg --cwd "$root_dir" log -r "$cmt" -T {files}\\n )"} )
+
+                    commit_to_files_txt[$cmt]+="${(F)files[@]}"$'\n'
+                done
+            fi
+
+
+            if (( error > 0 )); then
+                print "${fg_bold[red]}$error commit(s) not found${reset_color}"
+            fi
+        fi
+    else
+        print "The feature \`$feature' doesn't have assigned commits, no files to show"
+        return 30
+    fi
+
+    (( quiet )) || print "Files in commits of feature \`${fg_bold[magenta]}$feature${reset_color}':"
+    print
+    for cmt in "${(k)commit_to_files_txt[@]}"; do
+        print -- "Commit: ${fg_bold[green]}$cmt${reset_color}, files follow:"
+        print -- "⇒  $commit_to_files_txt[$cmt]"
+    done
+
+    return 0
+fi
+
+if (( list + LIST + create + create_from_commits + add + delete + delete_feature + set_commits + diff + files == 0 )); then
     if [[ "$#" != "1" ]]; then
         print "Exactly 1 arguments is needed – a feature to edit"
         return 21
