@@ -909,9 +909,9 @@ if (( files )); then
     fi
 
     (( quiet )) || print "Files in commits of feature \`${fg_bold[magenta]}$feature${reset_color}':"
-    print
+    (( quiet )) || print
     for cmt in "${(k)commit_to_files_txt[@]}"; do
-        print -- "Commit: ${fg_bold[green]}$cmt${reset_color}, files follow:"
+        print -- "Commit: ${fg_bold[green]}$cmt${reset_color}, files:"
         print -- "⇒  $commit_to_files_txt[$cmt]"
     done
 
