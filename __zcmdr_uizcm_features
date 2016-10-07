@@ -67,7 +67,7 @@ for (( idx = 1; idx <= size; idx ++ )); do
     fi
 
     __zcmdr_stdlib_get_button "featD" "" "/Files/" "$repo_root_dir" "$feat_name" "ShowFiles" __zcmdr_action_feature_files
-    __zcmdr_stdlib_get_button "featE" "" "/Backup/" "$repo_root_dir" "$name" "Backup" __zcmdr_action_feature_backup
+    __zcmdr_stdlib_get_button "featE" "" "/Backup/" "$repo_root_dir" "$feat_name" "Backup" __zcmdr_action_feature_backup
 
     output+=( "${reply[*]}" )
     own_LINE_COUNT+=1

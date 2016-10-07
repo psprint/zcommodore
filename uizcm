@@ -150,6 +150,12 @@ __zcmdr_action_feature_files() {
     __zcmdr_stdlib_to_cmd_line "zcm-feature -LL ${(q)feat_name}; zcm-feature -qf ${(q)feat_name}"
 }
 
+__zcmdr_action_feature_backup() {
+    local id="$1" opt="$2" cmd="$3" repo_path="$4" feat_name="$5"
+
+    __zcmdr_stdlib_to_cmd_line "zcm-feature -bx ${(q)feat_name}"
+}
+
 # Hg actions
 
 __zcmdr_action_hg_diff() {
