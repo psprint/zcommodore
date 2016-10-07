@@ -172,6 +172,11 @@ __zcmdr_find_repo_path_in_recents() {
 #
 
 if (( list )); then
+    if [[ "$#" -ne "1" ]]; then
+        print "Exactly 1 argument is needed – a ${fg_bold[cyan]}project name${reset_color} (can be a pattern, which should be quoted)"
+        return 31
+    fi
+
     local project_query="$1"
     if [[ -n "$project_query" ]]; then
         if [[ "$project_query" = "*" ]]; then
@@ -222,6 +227,11 @@ if (( list )); then
         return 0
     fi
 elif (( LIST )); then
+    if [[ "$#" -ne "1" ]]; then
+        print "Exactly 1 argument is needed – a ${fg_bold[magenta]}feature name${reset_color} (can be a pattern, which should be quoted)"
+        return 32
+    fi
+
     local feature_query="$1"
     if [[ -n "$feature_query" ]]; then
         if [[ "$feature_query" = "*" ]]; then
