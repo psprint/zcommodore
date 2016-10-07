@@ -164,8 +164,17 @@ cmdr_same_files() {
     fi
 }
 
+cmdr_git_filtered_diffs_for() {
+    if [[ "$#" -lt 2 ]]; then
+        echo "At least two arguments needed, repository path and commit(s)"
+        return 1
+    fi
 
+    local repo="$1"
+    shift
 
+    git -C "$repo" show --format=oneline --abbrev-commit --word-diff=color -p "$@" -- | __zcmdr_stdlib_filter_diff | ${PAGER:-less}
+}
 
 ZCMDR[cmdline_sourced]="1"
 
