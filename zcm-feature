@@ -254,7 +254,7 @@ if (( list + LIST )); then
         project_name="${project_name:t:r}"
 
         if [[ -n "$project_query" || -n "$feature_query" ]]; then
-            print -- " (${fg_bold[red]}$project_name${reset_color})"
+            print -- " (${fg_bold[cyan]}$project_name${reset_color})"
         else
             print
         fi
