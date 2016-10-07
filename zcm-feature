@@ -175,9 +175,12 @@ if (( list )); then
     local project_query="$1"
     if [[ -n "$project_query" ]]; then
         if [[ "$project_query" = "*" ]]; then
-            print "Current project: ${fg_bold[green]}${ZCMDR[current_project]:t:r}${reset_color}, features of projects \`*' follow:"
+            print "Current project: ${fg_bold[green]}${ZCMDR[current_project]:t:r}${reset_color}, features of projects \`${fg_bold[cyan]}*${reset_color}' follow:"
         else
-            print "Current project: ${fg_bold[green]}${ZCMDR[current_project]:t:r}${reset_color}, features of projects *${project_query}* follow:"
+            local query="*$project_query*"
+            query="${query//\*\*/*}"
+            query="${query//\*\*/*}"
+            print "Current project: ${fg_bold[green]}${ZCMDR[current_project]:t:r}${reset_color}, features of projects \`${fg_bold[cyan]}*${project_query}*${reset_color}' follow:"
         fi
     else
         print "Current project: ${fg_bold[green]}${ZCMDR[current_project]:t:r}${reset_color}, features follow:"
@@ -204,7 +207,18 @@ if (( list )); then
     done
 
     if [[ -z "${found[1]}" ]]; then
-        print "Project ${fg_bold[green]}${ZCMDR[current_project]}${reset_color} doesn't have features defined"
+        if [[ -n "$project_query" ]]; then
+            if [[ "$project_query" = "*" ]]; then
+                print "No project names matched \`${fg_bold[cyan]}*${reset_color}'"
+            else
+                local query="*$project_query*"
+                query="${query//\*\*/*}"
+                query="${query//\*\*/*}"
+                print "No project names matched \`${fg_bold[cyan]}$query${reset_color}'"
+            fi
+        else
+            print "Project ${fg_bold[green]}${ZCMDR[current_project]}${reset_color} doesn't have features defined"
+        fi
         return 0
     fi
 elif (( LIST )); then
@@ -904,7 +918,7 @@ if (( files )); then
             fi
         fi
     else
-        print "The feature \`$feature' doesn't have assigned commits, no files to show"
+        print "The feature \`${fg_bold[magenta]}$feature${reset_color}' doesn't have assigned commits, no files to show"
         return 30
     fi
 
