@@ -19,6 +19,7 @@ __zcmdr_usage_zcm_feature() {
     print -- "${fg_bold[green]}       zcm-feature {-y|--delete} {feature-name} {file1} {file2} ...${reset_color}"
     print -- "${fg_bold[green]}       zcm-feature {-Y|--delete-feature} {feature-name}${reset_color}"
     print -- "${fg_bold[green]}       zcm-feature {-S|--set-commits} {feature-name} {commit SHA} [commit SHA] ...${reset_color}"
+    print -- "${fg_bold[green]}       zcm-feature {-d|--diff} {feature-name}${reset_color}"
     print
     print -- "-h|--help                This message"
     print -- "-e|--extract             Take files also from commits (for editing)"
@@ -32,8 +33,9 @@ __zcmdr_usage_zcm_feature() {
     print -- "-C/--create-from-commits Create new feature from files of given commits, attach the commits"
     print -- "-a/--add                 Add given files to given feature"
     print -- "-y/--delete              Delete given files from given feature"
-    print -- "-Y/--delete-feature      Forget given feature"
+    print -- "-Y/--delete-feature      Forget given feature (delete)"
     print -- "-S/--set-commits         Attach given commits to given feature, replacing previous ones"
+    print -- "-d/--diff                Show contents of commits of given features (diffs)"
     print
     print -- "-q/--quiet      Operate without outputting messages"
     print -- "-v/--verbose    Print more status messages"
@@ -42,9 +44,9 @@ __zcmdr_usage_zcm_feature() {
 
 local -A opthash
 local -a optarr
-zparseopts -D -A opthash x -extract -cd -nocd l+=optarr -list L+=optarr c -create C -create-from-commits a -add y -delete Y -delete-feature S -set-commits q -quiet v -verbose h -help || { __zcmdr_usage_zcm; return 1; }
+zparseopts -D -A opthash x -extract -cd -nocd l+=optarr -list L+=optarr c -create C -create-from-commits a -add y -delete Y -delete-feature S -set-commits d -diff q -quiet v -verbose h -help || { __zcmdr_usage_zcm; return 1; }
 
-integer list=0 LIST=0 create=0 create_from_commits=0 add=0 delete=0 delete_feature=0 set_commits=0 quiet=0 verbose=0
+integer list=0 LIST=0 create=0 create_from_commits=0 add=0 delete=0 delete_feature=0 set_commits=0 diff quiet=0 verbose=0
 integer extract=0 cdopt=0 nocdopt=0
 
 # Help
@@ -61,10 +63,11 @@ integer extract=0 cdopt=0 nocdopt=0
 (( delete = ${+opthash[-y]} + ${+opthash[--delete]} ))
 (( delete_feature = ${+opthash[-Y]} + ${+opthash[--delete-feature]} ))
 (( set_commits = ${+opthash[-S]} + ${+opthash[--set-commits]} ))
+(( diff = ${+opthash[-d]} + ${+opthash[--diff]} ))
 (( quiet = ${+opthash[-q]} + ${+opthash[--quiet]} ))
 (( verbose = ${+opthash[-v]} + ${+opthash[--verbose]} ))
 
-if (( LIST + list + create + create_from_commits + add + delete + delete_feature + set_commits > 1 )); then
+if (( LIST + list + create + create_from_commits + add + delete + delete_feature + set_commits + diff > 1 )); then
     print "Conflicting options given, please use single operation specifier (like -c, -C, -a, etc.)"
     return 2
 fi
@@ -710,7 +713,100 @@ if (( set_commits )); then
     return 0
 fi
 
-if (( list + LIST + create + create_from_commits + add + delete + delete_feature + set_commits == 0 )); then
+if (( diff )); then
+    if [[ "$#" -ne "1" ]]; then
+        print "Exactly 1 argument is needed: a feature name, of which commits will be printed (diffs)"
+        return 23
+    fi
+
+    local feature="$1"
+
+    __zcmdr_verify_feature "$feature" "must_exist"
+    retcode=$?
+    (( retcode )) && return $retcode
+
+    local project_line="${ZCMDR[current_project]}"
+    local root_dir="${ZCMDR[current_repo]}"
+
+    local feature_file="${features_path}/${feature}.conf"
+    local -a entries
+    entries=( "${(@f)"$(<$feature_file)"}" )
+
+    if [[ "${entries[2]}" != "$project_line" ]]; then
+        print "Warning: the feature \`$feature' belongs to not-current project: ${fg_bold[green]}\`${entries[2]:t:r}'${reset_color}"
+        project_line="${entries[2]}"
+        if ! __zcmdr_find_repo_path_in_recents "$project_line"; then
+            print "Could not find repository of project \`${entries[2]:t:r}\' because"
+            print "the project is not remembered in recent-projects database."
+            print "Cannot continue, aborting"
+            return 24
+        else
+            root_dir="$REPLY"
+        fi
+    fi
+
+    local -a commits
+    commits=( "${(z@)entries[4]}" )
+
+    if [[ "${commits[1]}" != "commits" ]]; then
+        print -- "Improper 4th line in the feature file \`$feature_file', should begin with \`commits' string"
+        return 25
+    elif [[ "${#commits}" -gt 1 ]]; then
+        shift commits
+    else
+        print -- "Feature \`$feature' has no commits assigned"
+        return 0
+    fi
+
+    integer error=0 is_git=0
+    local cmt
+    local -a vercommits
+
+    if [[ -d "$root_dir"/.git ]]; then
+        is_git=1
+        for cmt in "${commits[@]}"; do
+            revision=( ${(f)"$( git -C "$root_dir" rev-parse --verify "${cmt}^{commit}" 2>/dev/null )"} )
+            if [[ "${#revision}" = "0" ]]; then
+                print "${fg_bold[red]}Commit $cmt doesn't exist${reset_color}"
+                error+=1
+            else
+                vercommits+=( "${revision[1]}" )
+            fi
+        done
+    elif [[ -d "$root_dir"/.hg ]]; then
+        for cmt in "${commits[@]}"; do
+            revision=( ${(f)"$( hg --cwd "$root_dir" log -r "${cmt}" -T {node}\\n 2>/dev/null )"} )
+            if [[ "${#revision}" = "0" ]]; then
+                print "${fg_bold[red]}Commit $cmt doesn't exist${reset_color}"
+                error+=1
+            else
+                vercommits+=( "${revision[1]}" )
+            fi
+        done
+    else
+        print "Cannot diff commits – project isn't Git nor Hg repository"
+        return 26
+    fi
+
+    if (( error > 0 )); then
+        if [[ "${#vercommits}" = "0" ]]; then
+            print "${fg_bold[red]}Error: checked for the $error feature's commit(s) and didn't found, aborting"
+            return 27
+        else
+            print "${fg_bold[red]}Warning: $error commit(s) not found"
+        fi
+    fi
+
+    if (( is_git )); then
+        if (( verbose == 0 )); then
+            git -C "$root_dir" show --format=oneline --abbrev-commit --word-diff=color -p "${vercommits[@]}" -- | __zcmdr_stdlib_filter_diff | ${PAGER:-less}
+        else
+            git -C "$root_dir" show --format=oneline --no-abbrev-commit --word-diff=color -p "${vercommits[@]}" -- | __zcmdr_stdlib_filter_diff | ${PAGER:-less}
+        fi
+    fi
+fi
+
+if (( list + LIST + create + create_from_commits + add + delete + delete_feature + set_commits + diff == 0 )); then
     if [[ "$#" != "1" ]]; then
         print "Exactly 1 arguments is needed – a feature to edit"
         return 21
