@@ -69,10 +69,9 @@ fi
 # Less?
 if [[ "$own_LINE_COUNT" -gt 7 ]]; then
     __zcmdr_stdlib_get_button "" ",log," "/Less -5 commits/" "minus" "" "Less-5" ""
-    reply[2]=" ${reply[2]}"
 fi
 
-gitout2+=( "${reply[1]}${reply[2]}" )
+gitout2+=( "${reply[*]}" )
 own_LINE_COUNT+=1
 
 reply=( "${gitout2[@]}" )
