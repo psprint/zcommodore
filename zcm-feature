@@ -238,9 +238,9 @@ elif (( LIST )); then
     local feature_query="$1"
     if [[ -n "$feature_query" ]]; then
         if [[ "$feature_query" = "*" ]]; then
-            print "Features matching \`*' follow:"
+            print "Features matching \`${fg_bold[magenta]}*${reset_color}' follow:"
         else
-            print "Features matching *${feature_query}* follow:"
+            print "Features matching \`${fg_bold[magenta]}*${feature_query}*${reset_color}' follow:"
         fi
     else
         print "All features for all projects follow:"
