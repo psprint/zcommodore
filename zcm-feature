@@ -40,6 +40,7 @@ __zcmdr_usage_zcm_feature() {
     print -- "-d/--diff                Show contents of commits of given features (diffs)"
     print -- "-f/--files               Show files attached via commits"
     print -- "-b/--backup              Create archive with files of a feature (-x: also commit files)"
+    print -- "-p/--prompt              Prompt for feature name (to be used with -c, -C, -a, etc.)"
     print
     print -- "-q/--quiet      Operate without outputting messages"
     print -- "-v/--verbose    Print more status messages"
@@ -48,10 +49,10 @@ __zcmdr_usage_zcm_feature() {
 
 local -A opthash
 local -a optarr
-zparseopts -D -A opthash x -extract -cd -nocd l+=optarr -list L+=optarr c -create C -create-from-commits a -add y -delete Y -delete-feature S -set-commits d -diff f -files q b -backup -quiet v -verbose h -help || { __zcmdr_usage_zcm; return 1; }
+zparseopts -D -E -A opthash x -extract -cd -nocd l+=optarr -list L+=optarr c -create C -create-from-commits a -add y -delete Y -delete-feature S -set-commits d -diff f -files q b -backup p -prompt -quiet v -verbose h -help || { __zcmdr_usage_zcm; return 1; }
 
 integer list=0 LIST=0 create=0 create_from_commits=0 add=0 delete=0 delete_feature=0 set_commits=0 diff=0 filesopt=0 backup=0 quiet=0 verbose=0
-integer extract=0 cdopt=0 nocdopt=0
+integer extract=0 cdopt=0 nocdopt=0 promptopt=0
 
 # Help
 (( ${+opthash[-h]} + ${+opthash[--help]} )) && { __zcmdr_usage_zcm_feature; return 0; }
@@ -70,6 +71,7 @@ integer extract=0 cdopt=0 nocdopt=0
 (( diff = ${+opthash[-d]} + ${+opthash[--diff]} ))
 (( filesopt = ${+opthash[-f]} + ${+opthash[--files]} ))
 (( backup = ${+opthash[-b]} + ${+opthash[--backup]} ))
+(( promptopt = ${+opthash[-p]} + ${+opthash[--prompt]} ))
 (( quiet = ${+opthash[-q]} + ${+opthash[--quiet]} ))
 (( verbose = ${+opthash[-v]} + ${+opthash[--verbose]} ))
 
@@ -170,6 +172,40 @@ __zcmdr_find_repo_path_in_recents() {
     [[ "$found" = "yes" ]] && return 0 || return 1
 }
 
+#
+# Prompt?
+#
+if (( promptopt )); then
+    print "Enter feature name or l {pattern}, L {pattern} to list existing features"
+    local ftname
+    while (( 1 )); do
+        ftname=""
+        vared -cp "Feature name: " ftname
+
+        [[ -z "$ftname" ]] && continue
+
+        if [[ "$ftname" = L[[:space:]]* || "$ftname" = "L" ]]; then
+            zcm-feature -L "${ftname##L #}"
+        elif [[ "$ftname" = l[[:space:]]* || "$ftname" = "l" ]]; then
+            zcm-feature -l "${ftname##l #}"
+        elif [[ "$ftname" = LL[[:space:]]* || "$ftname" = "LL" ]]; then
+            zcm-feature -LL "${ftname##LL #}"
+        elif [[ "$ftname" = ll[[:space:]]* || "$ftname" = "ll" ]]; then
+            zcm-feature -ll "${ftname##ll #}"
+        elif [[ "$ftname" = "q" ]]; then
+            return 0
+        elif [[ "$ftname" != [[:alpha:]_-]## ]]; then
+            print "Improper feature name: \`${fg_bold[magenta]}$ftname${reset_color}'. Allowed are letters, _, - and digits."
+        else
+            echo "Will use feature name: \`${fg_bold[magenta]}$ftname${reset_color}'."
+            break
+        fi
+    done
+
+    set "$ftname" "$@"
+fi
+
+#
 #
 # List
 #
