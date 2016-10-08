@@ -35,6 +35,7 @@ for entry in "${hgout[@]}"; do
     local txt3="${CMDR_MAGENTA}((${arrentry[3]}))${CMDR_MAGENTA_E}"
     local txt4="\`${arrentry[4]}\`"
 
+    __zcmdr_stdlib_get_button "zcmdr_checkbox_1" "${arrentry[1]}" "/Mark for feature/" "$repo_root_dir" "$(( own_LINE_COUNT + 1 ))" "_" __zcmdr_internal_action_mark_for_feature
     __zcmdr_stdlib_get_std_button "hlog1A" "0" "/Open commit/" "$repo_root_dir" "${arrentry[1]}" "$txt1" __zcmdr_action_hg_open_commit
     __zcmdr_stdlib_get_std_button "hlog1B" "0" "/Diff/" "$repo_root_dir" "${arrentry[1]}" "$txt2" __zcmdr_action_hg_diff
     #__zcmdr_stdlib_get_std_button "hlog1C" "0" "/Same-files commits/" "$repo_root_dir" "${arrentry[1]}" "$txt3" __zcmdr_action_git_same_files_e
@@ -50,7 +51,7 @@ for entry in "${hgout[@]}"; do
         fi
     fi
 
-    hgout2+=( "${reply[1]} ${reply[2]} ${reply[3]} ${reply[4]}" )
+    hgout2+=( "${reply[1]} ${reply[2]} ${reply[3]} ${reply[4]} ${reply[5]}" )
     own_LINE_COUNT+=1
 done
 IFS="$IFSBKP"
