@@ -382,6 +382,8 @@ start_seconds=$SECONDS
 if [[ -z "$REGENERATE" || "$REGENERATE" = *,load_project,* ||
         "$REGENERATE" = *,switch_project,* || "$REGENERATE" = *,all,* ]]
 then
+    # Each project reload clears commit selection
+    ZCMDR_SELECTED_COMMIT_IDS=( )
 
     local -a input_data
     if [[ "$REGENERATE" = *,load_project,* || "$REGENERATE" = *,switch_project,* ]]; then
