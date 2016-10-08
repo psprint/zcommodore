@@ -256,6 +256,27 @@ __zcmdr_internal_action_load_tree() {
     ZCMDRLIST_REPLY_TO_OVERWRITE_SIZE="$section_size"
 }
 
+__zcmdr_internal_action_mark_for_feature() {
+    local id="$1" sha="$2" cmd="$3" active_path="$4" list_index="$5"
+    if (( ${+ZCMDR_SELECTED_COMMIT_IDS} )); then
+        integer idx="${ZCMDR_SELECTED_COMMIT_IDS[(I)$sha]}"
+        if [[ "$idx" = "0" ]]; then
+            ZCMDR_SELECTED_COMMIT_IDS+=( "$sha" )
+            typeset -g ZCMDRLIST_REPLY_ALTER_CHECKBOX=$(( list_index + ZCMDR_SECTION_INDICES[log] + 1 ))
+            typeset -g ZCMDRLIST_REPLY_CHECKBOX_OP="set"
+        else
+            ZCMDR_SELECTED_COMMIT_IDS[idx]=()
+            typeset -g ZCMDRLIST_REPLY_ALTER_CHECKBOX=$(( list_index + ZCMDR_SECTION_INDICES[log] + 1 ))
+            typeset -g ZCMDRLIST_REPLY_CHECKBOX_OP="unset"
+        fi
+    else
+        typeset -g ZCMDR_SELECTED_COMMIT_IDS
+        ZCMDR_SELECTED_COMMIT_IDS=( "$sha" )
+        typeset -g ZCMDRLIST_REPLY_ALTER_CHECKBOX=$(( list_index + ZCMDR_SECTION_INDICES[log] + 1 ))
+        typeset -g ZCMDRLIST_REPLY_CHECKBOX_OP="set"
+    fi
+}
+
 #
 # Business logic follows
 #
@@ -275,6 +296,7 @@ zstyle -b ":plugin:zcommodore" cd_at_edit cd_at_edit || cd_at_edit="yes"
 # Variables
 #
 
+typeset -gA ZCMDR_SECTION_INDICES
 local -a reply      # Output of module
 local -a reply2     # Size of the output
 local -a reply3     # Module's nonselectables
@@ -624,6 +646,7 @@ for n in "header" "proj" "tree" "log" "modified" "features"; do
     fi
     anchors+=( "${reply[@]}" )
 
+    ZCMDR_SECTION_INDICES[$n]="$LINE_COUNT"
     OUTPUT+=( "${output[@]}" )
     LINE_COUNT+=size
 done

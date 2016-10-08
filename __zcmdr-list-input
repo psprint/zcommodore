@@ -170,6 +170,11 @@ case "$key" in
                         "${ZCMDR_ACTION_IDS_TO_HANDLERS[$id]}" "$id" "$idx" "$cmd" "$active_path" "$section_size"
                         reply=( "${replybkp[@]}" )
                     fi
+                elif [[ "$id" = *zcmdr_checkbox* ]]; then
+                    if [[ -n "${ZCMDR_ACTION_IDS_TO_HANDLERS[$id]}" ]]; then
+                        "${ZCMDR_ACTION_IDS_TO_HANDLERS[$id]}" "$id" "$idx" "$cmd" "$active_path" "$section_size"
+                        reply=( "${replybkp[@]}" )
+                    fi
                 else
                     # Save current element in the result variable
                     reply=( $current_idx SELECT )
