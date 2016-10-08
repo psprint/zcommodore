@@ -234,13 +234,26 @@ __zcmdr_internal_action_load_tree() {
     # Main function __zcmdr-list will update $@, etc.
     typeset -ga ZCMDRLIST_REPLY_LIST_PART
     ZCMDRLIST_REPLY_LIST_PART=( "${reply[@]}" )
-    typeset -g ZCMDRLIST_REPLY_LIST_SIZE="$reply2"
+
+    # List part size
+    typeset -g ZCMDRLIST_REPLY_LIST_SIZE
+    ZCMDRLIST_REPLY_LIST_SIZE="$reply2"
+
+    # Non-selectables
     typeset -ga ZCMDRLIST_REPLY_NONSELECTABLES
     ZCMDRLIST_REPLY_NONSELECTABLES=( "${reply3[@]}" )
+
+    # Hops
     typeset -ga ZCMDRLIST_REPLY_HOPS
     ZCMDRLIST_REPLY_HOPS=( "${reply4[@]}" )
-    typeset -g ZCMDRLIST_REPLY_HEADER_IDX="$header_idx"
-    typeset -g ZCMDRLIST_REPLY_TO_OVERWRITE_SIZE="$section_size"
+
+    # Target (to be replaced) idx
+    typeset -g ZCMDRLIST_REPLY_HEADER_IDX
+    ZCMDRLIST_REPLY_HEADER_IDX="$header_idx"
+
+    # Size of the target (to be replaced list part)
+    typeset -g ZCMDRLIST_REPLY_TO_OVERWRITE_SIZE
+    ZCMDRLIST_REPLY_TO_OVERWRITE_SIZE="$section_size"
 }
 
 #
