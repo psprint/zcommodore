@@ -642,14 +642,14 @@ while (( 1 )); do
         # Status window is optional (2/2)
         [ -n "$wname_status" ] && zcurses clear "$wname_status" redraw
     else
-        if [[ -n "$ZCMDRLIST_REPLY_LIST_SIZE" && "$ZCMDRLIST_REPLY_LIST_SIZE" -ge "1" ]]; then
+        if [[ -n "$ZCMDRLIST_REPLY_LIST_PART_SIZE" && "$ZCMDRLIST_REPLY_LIST_PART_SIZE" -ge "1" ]]; then
             set "${(@)@[1,ZCMDRLIST_REPLY_HEADER_IDX-1]}" "${ZCMDRLIST_REPLY_LIST_PART[@]}" "${(@)@[ZCMDRLIST_REPLY_HEADER_IDX+ZCMDRLIST_REPLY_TO_OVERWRITE_SIZE,-1]}"
             typeset -g ZCMDRLIST_REGENERATE_DISP_LIST
             ZCMDRLIST_REGENERATE_DISP_LIST="1"
 
             # How many elements push down (up if negative)
             # indices that are after the modified section
-            integer size_diff=$(( ZCMDRLIST_REPLY_LIST_SIZE - ZCMDRLIST_REPLY_TO_OVERWRITE_SIZE ))
+            integer size_diff=$(( ZCMDRLIST_REPLY_LIST_PART_SIZE - ZCMDRLIST_REPLY_TO_OVERWRITE_SIZE ))
 
             # Remove indices that lay inside the block being overwritten
             # NONSELECTABLES
@@ -729,7 +729,7 @@ while (( 1 )); do
             1="${asegs[*]}"
 
             # Cleanup
-            unset ZCMDRLIST_REPLY_LIST_PART ZCMDRLIST_REPLY_LIST_SIZE ZCMDRLIST_REPLY_NONSELECTABLES
+            unset ZCMDRLIST_REPLY_LIST_PART ZCMDRLIST_REPLY_LIST_PART_SIZE ZCMDRLIST_REPLY_NONSELECTABLES
             unset ZCMDRLIST_REPLY_HOPS ZCMDRLIST_REPLY_HEADER_IDX ZCMDRLIST_REPLY_TO_OVERWRITE_SIZE
         fi
     fi

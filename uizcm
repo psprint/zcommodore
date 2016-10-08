@@ -236,8 +236,8 @@ __zcmdr_internal_action_load_tree() {
     ZCMDRLIST_REPLY_LIST_PART=( "${reply[@]}" )
 
     # List part size
-    typeset -g ZCMDRLIST_REPLY_LIST_SIZE
-    ZCMDRLIST_REPLY_LIST_SIZE="$reply2"
+    typeset -g ZCMDRLIST_REPLY_LIST_PART_SIZE
+    ZCMDRLIST_REPLY_LIST_PART_SIZE="$reply2"
 
     # Non-selectables
     typeset -ga ZCMDRLIST_REPLY_NONSELECTABLES
