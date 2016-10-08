@@ -233,7 +233,7 @@ if (( list )); then
 
 
     local -a features
-    features=( "${features_path}"/*.conf(N) )
+    features=( "${features_path}"/*.conf(Nom) )
     if [[ -z "${features[1]}" ]]; then
         print "No features currently defined (for any project)"
         return 0
@@ -286,9 +286,9 @@ elif (( LIST )); then
 
     local -a found
     if [[ -z "$feature_query" ]]; then
-        found=( "${features_path}"/*.conf(N) )
+        found=( "${features_path}"/*.conf(Nom) )
     else
-        found=( "${features_path}"/*$~feature_query*.conf(N) )
+        found=( "${features_path}"/*$~feature_query*.conf(Nom) )
     fi
 
     if [[ -z "${found[1]}" ]]; then
