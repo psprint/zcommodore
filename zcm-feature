@@ -1223,6 +1223,16 @@ if (( list + LIST + create + create_from_commits + add + delete + delete_feature
     fi
 
     #
+    # Echo
+    #
+
+    local feature_edit_echo
+    zstyle -b ":plugin:zcommodore" feature_edit_echo feature_edit_echo || feature_edit_echo="yes"
+    if [[ "$feature_edit_echo" = "yes" ]]; then
+        print -- "Editing: ${files[*]}"
+    fi
+
+    #
     # Paths and editing
     #
 

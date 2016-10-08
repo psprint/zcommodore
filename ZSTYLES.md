@@ -15,4 +15,5 @@ zstyle ":plugin:zcommodore" auto_run "yes"                      # Automatically 
 zstyle ":plugin:zcommodore" backup_dir "$HOME/.backup"          # Where [Backup] button copies file (time stamp appended to name)
 zstyle ":plugin:zcommodore" pager_cmd "less -iR"                # Command to run pager (also often Git's pager is used)
 zstyle ":plugin:zcommodore" editor_use_tabs "yes"               # Try to recognize editor and pass options invoking tabs
+zstyle ":plugin:zcommodore" feature_edit_echo "yes"             # Echo the edited files when invoking zcm-feature
 ```
