@@ -686,7 +686,7 @@ if __zcmdr_stdlib_decode_hyperlink "$ZCMDRLIST_WRAPPER_BIT"; then
         REGENERATE="$ts"
         REGENERATE_ARG="$active_path"
     elif [[ -n "${ZCMDR_ACTION_IDS_TO_HANDLERS[$id]}" ]]; then
-        [[ "$id" != "glog1A" && "$id" = "hlog1A" ]] && zle && { zle .redisplay; zle .reset-prompt; }
+        [[ "$id" != "glogA" && "$id" = "hlogA" ]] && zle && { zle .redisplay; zle .reset-prompt; }
         # Call the handled with all hyper-link data
         "${ZCMDR_ACTION_IDS_TO_HANDLERS[$id]}" "$id" "$ts" "$cmd" "$active_path" "$file"
         break
