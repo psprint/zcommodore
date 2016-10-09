@@ -1296,7 +1296,7 @@ if (( list + LIST + create + create_from_commits + add + delete + delete_feature
             # TODO
             ;;
     esac
-    "$selected_editor" "${opts[@]}" "${files[@]}"
+    "$selected_editor" "${opts[@]}" -- "${files[@]}"
 fi
 
 return 0
