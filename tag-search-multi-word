@@ -258,6 +258,10 @@ if [ "$__tsmw_hcw_call_count" -eq "1" ]; then
     local -a cmd
     cmd=()
 
+    # Trap INT to manually interrupt Zle to work around a bug
+    setopt localtraps
+    trap 'zle && zle .send-break' INT
+
     if zle .recursive-edit -K tsmw; then
         zstyle -s ":plugin:zcommodore" editor selected_editor || selected_editor="${EDITOR:-vim}"
         zstyle -b ":plugin:zcommodore" cd_at_edit cd_at_edit || cd_at_edit="yes"
