@@ -211,6 +211,9 @@ if [ "$__tsmw_hcw_call_count" -eq "1" ]; then
     [ -n "$termcap[@7]" ] && bindkey -M tsmw "$termcap[@7]" .end-of-line
     [ -n "$terminfo[khome]" ] && bindkey -M tsmw "$terminfo[khome]" .beginning-of-line
     [ -n "$terminfo[kend]" ] && bindkey -M tsmw "$terminfo[kend]" .end-of-line
+    # The same for Ctrl-E, Ctrl-F
+    bindkey -M tsmw '^A' .beginning-of-line
+    bindkey -M tsmw '^E' .end-of-line
 
     # Additional keys
     bindkey -M tsmw '^P' "$up_widget"
