@@ -98,8 +98,8 @@ integer retcode
 
 local selected_editor cd_at_edit editor_use_tabs
 zstyle -s ":plugin:zcommodore" editor selected_editor || selected_editor="${EDITOR:-vim}"
-zstyle -b ":plugin:zcommodore" cd_at_edit cd_at_edit || cd_at_edit="yes"
-zstyle -b ":plugin:zcommodore" editor_use_tabs editor_use_tabs || editor_use_tabs="yes"
+zstyle -T ":plugin:zcommodore" cd_at_edit && cd_at_edit="yes" || cd_at_edit="no"
+zstyle -T ":plugin:zcommodore" editor_use_tabs && editor_use_tabs="yes" || editor_use_tabs="no"
 
 (( cdopt )) && cd_at_edit="yes"
 (( nocdopt )) && cd_at_edit="no"
@@ -1263,7 +1263,7 @@ if (( list + LIST + create + create_from_commits + add + delete + delete_feature
     #
 
     local feature_edit_echo
-    zstyle -b ":plugin:zcommodore" feature_edit_echo feature_edit_echo || feature_edit_echo="yes"
+    zstyle -T ":plugin:zcommodore" feature_edit_echo && feature_edit_echo="yes" || feature_edit_echo="no"
     if [[ "$feature_edit_echo" = "yes" ]]; then
         print -- "Editing: ${files[*]}"
     fi
