@@ -41,6 +41,7 @@ __zcmdr_usage_zcm_feature() {
     print -- "-f/--files               Show files attached via commits"
     print -- "-b/--backup              Create archive with files of a feature (-x: also commit files)"
     print -- "-p/--prompt              Prompt for feature name (to be used with -c, -C, -a, etc.)"
+    print -- "-P/--project             Which project to set for new feature (for scripting, with -c or -C)"
     print
     print -- "-q/--quiet      Operate without outputting messages"
     print -- "-v/--verbose    Print more status messages"
@@ -49,10 +50,12 @@ __zcmdr_usage_zcm_feature() {
 
 local -A opthash
 local -a optarr
-zparseopts -D -E -A opthash x -extract -cd -nocd l+=optarr -list L+=optarr c -create C -create-from-commits a -add y -delete Y -delete-feature S -set-commits d -diff f -files q b -backup p -prompt -quiet v -verbose h -help || { __zcmdr_usage_zcm; return 1; }
+zparseopts -D -E -A opthash x -extract -cd -nocd l+=optarr -list L+=optarr c -create C -create-from-commits \
+            a -add y -delete Y -delete-feature S -set-commits d -diff f -files b -backup p -prompt P -project \
+            q -quiet v -verbose h -help || { __zcmdr_usage_zcm; return 1; }
 
 integer list=0 LIST=0 create=0 create_from_commits=0 add=0 delete=0 delete_feature=0 set_commits=0 diff=0 filesopt=0 backup=0 quiet=0 verbose=0
-integer extract=0 cdopt=0 nocdopt=0 promptopt=0
+integer extract=0 cdopt=0 nocdopt=0 promptopt=0 project=0
 
 # Help
 (( ${+opthash[-h]} + ${+opthash[--help]} )) && { __zcmdr_usage_zcm_feature; return 0; }
@@ -72,6 +75,7 @@ integer extract=0 cdopt=0 nocdopt=0 promptopt=0
 (( filesopt = ${+opthash[-f]} + ${+opthash[--files]} ))
 (( backup = ${+opthash[-b]} + ${+opthash[--backup]} ))
 (( promptopt = ${+opthash[-p]} + ${+opthash[--prompt]} ))
+(( project = ${+opthash[-P]} + ${+opthash[--project]} ))
 (( quiet = ${+opthash[-q]} + ${+opthash[--quiet]} ))
 (( verbose = ${+opthash[-v]} + ${+opthash[--verbose]} ))
 
@@ -171,6 +175,35 @@ __zcmdr_find_repo_path_in_recents() {
     # Testable
     [[ "$found" = "yes" ]] && return 0 || return 1
 }
+
+#
+# Project?
+#
+local project_override="" root_dir_override=""
+if (( project )); then
+    if (( create + create_from_commits != 1 )); then
+        print "-P is to be used with one of -c, -C"
+        return 33
+    fi
+    project_override="$1"
+    shift
+
+    if [[ ! -d "$project_override" ]]; then
+        print "Provided (via -P) project path doesn't exist"
+        return 34
+    fi
+
+    if ! __zcmdr_find_repo_path_in_recents "$project_override"; then
+        print "Could not find repository of project \`${project_override:t:r}\' because"
+        print "the project is not remembered in recent-projects database."
+        print "Cannot override project with -P option, aborting.."
+        return 35
+    else
+        root_dir_override="$REPLY"
+    fi
+
+    print -- "Overriding project with ${fg[cyan]}${project_override/(#s)$HOME/~}${reset_color}"
+fi
 
 #
 # Prompt?
@@ -370,6 +403,7 @@ if (( create )); then
     (( retcode )) && return $retcode
 
     local project_line="${ZCMDR[current_project]}"
+    [[ -n "$project_override" ]] && project_line="$project_override"
     files=( "${(qq)files[@]}" )
     local files_line="files ${files[*]}"
     local commits_line="commits"
@@ -411,6 +445,7 @@ if (( create_from_commits )); then
     (( retcode )) && return $retcode
 
     local root_dir="${ZCMDR[current_repo]}"
+    [[ -n "$root_dir_override" ]] && root_dir="$root_dir_override"
 
     [[ ! -d "$root_dir" ]] && { print "Repository dir doesn't exist or isn't directory (\`$root_dir')"; return 9; }
 
@@ -457,6 +492,7 @@ if (( create_from_commits )); then
     fi
 
     local project_line="${ZCMDR[current_project]}"
+    [[ -n "$project_override" ]] && project_line="$project_override"
     files=( "${(qq)save_files[@]}" )
     local files_line="files ${files[*]}"
     commits=( "${(q)commits[@]}" )
