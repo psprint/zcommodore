@@ -227,7 +227,7 @@ if (( promptopt )); then
             zcm-feature -ll "${ftname##ll #}"
         elif [[ "$ftname" = "q" ]]; then
             return 0
-        elif [[ "$ftname" != [[:alpha:]_-]## ]]; then
+        elif [[ "$ftname" != [[:alnum:]_-]## ]]; then
             print "Improper feature name: \`${fg_bold[magenta]}$ftname${reset_color}'. Allowed are letters, _, - and digits."
         else
             echo "Will use feature name: \`${fg_bold[magenta]}$ftname${reset_color}'."
