@@ -264,7 +264,7 @@ if [ "$__tsmw_hcw_call_count" -eq "1" ]; then
 
     if zle .recursive-edit -K tsmw; then
         zstyle -s ":plugin:zcommodore" editor selected_editor || selected_editor="${EDITOR:-vim}"
-        zstyle -b ":plugin:zcommodore" cd_at_edit cd_at_edit || cd_at_edit="yes"
+        zstyle -T ":plugin:zcommodore" cd_at_edit && cd_at_edit="yes" || cd_at_edit="no"
 
         tagtext="${__tsmw_hcw_found[__tsmw_hcw_index]}"
         if [[ "$tagtext" = (#b)[^$'\177']#$'\177'[^$'\1']#$'\1'([^$'\2']#)$'\2'(*) ]]; then
@@ -325,7 +325,7 @@ if [ "$__tsmw_hcw_call_count" -eq "1" ]; then
     # Is there a command to run?
     if [[ "${#cmd}" != "0" ]]; then
         local auto_run
-        zstyle -b ":plugin:zcommodore" auto_run auto_run || auto_run="yes"
+        zstyle -T ":plugin:zcommodore" auto_run && auto_run="yes" || auto_run="no"
         BUFFER="${cmd[*]}"
         CURSOR="${#BUFFER}"
         [[ "$auto_run" = "yes" ]] && zle .accept-line
