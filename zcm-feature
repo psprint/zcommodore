@@ -929,7 +929,7 @@ if (( filesopt )); then
     local root_dir="${ZCMDR[current_repo]}"
 
     if [[ "${entries[2]}" != "$project_line" ]]; then
-        print "${fg_bold[red]}Warning: editing not current project \`${entries[2]:t:r}'${reset_color}"
+        print "${fg_bold[red]}Warning: listing from a not current project \`${entries[2]:t:r}'${reset_color}"
         project_line="${entries[2]}"
         root_dir=""
 
