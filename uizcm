@@ -302,7 +302,7 @@ zstyle -T ":plugin:zcommodore" cd_at_edit && cd_at_edit="yes" || cd_at_edit="no"
 # Variables
 #
 
-typeset -gA ZCMDR_SECTION_INDICES
+local -A ZCMDR_SECTION_INDICES
 local -a reply      # Output of module
 local -a reply2     # Size of the output
 local -a reply3     # Module's nonselectables
