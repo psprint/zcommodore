@@ -696,6 +696,15 @@ while (( 1 )); do
                 fi
             done
 
+            # Push down (up) entries of ZCMDR_SECTION_INDICES
+            local _key
+            for _key in "${(k)ZCMDR_SECTION_INDICES[@]}"; do
+                el="${ZCMDR_SECTION_INDICES[$_key]}"
+                if [[ -n "$el" && "$el" -gt "$ZCMDRLIST_REPLY_HEADER_IDX" ]]; then
+                    ZCMDR_SECTION_INDICES[$_key]=$(( ${ZCMDR_SECTION_INDICES[$_key]} + size_diff ))
+                fi
+            done
+
             # Now add new hops and nonselectables
             # first translating to global indices
             ZCMDRLIST_REPLY_NONSELECTABLES=( "${ZCMDRLIST_REPLY_NONSELECTABLES[@]//(#b)([[:digit:]]##)/$(( ${match[1]} + ZCMDRLIST_REPLY_HEADER_IDX - 1 ))}" )
