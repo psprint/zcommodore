@@ -262,17 +262,17 @@ __zcmdr_internal_action_mark_for_feature() {
         integer idx="${ZCMDR_SELECTED_COMMIT_IDS[(I)$sha]}"
         if [[ "$idx" = "0" ]]; then
             ZCMDR_SELECTED_COMMIT_IDS+=( "$sha" )
-            typeset -g ZCMDRLIST_REPLY_ALTER_CHECKBOX=$(( list_index + ZCMDR_SECTION_INDICES[log] + 1 ))
+            typeset -g ZCMDRLIST_REPLY_ALTER_CHECKBOX=$(( list_index + ZCMDR_SECTION_INDICES[log] ))
             typeset -g ZCMDRLIST_REPLY_CHECKBOX_OP="set"
         else
             ZCMDR_SELECTED_COMMIT_IDS[idx]=()
-            typeset -g ZCMDRLIST_REPLY_ALTER_CHECKBOX=$(( list_index + ZCMDR_SECTION_INDICES[log] + 1 ))
+            typeset -g ZCMDRLIST_REPLY_ALTER_CHECKBOX=$(( list_index + ZCMDR_SECTION_INDICES[log] ))
             typeset -g ZCMDRLIST_REPLY_CHECKBOX_OP="unset"
         fi
     else
         typeset -g ZCMDR_SELECTED_COMMIT_IDS
         ZCMDR_SELECTED_COMMIT_IDS=( "$sha" )
-        typeset -g ZCMDRLIST_REPLY_ALTER_CHECKBOX=$(( list_index + ZCMDR_SECTION_INDICES[log] + 1 ))
+        typeset -g ZCMDRLIST_REPLY_ALTER_CHECKBOX=$(( list_index + ZCMDR_SECTION_INDICES[log] ))
         typeset -g ZCMDRLIST_REPLY_CHECKBOX_OP="set"
     fi
 }
@@ -648,7 +648,7 @@ for n in "header" "proj" "tree" "log" "modified" "features"; do
     fi
     anchors+=( "${reply[@]}" )
 
-    ZCMDR_SECTION_INDICES[$n]="$LINE_COUNT"
+    ZCMDR_SECTION_INDICES[$n]=$(( LINE_COUNT + 1 ))
     OUTPUT+=( "${output[@]}" )
     LINE_COUNT+=size
 done
