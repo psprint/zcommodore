@@ -1009,9 +1009,11 @@ if (( filesopt )); then
 
     (( quiet )) || print "Files in commits of feature \`${fg_bold[magenta]}$feature${reset_color}':"
     (( quiet )) || print
+    local commit_line
     for cmt in "${(k)commit_to_files_txt[@]}"; do
         print -- "Commit: ${fg_bold[green]}$cmt${reset_color}, files:"
-        print -- "⇒  $commit_to_files_txt[$cmt]"
+        commit_line=${commit_to_files_txt[$cmt]//$'\n'/$'\n'⇒  }
+        print -- "⇒  ${commit_line%???}"
     done
 
     return 0
