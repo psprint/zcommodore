@@ -156,6 +156,12 @@ __zcmdr_action_feature_backup() {
     __zcmdr_stdlib_to_cmd_line "zcm-feature -bx ${(q)feat_name}"
 }
 
+__zcmdr_action_create_feature() {
+    local id="$1" project="$2" cmd="$3" repo_path="$4" feat_name="$5"
+
+    __zcmdr_stdlib_to_cmd_line "zcm-feature -pPC ${(q)project} ${ZCMDR_SELECTED_COMMIT_IDS[*]}"
+}
+
 # Hg actions
 
 __zcmdr_action_hg_diff() {

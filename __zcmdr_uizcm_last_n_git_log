@@ -71,6 +71,9 @@ if [[ "$own_LINE_COUNT" -gt 7 ]]; then
     __zcmdr_stdlib_get_button "" ",log," "/Less -5 commits/" "minus" "" "Less-5" ""
 fi
 
+# Feature creation
+__zcmdr_stdlib_get_button "glogE" "$current_project" "/Create feature/" "" "" "CreateFeature" __zcmdr_action_create_feature
+
 gitout2+=( "${reply[*]}" )
 own_LINE_COUNT+=1
 
