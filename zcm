@@ -173,10 +173,12 @@ if (( zconvey < 2 )); then
 
     # Oldest used file
     local circular_file_path
+    REPLY="."
     -zcmdr_stdlib_circular_next "last_project" "$nprojects"
     circular_file_path="$REPLY"
 
     # Reuse existing file if it has the same project
+    reply=()
     -zcmdr_stdlib_circular_paths "last_project"
     all_circular_paths=( "${reply[@]}" )
 
