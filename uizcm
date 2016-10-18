@@ -264,25 +264,19 @@ __zcmdr_internal_action_load_tree() {
 
 __zcmdr_internal_action_mark_for_feature() {
     local id="$1" sha="$2" cmd="$3" active_path="$4" list_index="$5"
-    if (( ${+ZCMDR_SELECTED_COMMIT_IDS} )); then
-        integer idx="${ZCMDR_SELECTED_COMMIT_IDS[(I)$sha]}"
-        if [[ "$idx" = "0" ]]; then
-            ZCMDR_SELECTED_COMMIT_IDS+=( "$sha" )
-            typeset -g ZCMDRLIST_REPLY_CHECKBOX_NUM=$(( list_index + ZCMDR_SECTION_INDICES[log] ))
-            typeset -g ZCMDRLIST_REPLY_CHECKBOX_OP="set"
-            REGENERATE_ALWAYS+=",log,"
-        else
-            ZCMDR_SELECTED_COMMIT_IDS[idx]=()
-            typeset -g ZCMDRLIST_REPLY_CHECKBOX_NUM=$(( list_index + ZCMDR_SECTION_INDICES[log] ))
-            typeset -g ZCMDRLIST_REPLY_CHECKBOX_OP="unset"
-            REGENERATE_ALWAYS="${REGENERATE_ALWAYS/,log,/}"
-        fi
-    else
-        typeset -g ZCMDR_SELECTED_COMMIT_IDS
-        ZCMDR_SELECTED_COMMIT_IDS=( "$sha" )
-        typeset -g ZCMDRLIST_REPLY_CHECKBOX_NUM=$(( list_index + ZCMDR_SECTION_INDICES[log] ))
-        typeset -g ZCMDRLIST_REPLY_CHECKBOX_OP="set"
+    typeset -g ZCMDRLIST_REPLY_CHECKBOX_NUM ZCMDRLIST_REPLY_CHECKBOX_OP
+
+    ZCMDRLIST_REPLY_CHECKBOX_NUM=$(( list_index + ZCMDR_SECTION_INDICES[log] ))
+
+    integer idx="${ZCMDR_SELECTED_COMMIT_IDS[(I)$sha]}"
+    if [[ "$idx" = "0" || -z "$idx" ]]; then
+        ZCMDR_SELECTED_COMMIT_IDS+=( "$sha" )
+        ZCMDRLIST_REPLY_CHECKBOX_OP="set"
         REGENERATE_ALWAYS+=",log,"
+    else
+        ZCMDR_SELECTED_COMMIT_IDS[idx]=()
+        ZCMDRLIST_REPLY_CHECKBOX_OP="unset"
+        REGENERATE_ALWAYS="${REGENERATE_ALWAYS/,log,/}"
     fi
 }
 
