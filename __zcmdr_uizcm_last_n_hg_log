@@ -34,8 +34,11 @@ for entry in "${hgout[@]}"; do
     local txt2="${CMDR_CYAN}${(qqq)arrentry[2]}${CMDR_CYAN_E}"
     local txt3="${CMDR_MAGENTA}((${arrentry[3]}))${CMDR_MAGENTA_E}"
     local txt4="\`${arrentry[4]}\`"
+    local txt5="_"
 
-    __zcmdr_stdlib_get_button "zcmdr_checkbox_1" "${arrentry[1]}" "/Mark for feature/" "$repo_root_dir" "$(( own_LINE_COUNT + 1 ))" "_" __zcmdr_internal_action_mark_for_feature
+    [[ "${ZCMDR_SELECTED_COMMIT_IDS[(I)${arrentry[1]}]}" != "0" ]] && txt5="x"
+
+    __zcmdr_stdlib_get_button "zcmdr_checkbox_1" "${arrentry[1]}" "/Mark for feature/" "$repo_root_dir" "$(( own_LINE_COUNT + 1 ))" "$txt5" __zcmdr_internal_action_mark_for_feature
     __zcmdr_stdlib_get_std_button "hlogA" "0" "/Open commit/" "$repo_root_dir" "${arrentry[1]}" "$txt1" __zcmdr_action_hg_open_commit
     __zcmdr_stdlib_get_std_button "hlogB" "0" "/Diff/" "$repo_root_dir" "${arrentry[1]}" "$txt2" __zcmdr_action_hg_diff
     #__zcmdr_stdlib_get_std_button "hlogC" "0" "/Same-files commits/" "$repo_root_dir" "${arrentry[1]}" "$txt3" __zcmdr_action_git_same_files_e
