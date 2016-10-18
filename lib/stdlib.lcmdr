@@ -283,7 +283,7 @@ function __zcmdr_stdlib_circular_paths() {
 
 function __zcmdr_stdlib_filter_diff() {
     local line
-    while read line; do
+    while read -r line; do
         if [[ "$line" != (#s)($'\033'[^m]#m)#(diff|index|---|+++)* ]]; then
             print -r -- "$line"
         else
