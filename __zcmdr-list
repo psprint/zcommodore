@@ -719,9 +719,13 @@ while (( 1 )); do
                 local _id="${reply[1]}" _idx="${reply[2]}" _cmd="${reply[3]}" _active_path="${reply[4]}" _section_size="${reply[5]}"
                 if [[ "$_idx" -gt "$ZCMDRLIST_REPLY_HEADER_IDX" ]]; then
                     # Plainly replace the hyperlink fragment
-                    local _new_idx
+                    integer _new_idx
                     (( _new_idx = _idx + size_diff ))
                     asegs[index]="${aseg/(#b)($'\1')$_idx$'\1'/${match[1]}$_new_idx${match[1]}}"
+                elif [[ "$_idx" = "$ZCMDRLIST_REPLY_HEADER_IDX" ]]; then
+                    integer _new_section_size
+                    (( _new_section_size = _section_size + size_diff ))
+                    asegs[index]="${aseg/(#b)($'\1')$_section_size($'\2')/${match[1]}$_new_section_size${match[2]}}"
                 fi
             done
             1="${asegs[*]}"
