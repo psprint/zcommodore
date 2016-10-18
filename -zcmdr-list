@@ -24,9 +24,6 @@ trap "REPLY=-2; reply=(); return" TERM INT QUIT
 
 [[ "${ZCMDR[stdlib_sourced]}" != "1" ]] && source "${ZCMDR_REPO_DIR}/lib/stdlib.lcmdr"
 
-# Drawing and input
-autoload __zcmdr-list-draw __zcmdr-list-input __zcmdr-process-buffer
-
 # Outputs a message in the bottom of the screen
 -zcmdrlist_status_msg() {
     # -1 for border, -1 for 0-based indexing
