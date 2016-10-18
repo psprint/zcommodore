@@ -729,12 +729,12 @@ while (( 1 )); do
             # Cleanup
             unset ZCMDRLIST_REPLY_LIST_PART ZCMDRLIST_REPLY_LIST_PART_SIZE ZCMDRLIST_REPLY_NONSELECTABLES
             unset ZCMDRLIST_REPLY_HOPS ZCMDRLIST_REPLY_HEADER_IDX ZCMDRLIST_REPLY_TO_OVERWRITE_SIZE
-        elif [[ "${+ZCMDRLIST_REPLY_ALTER_CHECKBOX}" = "1" ]]; then
-            local new_line="${@[ZCMDRLIST_REPLY_ALTER_CHECKBOX]}"
+        elif (( ${+ZCMDRLIST_REPLY_CHECKBOX_NUM} )); then
+            local new_line="${@[ZCMDRLIST_REPLY_CHECKBOX_NUM]}"
             [[ "$ZCMDRLIST_REPLY_CHECKBOX_OP" = "set" ]] && new_line="${new_line/\[_\]/[x]}" || new_line="${new_line/\[x\]/[_]}"
-            set "${(@)@[1,ZCMDRLIST_REPLY_ALTER_CHECKBOX-1]}" "$new_line" "${(@)@[ZCMDRLIST_REPLY_ALTER_CHECKBOX+1,-1]}"
+            set "${(@)@[1,ZCMDRLIST_REPLY_CHECKBOX_NUM-1]}" "$new_line" "${(@)@[ZCMDRLIST_REPLY_CHECKBOX_NUM+1,-1]}"
             typeset -g ZCMDRLIST_REGENERATE_DISP_LIST="1"
-            unset ZCMDRLIST_REPLY_ALTER_CHECKBOX ZCMDRLIST_REPLY_CHECKBOX_OP
+            unset ZCMDRLIST_REPLY_CHECKBOX_NUM ZCMDRLIST_REPLY_CHECKBOX_OP
         fi
     fi
 done
