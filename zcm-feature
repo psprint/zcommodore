@@ -1152,14 +1152,14 @@ if (( backup )); then
     cmdr_bdir -s
 
     -zcmdr_stdlib_get_date_and_time_string
-    tar -C "$project_line" -czf "${dest}/feat_${feature}_${REPLY}.tgz" "${files[@]}"
+    tar -C "$project_line" -czf "${dest}/feat_${feature}_${REPLY}.tgz" -- "${files[@]}"
     retcode=$?
 
     if (( retcode )); then
         if (( extract )); then
-            print -- "Error code [$retcode] when creating archive of feature ${fg_bold[magenta]}$feature${reset_color} (with files of commits)"
+            print -- "Error code [$retcode] when creating archive of feature ${fg_bold[magenta]}$feature${reset_color} (with files from commits)"
         else
-            print -- "Error code [$retcode] when creating archive of feature ${fg_bold[magenta]}$feature${reset_color} (without files of commits)"
+            print -- "Error code [$retcode] when creating archive of feature ${fg_bold[magenta]}$feature${reset_color} (without files from commits)"
         fi
         print -- "Target path: ${fg_bold[green]}${dest/(#s)$HOME/~}/feat_${feature}_${REPLY}.tgz${reset_color}"
     else
