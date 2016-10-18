@@ -58,8 +58,8 @@ fi
 # Setup
 #
 
-autoload tag-search-multi-word zcm __zcmdr-list __zcmdr-list-draw __zcmdr-list-input __zcmdr-list-wrapper
-autoload __zcmdr-process-buffer __zcmdr-usetty-wrapper uizcm zcm-feature
+autoload -- tag-search-multi-word zcm -zcmdr-list -zcmdr-list-draw -zcmdr-list-input -zcmdr-list-wrapper
+autoload -- -zcmdr-process-buffer -zcmdr-usetty-wrapper uizcm zcm-feature
 zle -N tag-search-multi-word
 zle -N tag-search-multi-word-backwards tag-search-multi-word
 zle -N tag-search-multi-word-pbackwards tag-search-multi-word
@@ -67,11 +67,11 @@ zle -N tag-search-multi-word-pforwards tag-search-multi-word
 bindkey "^O^K" tag-search-multi-word
 
 # uizcm autoloads
-autoload __zcmdr-process-buffer __zcmdr-usetty-wrapper __zcmdr-list __zcmdr-list-input __zcmdr-list-draw
-autoload __zcmdr_uizcm_last_n_git_log __zcmdr_uizcm_git_modified __zcmdr_action_git_open_commit
-autoload __zcmdr_uizcm_last_nprojects __zcmdr_uizcm_git_header __zcmdr_uizcm_hg_header
-autoload __zcmdr_uizcm_last_n_hg_log __zcmdr_action_hg_open_commit __zcmdr_uizcm_hg_modified
-autoload __zcmdr_uizcm_tree __zcmdr_uizcm_load_tree __zcmdr_uizcm_features
+autoload -- -zcmdr-process-buffer -zcmdr-usetty-wrapper -zcmdr-list -zcmdr-list-input -zcmdr-list-draw
+autoload -- -zcmdr_uizcm_last_n_git_log -zcmdr_uizcm_git_modified -zcmdr_action_git_open_commit
+autoload -- -zcmdr_uizcm_last_nprojects -zcmdr_uizcm_git_header -zcmdr_uizcm_hg_header
+autoload -- -zcmdr_uizcm_last_n_hg_log -zcmdr_action_hg_open_commit -zcmdr_uizcm_hg_modified
+autoload -- -zcmdr_uizcm_tree -zcmdr_uizcm_load_tree -zcmdr_uizcm_features
 
 zle -N uizcm
 bindkey "^O^U" uizcm

@@ -5,12 +5,12 @@ local id="$1" ts="$2" cmd="$3" active_path="$4" sha="$5"
 #
 
 # Own handler for own zcmdr-list - "a" / first action
-__zcmdr_action_hg_open_commit_a() {
+-zcmdr_action_hg_open_commit_a() {
     local id="$1" mypath="$2" cmd="$3" active_path="$4" sha="$5"
     if [[ "${ZCMDR[INTERACTIVE_COMMENTS]}" = "1" ]]; then
-        __zcmdr_stdlib_to_cmd_line "${(q)cmd} =( hg --cwd ${(q)active_path} cat -r $sha ${(q)mypath} ) # $mypath"
+        -zcmdr_stdlib_to_cmd_line "${(q)cmd} =( hg --cwd ${(q)active_path} cat -r $sha ${(q)mypath} ) # $mypath"
     else
-        __zcmdr_stdlib_to_cmd_line "${(q)cmd} =( hg --cwd ${(q)active_path} cat -r $sha ${(q)mypath} )"
+        -zcmdr_stdlib_to_cmd_line "${(q)cmd} =( hg --cwd ${(q)active_path} cat -r $sha ${(q)mypath} )"
     fi
 }
 
@@ -61,7 +61,7 @@ ZCMDRLIST_HOP_INDEXES+=( "$own_LINE_COUNT" )
 
 for (( idx = 1; idx <= size; idx ++ )); do
     reply=( )
-    __zcmdr_stdlib_get_std_button "hopen1A" "${hgout[idx]}" "$selected_editor" "$active_path" "$sha" "${hgout[idx]}" __zcmdr_action_hg_open_commit_a
+    -zcmdr_stdlib_get_std_button "hopen1A" "${hgout[idx]}" "$selected_editor" "$active_path" "$sha" "${hgout[idx]}" -zcmdr_action_hg_open_commit_a
     output+=( "${reply[1]}" )
 done
 
@@ -70,7 +70,7 @@ done
 #
 
 local ZCMDRLIST_WRAPPER_BIT=""
-__zcmdr-usetty-wrapper __zcmdr-list-wrapper "${output[@]}"
+-zcmdr-usetty-wrapper -zcmdr-list-wrapper "${output[@]}"
 
 if [ -z "$ZCMDRLIST_WRAPPER_BIT" ]; then
     zle && zle .redisplay
@@ -78,7 +78,7 @@ if [ -z "$ZCMDRLIST_WRAPPER_BIT" ]; then
 fi
 
 # ID, data1, data2, data3, data4
-if __zcmdr_stdlib_decode_hyperlink "$ZCMDRLIST_WRAPPER_BIT"; then
+if -zcmdr_stdlib_decode_hyperlink "$ZCMDRLIST_WRAPPER_BIT"; then
     local id="${reply[1]}" ts="${reply[2]}" cmd="${reply[3]}" active_path="${reply[4]}" file="${reply[5]}"
     if [[ -n "${ZCMDR_ACTION_IDS_TO_HANDLERS[$id]}" ]]; then
         zle && zle .redisplay

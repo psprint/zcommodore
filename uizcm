@@ -28,174 +28,174 @@ zstyle -s ":plugin:zcommodore" time_limit limit_seconds || limit_seconds="500"
 # Handler functions
 #
 
-__zcmdr_action_edit_file_cd() {
+-zcmdr_action_edit_file_cd() {
     local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5"
-    __zcmdr_stdlib_to_cmd_line "cd ${(q)active_path}; $cmd ${(q)file}"
+    -zcmdr_stdlib_to_cmd_line "cd ${(q)active_path}; $cmd ${(q)file}"
 }
 
-__zcmdr_action_edit_file_abs() {
+-zcmdr_action_edit_file_abs() {
     local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5"
-    __zcmdr_stdlib_to_cmd_line "$cmd ${(q)active_path}/${(q)file}"
+    -zcmdr_stdlib_to_cmd_line "$cmd ${(q)active_path}/${(q)file}"
 }
 
-__zcmdr_action_git_diff_file_abs() {
+-zcmdr_action_git_diff_file_abs() {
     local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5"
-    __zcmdr_stdlib_to_cmd_line "git -C ${(q)active_path} diff ${(q)file}"
+    -zcmdr_stdlib_to_cmd_line "git -C ${(q)active_path} diff ${(q)file}"
 }
 
-__zcmdr_action_file_cd() {
+-zcmdr_action_file_cd() {
     local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5"
 
-    __zcmdr_stdlib_resolve_path "$active_path" "$file"
+    -zcmdr_stdlib_resolve_path "$active_path" "$file"
     local dir="${(q)reply[1]}" file="${(q)reply[2]}"
 
-    __zcmdr_stdlib_to_cmd_line "cd $dir"
+    -zcmdr_stdlib_to_cmd_line "cd $dir"
 }
 
-__zcmdr_action_backup() {
+-zcmdr_action_backup() {
     local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5" dest
 
     zstyle -s ":plugin:zcommodore" backup_dir dest || dest="$HOME/.backup"
 
-    __zcmdr_stdlib_resolve_path "$active_path" "$file"
+    -zcmdr_stdlib_resolve_path "$active_path" "$file"
     local dir="${(q)reply[1]}" file="${(q)reply[2]}"
 
-    __zcmdr_stdlib_get_date_and_time_string
-    __zcmdr_stdlib_to_cmd_line "cmdr_bdir -s; cp -vf $dir/$file ${(q)dest}/${file}_$REPLY"
+    -zcmdr_stdlib_get_date_and_time_string
+    -zcmdr_stdlib_to_cmd_line "cmdr_bdir -s; cp -vf $dir/$file ${(q)dest}/${file}_$REPLY"
 }
 
-__zcmdr_action_git_history() {
+-zcmdr_action_git_history() {
     local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5"
-    __zcmdr_stdlib_to_cmd_line "git -C ${(q)active_path} log --follow -p -- ${(q)file}"
+    -zcmdr_stdlib_to_cmd_line "git -C ${(q)active_path} log --follow -p -- ${(q)file}"
 }
 
-__zcmdr_action_git_ahistory() {
-    local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5"
-
-    __zcmdr_stdlib_to_cmd_line "cmdr_ahistory ${(q)active_path} . ${(q)file}"
-}
-
-__zcmdr_action_git_store_as_object() {
+-zcmdr_action_git_ahistory() {
     local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5"
 
-    __zcmdr_stdlib_to_cmd_line "cmdr_store_as_object ${(q)active_path} . ${(q)file}"
+    -zcmdr_stdlib_to_cmd_line "cmdr_ahistory ${(q)active_path} . ${(q)file}"
 }
 
-__zcmdr_action_git_same_files() {
+-zcmdr_action_git_store_as_object() {
+    local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5"
+
+    -zcmdr_stdlib_to_cmd_line "cmdr_store_as_object ${(q)active_path} . ${(q)file}"
+}
+
+-zcmdr_action_git_same_files() {
     local id="$1" ts="$2" cmd="$3" active_path="$4" sha="$5"
 
-    __zcmdr_stdlib_to_cmd_line "cmdr_same_files ${(q)active_path} $sha"
+    -zcmdr_stdlib_to_cmd_line "cmdr_same_files ${(q)active_path} $sha"
 }
 
-__zcmdr_action_git_same_files_e() {
+-zcmdr_action_git_same_files_e() {
     local id="$1" ts="$2" cmd="$3" active_path="$4" sha="$5"
 
-    __zcmdr_stdlib_to_cmd_line "cmdr_same_files -e ${(q)active_path} $sha"
+    -zcmdr_stdlib_to_cmd_line "cmdr_same_files -e ${(q)active_path} $sha"
 }
 
-__zcmdr_action_git_same_author() {
+-zcmdr_action_git_same_author() {
     local id="$1" ts="$2" cmd="$3" active_path="$4" author="$5"
-    __zcmdr_stdlib_to_cmd_line "git -C ${(q)active_path} log --author=${(q)author} --date=short --pretty=format:'%Cgreen%cd %h %Creset%s'"
+    -zcmdr_stdlib_to_cmd_line "git -C ${(q)active_path} log --author=${(q)author} --date=short --pretty=format:'%Cgreen%cd %h %Creset%s'"
 }
 
-__zcmdr_action_git_diff() {
+-zcmdr_action_git_diff() {
     local id="$1" ts="$2" cmd="$3" active_path="$4" sha="$5"
 
-    __zcmdr_stdlib_to_cmd_line "git -C ${(q)active_path} log -p -1 --word-diff=color $sha"
+    -zcmdr_stdlib_to_cmd_line "git -C ${(q)active_path} log -p -1 --word-diff=color $sha"
 }
 
-__zcmdr_action_zconvey_zcmdr_g() {
+-zcmdr_action_zconvey_zcmdr_g() {
     local id="$1" ts="$2" cmd="$3" active_path="$4" zconvey="$5"
 
     if [[ "$zconvey" = "yes" ]]; then
         if ! type zc 2>/dev/null 1>&2; then
-            __zcmdr_stdlib_to_cmd_line "cd ${(q)active_path}; zcm -g; echo \"\\nZconvey is not installed: http://github.com/psprint/zconvey\""
+            -zcmdr_stdlib_to_cmd_line "cd ${(q)active_path}; zcm -g; echo \"\\nZconvey is not installed: http://github.com/psprint/zconvey\""
         else
-            __zcmdr_stdlib_to_cmd_line "cd ${(q)active_path}; zcm -g; zc-all zcm-refresh"
+            -zcmdr_stdlib_to_cmd_line "cd ${(q)active_path}; zcm -g; zc-all zcm-refresh"
         fi
     else
-        __zcmdr_stdlib_to_cmd_line "cd ${(q)active_path}; zcm -g"
+        -zcmdr_stdlib_to_cmd_line "cd ${(q)active_path}; zcm -g"
     fi
 }
 
-__zcmdr_action_feature_edit_cd() {
+-zcmdr_action_feature_edit_cd() {
     local id="$1" opt="$2" cmd="$3" repo_path="$4" feat_name="$5"
 
     if [[ "$opt" = "commits" ]]; then
-        __zcmdr_stdlib_to_cmd_line "zcm-feature --cd -x ${(q)feat_name}"
+        -zcmdr_stdlib_to_cmd_line "zcm-feature --cd -x ${(q)feat_name}"
     else
-        __zcmdr_stdlib_to_cmd_line "zcm-feature --cd ${(q)feat_name}"
+        -zcmdr_stdlib_to_cmd_line "zcm-feature --cd ${(q)feat_name}"
     fi
 }
 
-__zcmdr_action_feature_edit_abs() {
+-zcmdr_action_feature_edit_abs() {
     local id="$1" opt="$2" cmd="$3" repo_path="$4" feat_name="$5"
 
     if [[ "$opt" = "commits" ]]; then
-        __zcmdr_stdlib_to_cmd_line "zcm-feature --nocd -x ${(q)feat_name}"
+        -zcmdr_stdlib_to_cmd_line "zcm-feature --nocd -x ${(q)feat_name}"
     else
-        __zcmdr_stdlib_to_cmd_line "zcm-feature --nocd ${(q)feat_name}"
+        -zcmdr_stdlib_to_cmd_line "zcm-feature --nocd ${(q)feat_name}"
     fi
 }
 
-__zcmdr_action_feature_diff() {
+-zcmdr_action_feature_diff() {
     local id="$1" opt="$2" cmd="$3" repo_path="$4" feat_name="$5"
 
-    __zcmdr_stdlib_to_cmd_line "zcm-feature --diff ${(q)feat_name}"
+    -zcmdr_stdlib_to_cmd_line "zcm-feature --diff ${(q)feat_name}"
 }
 
-__zcmdr_action_feature_files() {
+-zcmdr_action_feature_files() {
     local id="$1" opt="$2" cmd="$3" repo_path="$4" feat_name="$5"
 
-    __zcmdr_stdlib_to_cmd_line "zcm-feature -LL ${(q)feat_name}; zcm-feature -qf ${(q)feat_name}"
+    -zcmdr_stdlib_to_cmd_line "zcm-feature -LL ${(q)feat_name}; zcm-feature -qf ${(q)feat_name}"
 }
 
-__zcmdr_action_feature_backup() {
+-zcmdr_action_feature_backup() {
     local id="$1" opt="$2" cmd="$3" repo_path="$4" feat_name="$5"
 
-    __zcmdr_stdlib_to_cmd_line "zcm-feature -bx ${(q)feat_name}"
+    -zcmdr_stdlib_to_cmd_line "zcm-feature -bx ${(q)feat_name}"
 }
 
-__zcmdr_action_create_feature() {
+-zcmdr_action_create_feature() {
     local id="$1" project="$2" cmd="$3" repo_path="$4" feat_name="$5"
 
-    __zcmdr_stdlib_to_cmd_line "zcm-feature -pPC ${(q)project} ${ZCMDR_SELECTED_COMMIT_IDS[*]}"
+    -zcmdr_stdlib_to_cmd_line "zcm-feature -pPC ${(q)project} ${ZCMDR_SELECTED_COMMIT_IDS[*]}"
 }
 
 # Hg actions
 
-__zcmdr_action_hg_diff() {
+-zcmdr_action_hg_diff() {
     local id="$1" ts="$2" cmd="$3" active_path="$4" sha="$5"
 
-    __zcmdr_stdlib_to_cmd_line "hg --cwd ${(q)active_path} log -p -r $sha"
+    -zcmdr_stdlib_to_cmd_line "hg --cwd ${(q)active_path} log -p -r $sha"
 }
 
-__zcmdr_action_hg_same_author() {
+-zcmdr_action_hg_same_author() {
     local id="$1" ts="$2" cmd="$3" active_path="$4" author="$5"
-    __zcmdr_stdlib_to_cmd_line "hg --cwd ${(q)active_path} log -u ${(q)author} -T'{node|shortest} {desc|firstline} {date|age} {author|emailuser}\n' | ${PAGER:-less}"
+    -zcmdr_stdlib_to_cmd_line "hg --cwd ${(q)active_path} log -u ${(q)author} -T'{node|shortest} {desc|firstline} {date|age} {author|emailuser}\n' | ${PAGER:-less}"
 }
 
-__zcmdr_action_hg_diff_file_abs() {
+-zcmdr_action_hg_diff_file_abs() {
     local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5"
-    __zcmdr_stdlib_to_cmd_line "hg --cwd ${(q)active_path} diff ${(q)file}"
+    -zcmdr_stdlib_to_cmd_line "hg --cwd ${(q)active_path} diff ${(q)file}"
 }
 
-__zcmdr_action_hg_history() {
+-zcmdr_action_hg_history() {
     local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5"
-    __zcmdr_stdlib_to_cmd_line "hg --cwd ${(q)active_path} log -p -- ${(q)file} | ${PAGER:-less}"
+    -zcmdr_stdlib_to_cmd_line "hg --cwd ${(q)active_path} log -p -- ${(q)file} | ${PAGER:-less}"
 }
 
-__zcmdr_action_tree_open() {
+-zcmdr_action_tree_open() {
     local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5"
     file="${(q)file}"
     file="${file/(#s)\\~/~}"
-    __zcmdr_stdlib_to_cmd_line "${(q)cmd} $file"
+    -zcmdr_stdlib_to_cmd_line "${(q)cmd} $file"
 }
 
 #
 # Internal actions
 #
-__zcmdr_internal_action_load_tree() {
+-zcmdr_internal_action_load_tree() {
     local id="$1" header_idx="$2" cmd="$3" active_path="$4" section_size="$5"
 
     local main_tree_path="$ZCMDR_CONFIG_DIR/tree.$$"
@@ -216,11 +216,11 @@ __zcmdr_internal_action_load_tree() {
             # if they do, then here we wait infinitely, but not
             # for .busy file to be deleted (might never happen)
             # - directly for the function to end
-            __zcmdr_uizcm_load_tree
+            -zcmdr_uizcm_load_tree
         fi
     else
         command rm -f "$main_tree_path" "$main_tree_path".ready "$main_tree_path".busy
-        __zcmdr_uizcm_load_tree
+        -zcmdr_uizcm_load_tree
     fi
 
     # Either there was .ready file or busy timed out, or no .ready nor .busy files
@@ -229,7 +229,7 @@ __zcmdr_internal_action_load_tree() {
 
     reply=( ); reply2="0"; reply3=( ); reply4=( )
 
-    __zcmdr_uizcm_tree "${tree[@]}"
+    -zcmdr_uizcm_tree "${tree[@]}"
 
     tree_output=( "${reply[@]}" )
     tree_size="$reply2"
@@ -237,7 +237,7 @@ __zcmdr_internal_action_load_tree() {
     tree_hops=( "${reply4[@]}" )
 
     # Return list part, its size, nonselectables and hops
-    # Main function __zcmdr-list will update $@, etc.
+    # Main function -zcmdr-list will update $@, etc.
     typeset -ga ZCMDRLIST_REPLY_LIST_PART
     ZCMDRLIST_REPLY_LIST_PART=( "${reply[@]}" )
 
@@ -262,7 +262,7 @@ __zcmdr_internal_action_load_tree() {
     ZCMDRLIST_REPLY_TO_OVERWRITE_SIZE="$section_size"
 }
 
-__zcmdr_internal_action_mark_for_feature() {
+-zcmdr_internal_action_mark_for_feature() {
     local id="$1" sha="$2" cmd="$3" active_path="$4" list_index="$5"
     typeset -g ZCMDRLIST_REPLY_CHECKBOX_NUM ZCMDRLIST_REPLY_CHECKBOX_OP
 
@@ -430,9 +430,9 @@ if [[ -z "$REGENERATE" || "$REGENERATE" = *,header,* || "$REGENERATE" = *,all,* 
     reply=( ); reply2="0"; reply3=( ); reply4=( )
 
     if (( IS_GIT )); then
-        __zcmdr_uizcm_git_header
+        -zcmdr_uizcm_git_header
     elif (( IS_HG )); then
-        __zcmdr_uizcm_hg_header
+        -zcmdr_uizcm_hg_header
     fi
 
     header_output=( "${reply[@]}" )
@@ -448,7 +448,7 @@ fi
 if [[ -z "$REGENERATE" || "$REGENERATE" = *,projects,* || "$REGENERATE" = *,all,* ]]; then
     reply=( ); reply2="0"; reply3=( ); reply4=( )
 
-    __zcmdr_uizcm_last_nprojects "$nprojects"
+    -zcmdr_uizcm_last_nprojects "$nprojects"
 
     proj_output=( "${reply[@]}" )
     proj_size="$reply2"
@@ -473,9 +473,9 @@ if [[ -z "$REGENERATE" || "$REGENERATE" = *,log,* || "$REGENERATE" = *,all,* ]];
     reply=( ); reply2="0"; reply3=( ); reply4=( )
 
     if (( IS_GIT )); then
-        __zcmdr_uizcm_last_n_git_log "$log_count"
+        -zcmdr_uizcm_last_n_git_log "$log_count"
     elif (( IS_HG )); then
-        __zcmdr_uizcm_last_n_hg_log "$log_count"
+        -zcmdr_uizcm_last_n_hg_log "$log_count"
     fi
 
     log_output=( "${reply[@]}" )
@@ -492,9 +492,9 @@ if [[ -z "$REGENERATE" || "$REGENERATE" = *,modified,* || "$REGENERATE" = *,all,
     reply=( ); reply2="0"; reply3=( ); reply4=( )
 
     if (( IS_GIT )); then
-        __zcmdr_uizcm_git_modified
+        -zcmdr_uizcm_git_modified
     elif (( IS_HG )); then
-        __zcmdr_uizcm_hg_modified
+        -zcmdr_uizcm_hg_modified
     fi
 
     modified_output=( "${reply[@]}" )
@@ -510,7 +510,7 @@ fi
 if [[ -z "$REGENERATE" || "$REGENERATE" = *,features,* || "$REGENERATE" = *,all,* ]]; then
     reply=( ); reply2="0"; reply3=( ); reply4=( )
 
-    __zcmdr_uizcm_features
+    -zcmdr_uizcm_features
 
     features_output=( "${reply[@]}" )
     features_size="$reply2"
@@ -536,7 +536,7 @@ if [[ -z "$REGENERATE" || "$REGENERATE" = *,tree,* || "$REGENERATE" = *,treeload
             command rm -f "$main_tree_path" "$main_tree_path".ready "$main_tree_path".busy
         elif [[ ! -f "$main_tree_path".busy ]]; then
             echo "Forcefully started tree load:" "$( date )" >>! /tmp/treeload.txt
-            ( __zcmdr_uizcm_load_tree & )
+            ( -zcmdr_uizcm_load_tree & )
         else
             # TODO: a message about tree still loading
             :
@@ -547,14 +547,14 @@ if [[ -z "$REGENERATE" || "$REGENERATE" = *,tree,* || "$REGENERATE" = *,treeload
         # one. This is also the path of first generation
         tree=( )
         command rm -f "$main_tree_path" "$main_tree_path".ready "$main_tree_path".busy
-        ( __zcmdr_uizcm_load_tree & )
+        ( -zcmdr_uizcm_load_tree & )
 
         # TODO: if ,treeload, then try to wait 1 second?
     fi
 
     reply=( ); reply2="0"; reply3=( ); reply4=( )
 
-    __zcmdr_uizcm_tree "${tree[@]}"
+    -zcmdr_uizcm_tree "${tree[@]}"
 
     tree_output=( "${reply[@]}" )
     tree_size="$reply2"
@@ -643,13 +643,13 @@ for n in "header" "proj" "tree" "log" "modified" "features"; do
     if [[ "$n" = "proj" ]]; then
         :
     elif [[ "$n" = "log" ]]; then
-        [[ -n "${hops[1]}" ]] && __zcmdr_stdlib_get_button "zcmdr_anchor_1" "${hops[1]}" "/Jump/" "" "$size" "${CMDR_MAGENTA}Log${CMDR_MAGENTA_E}" ""
+        [[ -n "${hops[1]}" ]] && -zcmdr_stdlib_get_button "zcmdr_anchor_1" "${hops[1]}" "/Jump/" "" "$size" "${CMDR_MAGENTA}Log${CMDR_MAGENTA_E}" ""
     elif [[ "$n" = "modified" ]]; then
-        [[ -n "${hops[1]}" ]] && __zcmdr_stdlib_get_button "zcmdr_anchor_2" "${hops[1]}" "/Jump/" "" "$size" "${CMDR_GREEN}Modified${CMDR_GREEN_E}" ""
+        [[ -n "${hops[1]}" ]] && -zcmdr_stdlib_get_button "zcmdr_anchor_2" "${hops[1]}" "/Jump/" "" "$size" "${CMDR_GREEN}Modified${CMDR_GREEN_E}" ""
     elif [[ "$n" = "tree" ]]; then
-        [[ -n "${hops[1]}" ]] && __zcmdr_stdlib_get_button "zcmdr_anchor_3" "${hops[1]}" "/Jump & Load/" "" "$size" "${CMDR_CYAN}Tree${CMDR_CYAN_E}" __zcmdr_internal_action_load_tree
+        [[ -n "${hops[1]}" ]] && -zcmdr_stdlib_get_button "zcmdr_anchor_3" "${hops[1]}" "/Jump & Load/" "" "$size" "${CMDR_CYAN}Tree${CMDR_CYAN_E}" -zcmdr_internal_action_load_tree
     elif [[ "$n" = "features" ]]; then
-        [[ -n "${hops[1]}" ]] && __zcmdr_stdlib_get_button "zcmdr_anchor_4" "${hops[1]}" "/Jump/" "" "$size" "${CMDR_CYAN}Features${CMDR_CYAN_E}"
+        [[ -n "${hops[1]}" ]] && -zcmdr_stdlib_get_button "zcmdr_anchor_4" "${hops[1]}" "/Jump/" "" "$size" "${CMDR_CYAN}Features${CMDR_CYAN_E}"
     fi
     anchors+=( "${reply[@]}" )
 
@@ -677,7 +677,7 @@ ZCMDRLIST_GENERATION_TIME="${ZCMDRLIST_GENERATION_TIME[1,5]}"
 
 ZCMDRLIST_HOP_INDEXES+=( 1 ) # jump to anchors
 local ZCMDRLIST_WRAPPER_BIT=""
-__zcmdr-usetty-wrapper __zcmdr-list-wrapper "${anchors[*]}" "${OUTPUT[@]}" "$ZCMDRLIST_GENERATION_TIME"
+-zcmdr-usetty-wrapper -zcmdr-list-wrapper "${anchors[*]}" "${OUTPUT[@]}" "$ZCMDRLIST_GENERATION_TIME"
 
 if [ -z "$ZCMDRLIST_WRAPPER_BIT" ]; then
     zle && { zle .redisplay; zle .reset-prompt; }
@@ -685,7 +685,7 @@ if [ -z "$ZCMDRLIST_WRAPPER_BIT" ]; then
 fi
 
 # ID, data1, data2, data3, data4
-if __zcmdr_stdlib_decode_hyperlink "$ZCMDRLIST_WRAPPER_BIT"; then
+if -zcmdr_stdlib_decode_hyperlink "$ZCMDRLIST_WRAPPER_BIT"; then
     local id="${reply[1]}" ts="${reply[2]}" cmd="${reply[3]}" active_path="${reply[4]}" file="${reply[5]}"
     if [[ -z "$id" ]]; then
         REGENERATE="$ts"

@@ -45,29 +45,29 @@ for (( idx = 1; idx <= size; idx ++ )); do
     # $6 - text
     # $7 - handler function name
     if [ "$cd_at_edit" = "yes" ]; then
-        __zcmdr_stdlib_get_std_button "featA" "" "$selected_editor" "$repo_root_dir" "$feat_name" "$txtentry" __zcmdr_action_feature_edit_cd
+        -zcmdr_stdlib_get_std_button "featA" "" "$selected_editor" "$repo_root_dir" "$feat_name" "$txtentry" -zcmdr_action_feature_edit_cd
         if (( has_commits )); then
-            __zcmdr_stdlib_get_button "featB" "commits" "$selected_editor" "$repo_root_dir" "$feat_name" "WithCommits" __zcmdr_action_feature_edit_cd
+            -zcmdr_stdlib_get_button "featB" "commits" "$selected_editor" "$repo_root_dir" "$feat_name" "WithCommits" -zcmdr_action_feature_edit_cd
         else
             reply+=( "${CMDR_RED}[WithCommits]${CMDR_RED_E}" )
         fi
     else
-        __zcmdr_stdlib_get_std_button "featA" "" "$selected_editor" "$repo_root_dir" "$feat_name" "$txtentry" __zcmdr_action_feature_edit_abs
+        -zcmdr_stdlib_get_std_button "featA" "" "$selected_editor" "$repo_root_dir" "$feat_name" "$txtentry" -zcmdr_action_feature_edit_abs
         if (( has_commits )); then
-            __zcmdr_stdlib_get_button "featB" "commits" "$selected_editor" "$repo_root_dir" "$feat_name" "WithCommits" __zcmdr_action_feature_edit_abs
+            -zcmdr_stdlib_get_button "featB" "commits" "$selected_editor" "$repo_root_dir" "$feat_name" "WithCommits" -zcmdr_action_feature_edit_abs
         else
             reply+=( "${CMDR_RED}[WithCommits]${CMDR_RED_E}" )
         fi
     fi
 
     if (( has_commits )); then
-        __zcmdr_stdlib_get_button "featC" "" "/Diff/" "$repo_root_dir" "$feat_name" "Diff" __zcmdr_action_feature_diff
+        -zcmdr_stdlib_get_button "featC" "" "/Diff/" "$repo_root_dir" "$feat_name" "Diff" -zcmdr_action_feature_diff
     else
         reply+=( "${CMDR_RED}[Diff]${CMDR_RED_E}" )
     fi
 
-    __zcmdr_stdlib_get_button "featD" "" "/Files/" "$repo_root_dir" "$feat_name" "ShowFiles" __zcmdr_action_feature_files
-    __zcmdr_stdlib_get_button "featE" "" "/Backup/" "$repo_root_dir" "$feat_name" "Backup" __zcmdr_action_feature_backup
+    -zcmdr_stdlib_get_button "featD" "" "/Files/" "$repo_root_dir" "$feat_name" "ShowFiles" -zcmdr_action_feature_files
+    -zcmdr_stdlib_get_button "featE" "" "/Backup/" "$repo_root_dir" "$feat_name" "Backup" -zcmdr_action_feature_backup
 
     output+=( "${reply[*]}" )
     own_LINE_COUNT+=1

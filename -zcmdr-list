@@ -199,13 +199,13 @@ autoload __zcmdr-list-draw __zcmdr-list-input __zcmdr-process-buffer
         [[ "$ZCMDRLIST_CURRENT_SEGMENT" -gt "$nseg" ]] && ZCMDRLIST_CURRENT_SEGMENT="$nseg"
         integer active_segment="$ZCMDRLIST_CURRENT_SEGMENT"
 
-        # Prepare output variables for __zcmdr-process-buffer
+        # Prepare output variables for -zcmdr-process-buffer
         local ZCMDR_PB_WORDS="" ZCMDR_PB_WORDS_BEGINNINGS="" ZCMDR_PB_SPACES=""
         local ZCMDR_PB_SELECTED_WORD="" ZCMDR_PB_LEFT="" ZCMDR_PB_RIGHT=""
 
         # Lets find interesting segment and mark it with bells (\7),
         # that are translated to red color
-        __zcmdr-process-buffer "$element"
+        -zcmdr-process-buffer "$element"
         integer size="${#ZCMDR_PB_WORDS}" i
         local buf=""
         for (( i=1; i<=size; i++ )); do
@@ -228,7 +228,7 @@ autoload __zcmdr-list-draw __zcmdr-list-input __zcmdr-process-buffer
 
 # Check if there is proper input
 if [ "$#" -lt 1 ]; then
-    echo "Usage: __zcmdr-list element_1 ..."
+    echo "Usage: -zcmdr-list element_1 ..."
     return 1
 fi
 
@@ -438,7 +438,7 @@ while (( 1 )); do
         disp_list2=( "${disp_list2[@]//$'\1'[^$'\1']#$'\1'[^$'\1']#$'\1'[^$'\1']#$'\1'[^$'\1']#$'\1'[^$'\1']#$'\2'/}" )
 
         # Output colored list
-        __zcmdr-list-draw "$(( ZCMDRLIST_CURRENT_IDX - ZCMDRLIST_FROM_WHAT_IDX_LIST_IS_SHOWN + 1 ))" \
+        -zcmdr-list-draw "$(( ZCMDRLIST_CURRENT_IDX - ZCMDRLIST_FROM_WHAT_IDX_LIST_IS_SHOWN + 1 ))" \
             "$page_height" "$page_width" 1 2 "$ZCMDRLIST_TEXT_OFFSET" "$wname_main" \
             "$disp_list2[@]"
     else
@@ -504,7 +504,7 @@ while (( 1 )); do
         disp_list2=( "${disp_list2[@]//$'\1'[^$'\1']#$'\1'[^$'\1']#$'\1'[^$'\1']#$'\1'[^$'\1']#$'\1'[^$'\1']#$'\2'/}" )
 
         # Output the list
-        __zcmdr-list-draw "$(( ZCMDRLIST_CURRENT_IDX - ZCMDRLIST_FROM_WHAT_IDX_LIST_IS_SHOWN + 1 ))" \
+        -zcmdr-list-draw "$(( ZCMDRLIST_CURRENT_IDX - ZCMDRLIST_FROM_WHAT_IDX_LIST_IS_SHOWN + 1 ))" \
             "$page_height" "$page_width" 1 2 "$ZCMDRLIST_TEXT_OFFSET" "$wname_main" \
             "$disp_list2[@]"
     fi
@@ -520,7 +520,7 @@ while (( 1 )); do
     # Status window is optional (1/2)
     [ -n "$wname_status" ] && {
         local st_path="" st_cmd=""
-        if __zcmdr_stdlib_decode_hyperlink "${tmp[$ZCMDRLIST_CURRENT_SEGMENT]}"; then
+        if -zcmdr_stdlib_decode_hyperlink "${tmp[$ZCMDRLIST_CURRENT_SEGMENT]}"; then
             st_cmd="${(Q)reply[3]}"
             [[ -n "${(Q)reply[1]}" ]] && st_path="${(Q)reply[4]}"
 
@@ -590,7 +590,7 @@ while (( 1 )); do
     fi
 
     integer track_cur_idx="$ZCMDRLIST_CURRENT_IDX"
-    __zcmdr-list-input "$ZCMDRLIST_CURRENT_IDX" "$ZCMDRLIST_FROM_WHAT_IDX_LIST_IS_SHOWN" \
+    -zcmdr-list-input "$ZCMDRLIST_CURRENT_IDX" "$ZCMDRLIST_FROM_WHAT_IDX_LIST_IS_SHOWN" \
                     "$page_height" "$page_width" "$last_element" "$nseg" "$ZCMDRLIST_TEXT_OFFSET" \
                     "$final_key" "$ZCMDRLIST_IS_SEARCH_MODE" "$ZCMDRLIST_SEARCH_BUFFER" \
                     "$ZCMDRLIST_IS_UNIQ_MODE" "$ZCMDRLIST_DISABLE_SEARCH"
@@ -715,7 +715,7 @@ while (( 1 )); do
             for (( index = 1; index <= mysize; index ++ )); do
                 aseg="${asegs[index]}"
                 [[ -z "$aseg" ]] && continue
-                __zcmdr_stdlib_decode_hyperlink "$aseg"
+                -zcmdr_stdlib_decode_hyperlink "$aseg"
                 local _id="${reply[1]}" _idx="${reply[2]}" _cmd="${reply[3]}" _active_path="${reply[4]}" _section_size="${reply[5]}"
                 if [[ "$_idx" -gt "$ZCMDRLIST_REPLY_HEADER_IDX" ]]; then
                     # Plainly replace the hyperlink fragment

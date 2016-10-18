@@ -32,7 +32,7 @@ for (( idx = 1; idx <= size; idx ++ )); do
     reply=()
 
     # Time spec
-    __zcmdr_stdlib_get_timestamp
+    -zcmdr_stdlib_get_timestamp
     integer days=$(( (REPLY-mtime)/(24*60*60) ))
     local day_info
     (( days > 0 )) && day_info="${days}_day(s)" || day_info="today"
@@ -56,17 +56,17 @@ for (( idx = 1; idx <= size; idx ++ )); do
     # $6 - text
     # $7 - handler function name
     if [ "$cd_at_edit" = "yes" ]; then
-        __zcmdr_stdlib_get_std_button "hmodA" "$mtime" "$selected_editor" "$repo_root_dir" "$entry" "$day_info" __zcmdr_action_edit_file_cd
-        __zcmdr_stdlib_get_std_button "hmodB" "$mtime" "$selected_editor" "$repo_root_dir" "$entry" "$txtentry" __zcmdr_action_edit_file_cd
+        -zcmdr_stdlib_get_std_button "hmodA" "$mtime" "$selected_editor" "$repo_root_dir" "$entry" "$day_info" -zcmdr_action_edit_file_cd
+        -zcmdr_stdlib_get_std_button "hmodB" "$mtime" "$selected_editor" "$repo_root_dir" "$entry" "$txtentry" -zcmdr_action_edit_file_cd
     else
-        __zcmdr_stdlib_get_std_button "hmodA" "$mtime" "$selected_editor" "$repo_root_dir" "$entry" "$day_info" __zcmdr_action_edit_file_abs
-        __zcmdr_stdlib_get_std_button "hmodB" "$mtime" "$selected_editor" "$repo_root_dir" "$entry" "$txtentry" __zcmdr_action_edit_file_abs
+        -zcmdr_stdlib_get_std_button "hmodA" "$mtime" "$selected_editor" "$repo_root_dir" "$entry" "$day_info" -zcmdr_action_edit_file_abs
+        -zcmdr_stdlib_get_std_button "hmodB" "$mtime" "$selected_editor" "$repo_root_dir" "$entry" "$txtentry" -zcmdr_action_edit_file_abs
     fi
 
-    __zcmdr_stdlib_get_button "hmodC" "$mtime" "/Diff/" "$repo_root_dir" "$entry" "Diff" __zcmdr_action_hg_diff_file_abs
-    __zcmdr_stdlib_get_button "hmodD" "$mtime" "/FileCD/" "$repo_root_dir" "$entry" "FileCD" __zcmdr_action_file_cd
-    __zcmdr_stdlib_get_button "hmodE" "$mtime" "/Backup/" "$repo_root_dir" "$entry" "Backup" __zcmdr_action_backup
-    __zcmdr_stdlib_get_button "hmodF" "$mtime" "/History/" "$repo_root_dir" "$entry" "History" __zcmdr_action_hg_history
+    -zcmdr_stdlib_get_button "hmodC" "$mtime" "/Diff/" "$repo_root_dir" "$entry" "Diff" -zcmdr_action_hg_diff_file_abs
+    -zcmdr_stdlib_get_button "hmodD" "$mtime" "/FileCD/" "$repo_root_dir" "$entry" "FileCD" -zcmdr_action_file_cd
+    -zcmdr_stdlib_get_button "hmodE" "$mtime" "/Backup/" "$repo_root_dir" "$entry" "Backup" -zcmdr_action_backup
+    -zcmdr_stdlib_get_button "hmodF" "$mtime" "/History/" "$repo_root_dir" "$entry" "History" -zcmdr_action_hg_history
 
     hgout2+=( "${reply[1]} ${reply[2]} ${reply[3]} ${reply[4]} ${reply[5]} ${reply[6]}" )
     own_LINE_COUNT+=1

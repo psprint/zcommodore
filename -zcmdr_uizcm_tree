@@ -22,7 +22,7 @@ for (( idx = 1; idx <= size; idx ++ )); do
     local passed_path="${globout[idx]/(#s)$HOME/~}"
 
     reply=( )
-    __zcmdr_stdlib_get_std_button "topenA" "" "$selected_editor" "$current_project" "$passed_path" "$txt" __zcmdr_action_tree_open
+    -zcmdr_stdlib_get_std_button "topenA" "" "$selected_editor" "$current_project" "$passed_path" "$txt" -zcmdr_action_tree_open
     output+=( "${reply[1]}" )
     own_LINE_COUNT+=1
 done
@@ -30,7 +30,7 @@ done
 # Button to load tree when having no results
 if [[ "$size" -eq "0" ]]; then
     reply=( )
-    __zcmdr_stdlib_get_button "" ",tree,treeload," "/Load if ready/" "load" "" "Load" ""
+    -zcmdr_stdlib_get_button "" ",tree,treeload," "/Load if ready/" "load" "" "Load" ""
     output+=( "${reply[1]}" )
     own_LINE_COUNT+=1
 fi

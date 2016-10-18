@@ -67,8 +67,8 @@ if [[ "$REGENERATE" = *,load_project,* || "$REGENERATE" = *,switch_project,* ]];
     fi
 
     reply=()
-    __zcmdr_stdlib_get_std_button "gheadA" "$mtime" "/Save/" "$current_project" "" "${CMDR_GREEN}((Switch permanenty))${CMDR_GREEN_E}" __zcmdr_action_zconvey_zcmdr_g
-    __zcmdr_stdlib_get_std_button "gheadB" "$mtime" "/Save,Zconvey/" "$current_project" "yes" "${CMDR_MAGENTA}((Also Zconvey the switch to other Zsh))${CMDR_MAGENTA_E}" __zcmdr_action_zconvey_zcmdr_g
+    -zcmdr_stdlib_get_std_button "gheadA" "$mtime" "/Save/" "$current_project" "" "${CMDR_GREEN}((Switch permanenty))${CMDR_GREEN_E}" -zcmdr_action_zconvey_zcmdr_g
+    -zcmdr_stdlib_get_std_button "gheadB" "$mtime" "/Save,Zconvey/" "$current_project" "yes" "${CMDR_MAGENTA}((Also Zconvey the switch to other Zsh))${CMDR_MAGENTA_E}" -zcmdr_action_zconvey_zcmdr_g
     output+=( "$line ${reply[1]} ${reply[2]}" )
     own_LINE_COUNT+=1
 fi

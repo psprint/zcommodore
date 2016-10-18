@@ -1,7 +1,7 @@
 emulate -LR zsh
 setopt extendedglob typesetsilent
 
-__zcmdr_usage_zcm() {
+-zcmdr_usage_zcm() {
     print -- "Project switching tool. With no arguments will switch to current directory."
     print -- "With -g will also generate tags. With -l will list last N projects. With"
     print -- "-z will Zconvey the project change to all sessions (-f: also to busy ones;"
@@ -22,12 +22,12 @@ __zcmdr_usage_zcm() {
 
 local -A opthash
 local -a optarr
-zparseopts -D -A opthash g -gen l -list z+=optarr -zconvey f -force q -quiet v -verbose h -help || { __zcmdr_usage_zcm; return 1; }
+zparseopts -D -A opthash g -gen l -list z+=optarr -zconvey f -force q -quiet v -verbose h -help || { -zcmdr_usage_zcm; return 1; }
 
 integer gen=0 list=0 zconvey=0 force=0 quiet=0 verbose=0
 
 # Help
-(( ${+opthash[-h]} + ${+opthash[--help]} )) && { __zcmdr_usage_zcm; return 0; }
+(( ${+opthash[-h]} + ${+opthash[--help]} )) && { -zcmdr_usage_zcm; return 0; }
 
 # GEN, LIST, ZCONVEY, FORCE, QUIET, VERBOSE
 (( gen = ${+opthash[-g]} + ${+opthash[--gen]} ))
@@ -78,7 +78,7 @@ zstyle -s ":plugin:zcommodore" nprojects nprojects || nprojects="7"
 local -a all_circular_paths entries
 local p answer
 
-__zcmdr_stdlib_circular_paths "last_project"
+-zcmdr_stdlib_circular_paths "last_project"
 all_circular_paths=( "${reply[@]}" )
 (( verbose )) && print "Last-projects list has size ${#all_circular_paths}, Zstyle setting is $nprojects"
 
@@ -173,11 +173,11 @@ if (( zconvey < 2 )); then
 
     # Oldest used file
     local circular_file_path
-    __zcmdr_stdlib_circular_next "last_project" "$nprojects"
+    -zcmdr_stdlib_circular_next "last_project" "$nprojects"
     circular_file_path="$REPLY"
 
     # Reuse existing file if it has the same project
-    __zcmdr_stdlib_circular_paths "last_project"
+    -zcmdr_stdlib_circular_paths "last_project"
     all_circular_paths=( "${reply[@]}" )
 
     for p in "${all_circular_paths[@]}"; do

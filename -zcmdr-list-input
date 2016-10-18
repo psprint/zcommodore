@@ -156,7 +156,7 @@ case "$key" in
             local -a replybkp
             replybkp=( "${reply[@]}" )
             reply=( )
-            if __zcmdr_stdlib_decode_hyperlink "${segs[ZCMDRLIST_CURRENT_SEGMENT]}"; then
+            if -zcmdr_stdlib_decode_hyperlink "${segs[ZCMDRLIST_CURRENT_SEGMENT]}"; then
                 local id="${reply[1]}" idx="${reply[2]}" cmd="${reply[3]}" active_path="${reply[4]}" section_size="${reply[5]}"
                 reply=( "${replybkp[@]}" )
 

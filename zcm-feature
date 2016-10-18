@@ -3,7 +3,7 @@ setopt extendedglob typesetsilent
 
 [[ -z "${fg_bold[green]}" ]] && builtin autoload -Uz colors && colors
 
-__zcmdr_usage_zcm_feature() {
+-zcmdr_usage_zcm_feature() {
     print -- "Feature management tool. You can EDIT files belonging to feature (with"
     print -- "editor from e.g. \$EDITOR variable), CREATE feature from set of files"
     print -- "or from *commit*, UPDATE files of a feature and DELETE whole feature."
@@ -52,13 +52,13 @@ local -A opthash
 local -a optarr
 zparseopts -D -E -A opthash x -extract -cd -nocd l+=optarr -list L+=optarr c -create C -create-from-commits \
             a -add y -delete Y -delete-feature S -set-commits d -diff f -files b -backup p -prompt P -project \
-            q -quiet v -verbose h -help || { __zcmdr_usage_zcm; return 1; }
+            q -quiet v -verbose h -help || { -zcmdr_usage_zcm; return 1; }
 
 integer list=0 LIST=0 create=0 create_from_commits=0 add=0 delete=0 delete_feature=0 set_commits=0 diff=0 filesopt=0 backup=0 quiet=0 verbose=0
 integer extract=0 cdopt=0 nocdopt=0 promptopt=0 project=0
 
 # Help
-(( ${+opthash[-h]} + ${+opthash[--help]} )) && { __zcmdr_usage_zcm_feature; return 0; }
+(( ${+opthash[-h]} + ${+opthash[--help]} )) && { -zcmdr_usage_zcm_feature; return 0; }
 
 (( extract = ${+opthash[-x]} + ${+opthash[--extract]} ))
 (( cdopt = ${+opthash[--cd]} ))
@@ -117,7 +117,7 @@ zstyle -s ":plugin:zcommodore" nprojects nprojects || nprojects="7"
 # Functions
 #
 
-__zcmdr_verify_feature() {
+-zcmdr_verify_feature() {
     local feature="$1"
 
     if [[ "$feature" != [[:alnum:]_-]## ]]; then
@@ -155,11 +155,11 @@ __zcmdr_verify_feature() {
 # project given as input
 #
 # $1 - $ZCMDR[current_project]
-__zcmdr_find_repo_path_in_recents() {
+-zcmdr_find_repo_path_in_recents() {
     local project="$1" p found="no"
     local -a all_circular_paths last_entries
 
-    __zcmdr_stdlib_circular_paths "last_project"
+    -zcmdr_stdlib_circular_paths "last_project"
     all_circular_paths=( "${reply[@]}" )
 
     REPLY=""
@@ -193,7 +193,7 @@ if (( project )); then
         return 34
     fi
 
-    if ! __zcmdr_find_repo_path_in_recents "$project_override"; then
+    if ! -zcmdr_find_repo_path_in_recents "$project_override"; then
         print "Could not find repository of project \`${project_override:t:r}\' because"
         print "the project is not remembered in recent-projects database."
         print "Cannot override project with -P option, aborting.."
@@ -398,7 +398,7 @@ if (( create )); then
 
     local feature_file="${features_path}/${feature}.conf"
 
-    __zcmdr_verify_feature "$feature"
+    -zcmdr_verify_feature "$feature"
     retcode=$?
     (( retcode )) && return $retcode
 
@@ -440,7 +440,7 @@ if (( create_from_commits )); then
 
     local feature_file="${features_path}/${feature}.conf"
 
-    __zcmdr_verify_feature "$feature"
+    -zcmdr_verify_feature "$feature"
     retcode=$?
     (( retcode )) && return $retcode
 
@@ -519,7 +519,7 @@ if (( add )); then
     local -aU files
     files=( "$@" )
 
-    __zcmdr_verify_feature "$feature" "can_exist"
+    -zcmdr_verify_feature "$feature" "can_exist"
     retcode=$?
     (( retcode )) && return $retcode
 
@@ -596,7 +596,7 @@ if (( delete )); then
     local -aU files
     files=( "$@" )
 
-    __zcmdr_verify_feature "$feature" "can_exist"
+    -zcmdr_verify_feature "$feature" "can_exist"
     retcode=$?
     (( retcode )) && return $retcode
 
@@ -691,7 +691,7 @@ if (( delete_feature )); then
 
     local feature="$1"
 
-    __zcmdr_verify_feature "$feature" "must_exist"
+    -zcmdr_verify_feature "$feature" "must_exist"
     retcode=$?
     (( retcode )) && return $retcode
 
@@ -733,7 +733,7 @@ if (( set_commits )); then
     local -aU commits
     commits=( "$@" )
 
-    __zcmdr_verify_feature "$feature" "must_exist"
+    -zcmdr_verify_feature "$feature" "must_exist"
     retcode=$?
     (( retcode )) && return $retcode
 
@@ -753,7 +753,7 @@ if (( set_commits )); then
             return 18
         else
             project_line="${entries[2]}"
-            if ! __zcmdr_find_repo_path_in_recents "$project_line"; then
+            if ! -zcmdr_find_repo_path_in_recents "$project_line"; then
                 print "Could not find repository of project \`${entries[2]:t:r}\' because"
                 print "the project is not remembered in recent-projects database."
                 print "Will perform without commit verification."
@@ -823,7 +823,7 @@ if (( diff )); then
 
     local feature="$1"
 
-    __zcmdr_verify_feature "$feature" "must_exist"
+    -zcmdr_verify_feature "$feature" "must_exist"
     retcode=$?
     (( retcode )) && return $retcode
 
@@ -837,7 +837,7 @@ if (( diff )); then
     if [[ "${entries[2]}" != "$project_line" ]]; then
         print "Warning: the feature \`$feature' belongs to not-current project: ${fg_bold[green]}\`${entries[2]:t:r}'${reset_color}"
         project_line="${entries[2]}"
-        if ! __zcmdr_find_repo_path_in_recents "$project_line"; then
+        if ! -zcmdr_find_repo_path_in_recents "$project_line"; then
             print "Could not find repository of project \`${entries[2]:t:r}\' because"
             print "the project is not remembered in recent-projects database."
             print "Cannot continue, aborting"
@@ -901,9 +901,9 @@ if (( diff )); then
 
     if (( is_git )); then
         if (( verbose == 0 )); then
-            git -C "$root_dir" show --format=oneline --abbrev-commit --word-diff=color -p "${vercommits[@]}" -- | __zcmdr_stdlib_filter_diff | ${PAGER:-less}
+            git -C "$root_dir" show --format=oneline --abbrev-commit --word-diff=color -p "${vercommits[@]}" -- | -zcmdr_stdlib_filter_diff | ${PAGER:-less}
         else
-            git -C "$root_dir" show --format=oneline --no-abbrev-commit --word-diff=color -p "${vercommits[@]}" -- | __zcmdr_stdlib_filter_diff | ${PAGER:-less}
+            git -C "$root_dir" show --format=oneline --no-abbrev-commit --word-diff=color -p "${vercommits[@]}" -- | -zcmdr_stdlib_filter_diff | ${PAGER:-less}
         fi
     fi
 fi
@@ -917,7 +917,7 @@ if (( filesopt )); then
     local feature="$1"
     shift
 
-    __zcmdr_verify_feature "$feature" "must_exist"
+    -zcmdr_verify_feature "$feature" "must_exist"
     retcode=$?
     (( retcode )) && return $retcode
 
@@ -933,7 +933,7 @@ if (( filesopt )); then
         project_line="${entries[2]}"
         root_dir=""
 
-        if ! __zcmdr_find_repo_path_in_recents "$project_line"; then
+        if ! -zcmdr_find_repo_path_in_recents "$project_line"; then
             print "Could not find repository of project \`${entries[2]:t:r}\' because"
             print "the project is not remembered in recent-projects database."
             print "Cannot read feature's commits (to list files), aborting.."
@@ -1026,7 +1026,7 @@ if (( backup )); then
     local feature="$1"
     shift
 
-    __zcmdr_verify_feature "$feature" "must_exist"
+    -zcmdr_verify_feature "$feature" "must_exist"
     retcode=$?
     (( retcode )) && return $retcode
 
@@ -1043,7 +1043,7 @@ if (( backup )); then
         root_dir=""
 
         if (( extract )); then
-            if ! __zcmdr_find_repo_path_in_recents "$project_line"; then
+            if ! -zcmdr_find_repo_path_in_recents "$project_line"; then
                 print "Could not find repository of project \`${entries[2]:t:r}\' because"
                 print "the project is not remembered in recent-projects database."
                 print "Cannot use feature's commits, will only open feature's files."
@@ -1151,7 +1151,7 @@ if (( backup )); then
     [[ "${ZCMDR[cmdline_sourced]}" != "1" ]] && source "${ZCMDR_REPO_DIR}/lib/cmdline.lcmdr"
     cmdr_bdir -s
 
-    __zcmdr_stdlib_get_date_and_time_string
+    -zcmdr_stdlib_get_date_and_time_string
     tar -C "$project_line" -czf "${dest}/feat_${feature}_${REPLY}.tgz" "${files[@]}"
     retcode=$?
 
@@ -1182,7 +1182,7 @@ if (( list + LIST + create + create_from_commits + add + delete + delete_feature
     local feature="$1"
     shift
 
-    __zcmdr_verify_feature "$feature" "must_exist"
+    -zcmdr_verify_feature "$feature" "must_exist"
     retcode=$?
     (( retcode )) && return $retcode
 
@@ -1199,7 +1199,7 @@ if (( list + LIST + create + create_from_commits + add + delete + delete_feature
         root_dir=""
 
         if (( extract )); then
-            if ! __zcmdr_find_repo_path_in_recents "$project_line"; then
+            if ! -zcmdr_find_repo_path_in_recents "$project_line"; then
                 print "Could not find repository of project \`${entries[2]:t:r}\' because"
                 print "the project is not remembered in recent-projects database."
                 print "Cannot use feature's commits, will only open feature's files."

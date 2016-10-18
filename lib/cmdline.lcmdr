@@ -61,7 +61,7 @@ cmdr_store_as_object() {
 
     local sha=$( git -C "$repo_path" hash-object -w "$file_path/$file_name" )
 
-    __zcmdr_stdlib_get_date_and_time_string
+    -zcmdr_stdlib_get_date_and_time_string
 
     echo "$sha $REPLY ${(q)file_name}" >>! "$repo_path/stored_objects.lst"
     echo "Created BLOB for \`$file_name': ${fg_bold[green]}$sha${reset_color}"
@@ -173,7 +173,7 @@ cmdr_git_filtered_diffs_for() {
     local repo="$1"
     shift
 
-    git -C "$repo" show --format=oneline --abbrev-commit --word-diff=color -p "$@" -- | __zcmdr_stdlib_filter_diff | ${PAGER:-less}
+    git -C "$repo" show --format=oneline --abbrev-commit --word-diff=color -p "$@" -- | -zcmdr_stdlib_filter_diff | ${PAGER:-less}
 }
 
 ZCMDR[cmdline_sourced]="1"

@@ -12,7 +12,7 @@ nonselectables+=( "$own_LINE_COUNT" )
 hop_indices+=( "$own_LINE_COUNT" )
 
 # Fetch paths to files with data on last $nprojects projects
-__zcmdr_stdlib_circular_paths "last_project"
+-zcmdr_stdlib_circular_paths "last_project"
 
 local -a entries
 integer pcount=0
@@ -39,8 +39,8 @@ for proj in "${reply[@]}"; do
     txtproject="$ACC_YELLOW${txtproject}$ACC_YELLOW_E"
 
     reply=( )
-    __zcmdr_stdlib_get_std_button "" ",load_project,header,log,modified,tree," "/Load project/" "$proj" "" "$txtname" ""
-    __zcmdr_stdlib_get_std_button "" ",switch_project,header,log,modified,tree," "/Switch project/" "$proj" "" "$txtproject" ""
+    -zcmdr_stdlib_get_std_button "" ",load_project,header,log,modified,tree," "/Load project/" "$proj" "" "$txtname" ""
+    -zcmdr_stdlib_get_std_button "" ",switch_project,header,log,modified,tree," "/Switch project/" "$proj" "" "$txtproject" ""
 
     output+=( "${reply[1]} ${reply[2]}" )
     own_LINE_COUNT+=1

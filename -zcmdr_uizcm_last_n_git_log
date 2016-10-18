@@ -50,11 +50,11 @@ for entry in "${gitout[@]}"; do
         fi
     fi
 
-    __zcmdr_stdlib_get_button "zcmdr_checkbox_1" "${arrentry[1]}" "/Mark for feature/" "$repo_root_dir" "$(( own_LINE_COUNT + 1 ))" "$txt6" __zcmdr_internal_action_mark_for_feature
-    __zcmdr_stdlib_get_std_button "glogA" "0" "/Open commit/" "$repo_root_dir" "${arrentry[1]}" "$txt1" __zcmdr_action_git_open_commit
-    __zcmdr_stdlib_get_std_button "glogB" "0" "/Diff/" "$repo_root_dir" "${arrentry[1]}" "$txt2" __zcmdr_action_git_diff
-    __zcmdr_stdlib_get_std_button "glogC" "0" "/Same-files commits/" "$repo_root_dir" "${arrentry[1]}" "$txt4" __zcmdr_action_git_same_files_e
-    __zcmdr_stdlib_get_std_button "glogD" "0" "/Same-author commits/" "$repo_root_dir" "${arrentry[5]}" "$txt5" __zcmdr_action_git_same_author
+    -zcmdr_stdlib_get_button "zcmdr_checkbox_1" "${arrentry[1]}" "/Mark for feature/" "$repo_root_dir" "$(( own_LINE_COUNT + 1 ))" "$txt6" -zcmdr_internal_action_mark_for_feature
+    -zcmdr_stdlib_get_std_button "glogA" "0" "/Open commit/" "$repo_root_dir" "${arrentry[1]}" "$txt1" -zcmdr_action_git_open_commit
+    -zcmdr_stdlib_get_std_button "glogB" "0" "/Diff/" "$repo_root_dir" "${arrentry[1]}" "$txt2" -zcmdr_action_git_diff
+    -zcmdr_stdlib_get_std_button "glogC" "0" "/Same-files commits/" "$repo_root_dir" "${arrentry[1]}" "$txt4" -zcmdr_action_git_same_files_e
+    -zcmdr_stdlib_get_std_button "glogD" "0" "/Same-author commits/" "$repo_root_dir" "${arrentry[5]}" "$txt5" -zcmdr_action_git_same_author
 
     gitout2+=( "${reply[1]} ${reply[2]}$entry3 ${reply[3]} ${reply[4]} ${reply[5]}" )
     own_LINE_COUNT+=1
@@ -66,16 +66,16 @@ reply=( )
 
 # More? Has that "ends exactly at git_log_count" small flaw
 if [[ "${#gitout[@]}" -ge "$git_log_count" ]]; then
-__zcmdr_stdlib_get_button "" ",log," "/More +5 commits/" "plus" "" "More+5" ""
+-zcmdr_stdlib_get_button "" ",log," "/More +5 commits/" "plus" "" "More+5" ""
 fi
 
 # Less?
 if [[ "$own_LINE_COUNT" -gt 7 ]]; then
-    __zcmdr_stdlib_get_button "" ",log," "/Less -5 commits/" "minus" "" "Less-5" ""
+    -zcmdr_stdlib_get_button "" ",log," "/Less -5 commits/" "minus" "" "Less-5" ""
 fi
 
 # Feature creation
-__zcmdr_stdlib_get_button "glogE" "$current_project" "/Create feature/" "" "" "CreateFeature" __zcmdr_action_create_feature
+-zcmdr_stdlib_get_button "glogE" "$current_project" "/Create feature/" "" "" "CreateFeature" -zcmdr_action_create_feature
 
 gitout2+=( "${reply[*]}" )
 own_LINE_COUNT+=1
