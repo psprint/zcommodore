@@ -270,16 +270,19 @@ __zcmdr_internal_action_mark_for_feature() {
             ZCMDR_SELECTED_COMMIT_IDS+=( "$sha" )
             typeset -g ZCMDRLIST_REPLY_CHECKBOX_NUM=$(( list_index + ZCMDR_SECTION_INDICES[log] ))
             typeset -g ZCMDRLIST_REPLY_CHECKBOX_OP="set"
+            REGENERATE_ALWAYS+=",log,"
         else
             ZCMDR_SELECTED_COMMIT_IDS[idx]=()
             typeset -g ZCMDRLIST_REPLY_CHECKBOX_NUM=$(( list_index + ZCMDR_SECTION_INDICES[log] ))
             typeset -g ZCMDRLIST_REPLY_CHECKBOX_OP="unset"
+            REGENERATE_ALWAYS="${REGENERATE_ALWAYS/,log,/}"
         fi
     else
         typeset -g ZCMDR_SELECTED_COMMIT_IDS
         ZCMDR_SELECTED_COMMIT_IDS=( "$sha" )
         typeset -g ZCMDRLIST_REPLY_CHECKBOX_NUM=$(( list_index + ZCMDR_SECTION_INDICES[log] ))
         typeset -g ZCMDRLIST_REPLY_CHECKBOX_OP="set"
+        REGENERATE_ALWAYS+=",log,"
     fi
 }
 
@@ -374,7 +377,7 @@ local current_tag_file="${ZCMD[current_tag_file]}"
 ### REGENERATION REQUEST LOOP ###
 ###
 
-local REGENERATE="" REGENERATE_ARG=""
+local REGENERATE="" REGENERATE_ARG="" REGENERATE_ALWAYS=""
 local prev_current_project=""
 
 while (( 1 )); do
@@ -391,6 +394,7 @@ if [[ -z "$REGENERATE" || "$REGENERATE" = *,load_project,* ||
 then
     # Each project reload clears commit selection
     ZCMDR_SELECTED_COMMIT_IDS=( )
+    REGENERATE_ALWAYS=""
 
     local -a input_data
     if [[ "$REGENERATE" = *,load_project,* || "$REGENERATE" = *,switch_project,* ]]; then
@@ -692,6 +696,7 @@ if __zcmdr_stdlib_decode_hyperlink "$ZCMDRLIST_WRAPPER_BIT"; then
     if [[ -z "$id" ]]; then
         REGENERATE="$ts"
         REGENERATE_ARG="$active_path"
+        REGENERATE+="$REGENERATE_ALWAYS"
     elif [[ -n "${ZCMDR_ACTION_IDS_TO_HANDLERS[$id]}" ]]; then
         [[ "$id" != "glogA" && "$id" = "hlogA" ]] && zle && { zle .redisplay; zle .reset-prompt; }
         # Call the handled with all hyper-link data
