@@ -225,7 +225,6 @@ __zcmdr_internal_action_load_tree() {
 
     # Either there was .ready file or busy timed out, or no .ready nor .busy files
     tree=( "${(@f)"$(<$main_tree_path)"}" )
-    command rm -f "$main_tree_path" "$main_tree_path".ready "$main_tree_path".busy
 
     reply=( ); reply2="0"; reply3=( ); reply4=( )
 
