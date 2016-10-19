@@ -293,6 +293,12 @@ if [ "$__tsmw_hcw_call_count" -eq "1" ]; then
                 (emacs|emacsclient)
                     cmd+=( "$selected_editor" "+${taglinebyte%,*}" -- "${(q)tagfile}" )
                     ;;
+                (gedit)
+                    cmd+=( "$selected_editor" "+${taglinebyte%,*}" -- "${(q)tagfile}" )
+                    ;;
+                (nano)
+                    cmd+=( "$selected_editor" "+${taglinebyte%,*}" -- "${(q)tagfile}" )
+                    ;;
             esac
         fi
     else
