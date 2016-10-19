@@ -78,12 +78,19 @@ zstyle -s ":plugin:zcommodore" nprojects nprojects || nprojects="7"
 local -a all_circular_paths entries
 local p answer
 
+reply=( )
 -zcmdr_stdlib_circular_paths "last_project"
 all_circular_paths=( "${reply[@]}" )
 (( verbose )) && print "Last-projects list has size ${#all_circular_paths}, Zstyle setting is $nprojects"
 
 if (( list )); then
     all_circular_paths=( "${(@)all_circular_paths[1,nprojects]}" )
+
+    if [[ "${#all_circular_paths}" = "0" ]]; then
+        print "No remembered projects, first select some project with"
+        print "${fg_bold[green]}\`zcm .'${reset_color} or ${fg_bold[green]}\`zcm -g .'${reset_color}, ran in the project's directory"
+        return 1
+    fi
 
     local -a all_projects
     for p in "${all_circular_paths[@]}"; do
