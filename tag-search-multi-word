@@ -288,10 +288,10 @@ if [ "$__tsmw_hcw_call_count" -eq "1" ]; then
             # Editor command
             case "$selected_editor" in
                 (vim|vi|gvim|mvim|nvim)
-                    cmd+=( "$selected_editor" "+${taglinebyte%,*}" "${(q)tagfile}" )
+                    cmd+=( "$selected_editor" "+${taglinebyte%,*}" -- "${(q)tagfile}" )
                     ;;
-                (emacs)
-                    cmd+=( "$selected_editor" "+${taglinebyte%,*}" "${(q)tagfile}" )
+                (emacs|emacsclient)
+                    cmd+=( "$selected_editor" "+${taglinebyte%,*}" -- "${(q)tagfile}" )
                     ;;
             esac
         fi
