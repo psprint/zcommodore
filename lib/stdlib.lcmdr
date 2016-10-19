@@ -240,7 +240,7 @@ function -zcmdr_stdlib_circular_next() {
 
     # Circular buffers' directory
     local circpath="$ZCMDR_CONFIG_DIR/var/circular_buffers"
-    command mkdir -p "$circpath"
+    [[ ! -d "$circpath" ]] && command mkdir -p "$circpath"
 
     local -a circular_buffer
     circular_buffer=( "$circpath"/"$base".[[:digit:]]##(OmN) )
