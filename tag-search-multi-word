@@ -15,7 +15,7 @@
 # zstyle ":plugin:zcommodore:tag-search-multi-word" highlight-color "fg=magenta,bold"
 
 emulate -LR zsh
-setopt typesetsilent extendedglob noshortloops
+setopt typesetsilent extendedglob noshortloops localtraps
 
 # When an error, then no cursor keys bindings
 zmodload zsh/terminfo 2>/dev/null
@@ -27,6 +27,9 @@ typeset -g __tsmw_page_size __tsmw_hl_color
 typeset -gaU __tsmw_hcw_found
 typeset -ga __tsmw_tag_data
 typeset -g __tsmw_repo_or_project
+
+(( __tsmw_hcw_call_count ++ ))
+trap '(( __tsmw_hcw_call_count -- )); return 0;' INT
 
 _tsmw_main() {
     # First call or restart?
@@ -145,7 +148,6 @@ _tsmw_main() {
     region_highlight+=( "$rh" )
 }
 
-(( __tsmw_hcw_call_count ++ ))
 _tsmw_main
 
 _tsmw_simulate_widget() {
@@ -259,7 +261,6 @@ if [ "$__tsmw_hcw_call_count" -eq "1" ]; then
     cmd=()
 
     # Trap INT to manually interrupt Zle to work around a bug
-    setopt localtraps
     trap 'zle && zle .send-break' INT
 
     if zle .recursive-edit -K tsmw; then
@@ -336,6 +337,8 @@ if [ "$__tsmw_hcw_call_count" -eq "1" ]; then
         CURSOR="${#BUFFER}"
         [[ "$auto_run" = "yes" ]] && zle .accept-line
     fi
+elif (( __tsmw_hcw_call_count > 0 )); then
+    (( __tsmw_hcw_call_count -- ))
 fi
 
 # vim:ft=zsh
