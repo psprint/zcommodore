@@ -62,7 +62,7 @@ for (( i=1; i<=nwords; i++ )); do
     if [[ "$word" = [\;\>\&\|] && -z "$MATCH" && "$idx" -gt "1" ]]; then
         idx=idx-1
         ZCMDR_PB2_QWORDS[idx]+="$word"
-    elif [[ -z "$MATCH" && "$idx" -gt "1" && "${ZCMDR_PB2_QWORDS[idx-1]}" = [\;\>\&\|] ]]; then
+    elif [[ -z "$MATCH" && "$idx" -gt "1" && "${ZCMDR_PB2_QWORDS[idx-1]}" = *[\;\>\&\|] ]]; then
         idx=idx-1
         ZCMDR_PB2_QWORDS[idx]+="$word"
     else
