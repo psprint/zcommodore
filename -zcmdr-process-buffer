@@ -59,7 +59,7 @@ for (( i=1; i<=nwords; i++ )); do
     # Remove white spaces
     buf="${buf##(#m)[^$word[1]]#}"
     # Count them
-    char_count=char_count+"$#MATCH"
+    char_count=char_count+"${#MATCH}"
     # This is the beginning of current word
     ZCMDR_PB_WORDS_BEGINNINGS[i]=$(( char_count + 1 ))
     # Remember the spaces
