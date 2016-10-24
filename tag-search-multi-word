@@ -173,6 +173,12 @@ _tsmw_delete_char() {
     _tsmw_simulate_widget
 }
 
+_tsmw_cancel_accept() {
+    BUFFER=""
+    __tsmw_hcw_index=-1
+    zle .accept-line
+}
+
 if [ "$__tsmw_hcw_call_count" -eq "1" ]; then
     # Make the tsmw keymap a copy of the current main
     bindkey -N tsmw emacs
@@ -260,47 +266,57 @@ if [ "$__tsmw_hcw_call_count" -eq "1" ]; then
     local -a cmd
     cmd=()
 
+    # Add Ctrl-V, ESC bindings to cancel search
+    # A workaround for Zsh versions like 5.0.2
+    zle -N _tsmw_cancel_accept
+    bindkey -M tsmw "^V" _tsmw_cancel_accept
+    bindkey -M tsmw "^[" _tsmw_cancel_accept
+
     # Trap INT to manually interrupt Zle to work around a bug
     trap 'zle && zle .send-break' INT
 
     if zle .recursive-edit -K tsmw; then
-        zstyle -s ":plugin:zcommodore" editor selected_editor || selected_editor="${EDITOR:-vim}"
-        zstyle -T ":plugin:zcommodore" cd_at_edit && cd_at_edit="yes" || cd_at_edit="no"
+        if [[ "$__tsmw_hcw_index" -lt "0" ]]; then
+            BUFFER=""
+        else
+            zstyle -s ":plugin:zcommodore" editor selected_editor || selected_editor="${EDITOR:-vim}"
+            zstyle -T ":plugin:zcommodore" cd_at_edit && cd_at_edit="yes" || cd_at_edit="no"
 
-        tagtext="${__tsmw_hcw_found[__tsmw_hcw_index]}"
-        if [[ "$tagtext" = (#b)[^$'\177']#$'\177'[^$'\1']#$'\1'([^$'\2']#)$'\2'(*) ]]; then
-            taglinebyte="${match[1]}"
+            tagtext="${__tsmw_hcw_found[__tsmw_hcw_index]}"
+            if [[ "$tagtext" = (#b)[^$'\177']#$'\177'[^$'\1']#$'\1'([^$'\2']#)$'\2'(*) ]]; then
+                taglinebyte="${match[1]}"
 
-            # CD vs absolute path
-            if [[ "$PWD" != "${ZCMDR[current_project]}" ]]; then
-                if [[ "$cd_at_edit" = "yes" ]];then
-                    cmd+=( "cd" "${(q)ZCMDR[current_project]}" ";" )
-                    tagfile="${match[2]}"
+                # CD vs absolute path
+                if [[ "$PWD" != "${ZCMDR[current_project]}" ]]; then
+                    if [[ "$cd_at_edit" = "yes" ]];then
+                        cmd+=( "cd" "${(q)ZCMDR[current_project]}" ";" )
+                        tagfile="${match[2]}"
+                    else
+                        tagfile="${ZCMDR[current_project]}/${match[2]}"
+                    fi
                 else
-                    tagfile="${ZCMDR[current_project]}/${match[2]}"
+                    # Already at required path, CD vs absolute path
+                    # decision is not needed - no absolute path,
+                    # no cd, just edit
+                    tagfile="${match[2]}"
                 fi
-            else
-                # Already at required path, CD vs absolute path
-                # decision is not needed - no absolute path,
-                # no cd, just edit
-                tagfile="${match[2]}"
-            fi
 
-            # Editor command
-            case "$selected_editor" in
-                (vim|vi|gvim|mvim|nvim)
-                    cmd+=( "$selected_editor" "+${taglinebyte%,*}" -- "${(q)tagfile}" )
-                    ;;
-                (emacs|emacsclient)
-                    cmd+=( "$selected_editor" "+${taglinebyte%,*}" -- "${(q)tagfile}" )
-                    ;;
-                (gedit)
-                    cmd+=( "$selected_editor" "+${taglinebyte%,*}" -- "${(q)tagfile}" )
-                    ;;
-                (nano)
-                    cmd+=( "$selected_editor" "+${taglinebyte%,*}" -- "${(q)tagfile}" )
-                    ;;
-            esac
+                # Editor command
+                case "$selected_editor" in
+                    (vim|vi|gvim|mvim|nvim)
+                        cmd+=( "$selected_editor" "+${taglinebyte%,*}" -- "${(q)tagfile}" )
+                        ;;
+                    (emacs|emacsclient)
+                        cmd+=( "$selected_editor" "+${taglinebyte%,*}" -- "${(q)tagfile}" )
+                        ;;
+                    (gedit)
+                        cmd+=( "$selected_editor" "+${taglinebyte%,*}" -- "${(q)tagfile}" )
+                        ;;
+                    (nano)
+                        cmd+=( "$selected_editor" "+${taglinebyte%,*}" -- "${(q)tagfile}" )
+                        ;;
+                esac
+            fi
         fi
     else
         BUFFER=""
