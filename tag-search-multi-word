@@ -222,6 +222,13 @@ if [ "$__tsmw_hcw_call_count" -eq "1" ]; then
     # The same for Ctrl-E, Ctrl-F
     bindkey -M tsmw '^A' .beginning-of-line
     bindkey -M tsmw '^E' .end-of-line
+    # Additional keys
+    bindkey -M tsmw '^[b' .backward-word
+    bindkey -M tsmw '^[B' .backward-word
+    bindkey -M tsmw '^[f' .forward-word
+    bindkey -M tsmw '^[F' .forward-word
+    bindkey -M tsmw '^[w' .forward-word
+    bindkey -M tsmw '^[W' .forward-word
 
     # Additional keys
     bindkey -M tsmw '^P' "$up_widget"
