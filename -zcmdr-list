@@ -95,7 +95,7 @@ trap "REPLY=-2; reply=(); return" TERM INT QUIT
 
     # Verify that element is just visible, if not then compute exact page
     if [[ "$ZCMDRLIST_CURRENT_IDX" -lt "$ZCMDRLIST_FROM_WHAT_IDX_LIST_IS_SHOWN" ||
-        "$ZCMDRLIST_CURRENT_IDX" -gt "$(( ZCMDRLIST_FROM_WHAT_IDX_LIST_IS_SHOWN + page_height + 1 ))" ]]
+        "$ZCMDRLIST_CURRENT_IDX" -gt "$(( ZCMDRLIST_FROM_WHAT_IDX_LIST_IS_SHOWN + page_height - 1 ))" ]]
     then
         (( ZCMDRLIST_FROM_WHAT_IDX_LIST_IS_SHOWN = ((ZCMDRLIST_CURRENT_IDX-1)/page_height) * page_height + 1 ))
     fi
