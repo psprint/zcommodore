@@ -1,0 +1,26 @@
+2016-10-06 58a01c4 myctags: Don't use C99 features
+2016-10-03 d1af8eb Sh: Allow '+'-started options (2) additional required changes
+2016-10-01 13614e7 Sh: Allow '+'-started options
+2016-09-23 086b203 myctags: INSTALL can be confused with install on OS X
+2016-09-22 3850a6a myctags: Fix vim parser stalling on line "command." and other of a kind
+2016-09-21 764ba7e myctags: Ability to request recompilation via RECOMPILE_REQUEST file
+2016-09-21 348f2e8 lregex.c: Final warning fixed
+2016-09-21 f02cd0e myctags: Almost all warnings fixed
+2016-09-20 9451bea myctags: examine mode-lines to detect Sh languages (e.g. Zsh)
+2016-09-20 fcebbf1 myctags: A small comment on existing code
+2016-09-20 6fa31b9 myctags: Modify Emacs output to include file name in each line. No... ... pure file name entries are generated (the ones after \f (^L) line).
+2016-09-20 63ffd69 myctags / sh.c: full fix of possible crash
+2016-09-20 506280f myctags / sh.c: basic fix of possible crash
+2016-09-19 b9cfe23 myctags: A cast to int for isspace
+2016-09-18 0c13f54 myctags: Include other typeset equivalents and typeset itself
+2016-09-18 bbd472b myctags: Variables assigned on declaration properly detected
+2016-09-18 813c14d myctags: Multiple variables in one line are detected if not initialized
+2016-09-18 534b5c5 myctags: Hold gathered symbols in array (to detect multiple in one line)
+2016-09-18 a66873f myctags: Remove redundant isspace() check (functions)
+2016-09-18 97f3d73 myctags: Preliminary variable support
+2016-09-18 a111c02 myctags: My formatting style
+2016-09-18 429a6aa myctags: expand tabs on whole sh.c file
+2016-09-18 03e77d2 myctags: Comment existing code
+2016-09-18 db6e9cf myctags: allow '-' in function names
+2016-09-18 17f7d04 myctags: More detected extensions of shell files
+2016-09-17 337c2ab Initial commit (with exuberant ctags)
